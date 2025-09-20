@@ -1,0 +1,15 @@
+.list {
+    display: flex;
+    height: 200px;
+}
+
+.list input[type="checkbox"] {
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+}
+
+.list input[type="checkbox"]:nth-child(4n+1),
+.list input[type="checkbox"]:nth-child(4n+2) {
+    background-color: #0002;
+}
