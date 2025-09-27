@@ -24,6 +24,7 @@ function App() {
   const firstBarLabels: Sticking[] = convertResult.bars[0]
     .replace(/\s/g, '')
     .split('') as Sticking[]
+
   const secondBarLabels: Sticking[] | null = convertResult.bars[1]
     ? (convertResult.bars[1].replace(/\s/g, '').split('') as Sticking[])
     : null

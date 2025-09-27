@@ -1,5 +1,7 @@
 import type { Sticking } from '../../../types.ts'
-import { flipHands, isAccented } from '../utils/hand-utils.ts'
+import { flipHands } from '../utils/hand-utils.ts'
+import { QUARTER_LENGTH } from '../../constants.ts'
+import { INVALID_TRANSITIONS } from '../strategies/quality-evaluator.ts'
 
 export function createFormattedBars(
   bar: Sticking[],
@@ -17,25 +19,49 @@ export function createFormattedBars(
 
 export function formatBar(bar: Sticking[]): string {
   const quarters = []
-  for (let i = 0; i < bar.length; i += 4) {
-    quarters.push(bar.slice(i, i + 4).join(''))
+  for (let i = 0; i < bar.length; i += QUARTER_LENGTH) {
+    quarters.push(bar.slice(i, i + QUARTER_LENGTH).join(''))
   }
   return quarters.join(' ')
 }
 
-export function shouldCreateMirroredBar(bar: Sticking[]): boolean {
-  if (bar.length === 0) return false
+type ShouldCreateMirroredBarArgs = {
+  accentMap8: number[]
+  bar: Sticking[]
+  rudimentType: string
+}
+export function shouldCreateMirroredBar({
+  bar,
+}: ShouldCreateMirroredBarArgs): boolean {
+  const calcDoubles = (str: string) => (str.match(/rr|ll/g) || []).length
 
-  const first = bar[0]
-  const last = bar[bar.length - 1]
+  const testNonFlippedSequence = bar.join('') + bar.join('')
+  const testFlippedSequence = bar.join('') + flipHands(bar).join('')
 
-  const firstHand = first.toLowerCase()
-  const lastHand = last.toLowerCase()
-  const firstAccented = isAccented(first)
-  const lastAccented = isAccented(last)
-
-  return (
-    firstHand === lastHand &&
-    (firstAccented !== lastAccented || (firstAccented && lastAccented))
+  const nonFlippedValid = !INVALID_TRANSITIONS.some(transition =>
+    testNonFlippedSequence.includes(transition)
   )
+  const flippedValid = !INVALID_TRANSITIONS.some(transition =>
+    testFlippedSequence.includes(transition)
+  )
+
+  // Если только flipped проходит валидацию
+  if (!nonFlippedValid && flippedValid) {
+    return true
+  }
+
+  // Если только non-flipped проходит валидацию
+  if (nonFlippedValid && !flippedValid) {
+    return false
+  }
+
+  // Если оба проходят валидацию, сравниваем количество двоек
+  if (nonFlippedValid && flippedValid) {
+    const nonFlippedDoubles = calcDoubles(testNonFlippedSequence)
+    const flippedDoubles = calcDoubles(testFlippedSequence)
+    return flippedDoubles > nonFlippedDoubles
+  }
+
+  // Если оба не проходят валидацию
+  return false
 }
