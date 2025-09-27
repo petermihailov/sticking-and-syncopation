@@ -29,7 +29,7 @@ const testCases = [
       paradiddle_single_accent: 'RlRl RlRl RlRl RlRl',
       paradiddle_double_accent: 'RLRL RLRL RLRL RLRL',
       invert_paradiddle_single_accent: 'RlRl RlRl RlRl RlRl',
-      invert_paradiddle_double_accent: 'RLRL RLRL RLRL RLRL',
+      invert_paradiddle_double_accent: 'RlRl RlRl RlRl RlRl',
     },
   },
   {
@@ -98,16 +98,28 @@ const testCases = [
       invert_paradiddle_double_accent: 'Rllr rllR LrrL RllR',
     },
   },
-  // {
-  //   name: 'Паттерн [1,0,0,1,1,0,0,1]',
-  //   input: [1, 0, 0, 1, 1, 0, 0, 1],
-  //   expected: {
-  //     paradiddle_single_accent: 'Rlrr llRl Rlrr llRl',
-  //     paradiddle_double_accent: 'RLrr llRL RLrr llRL',
-  //     invert_paradiddle_single_accent: 'Rllr rlRl Rllr rlRl',
-  //     invert_paradiddle_double_accent: 'Rllr rLRL Rllr rLRL',
-  //   },
-  // },
+  {
+    name: 'Паттерн [1,0,0,1,1,0,0,1]',
+    input: [1, 0, 0, 1, 1, 0, 0, 1],
+    isMirrored: false,
+    expected: {
+      paradiddle_single_accent: 'Rlrr llRl Rlrr llRl',
+      paradiddle_double_accent: 'RLrr llRL RLrr llRL',
+      invert_paradiddle_single_accent: 'Rllr rlRl Rllr rlRl',
+      invert_paradiddle_double_accent: 'Rllr rLRl Rllr rLRl',
+    },
+  },
+  {
+    name: 'Паттерн [0,1,0,0,0,0,0,0]',
+    input: [0, 1, 0, 0, 0, 0, 0, 0],
+    isMirrored: true,
+    expected: {
+      paradiddle_single_accent: 'rrLr llrr llrr llrr',
+      paradiddle_double_accent: 'rrLR llrr llrr llrr',
+      invert_paradiddle_single_accent: 'rlRl lrrl lrrl lrrl',
+      invert_paradiddle_double_accent: 'rLRl lrrl lrrl lrrl',
+    },
+  },
 ]
 
 describe('convertToParadiddles', () => {
@@ -117,7 +129,11 @@ describe('convertToParadiddles', () => {
         it(`${type}`, () => {
           const result = convertToParadiddles(testCase.input as Accent[], type)
           expect(result.bars[0]).toBe(testCase.expected[type])
-          expect(result.isMirrored).toBe(testCase.isMirrored)
+          const expectedMirrored =
+            typeof testCase.isMirrored === 'object'
+              ? testCase.isMirrored[type]
+              : testCase.isMirrored
+          expect(result.isMirrored).toBe(expectedMirrored)
         })
       })
     })

@@ -1,8 +1,10 @@
 import type { Accent } from '../../types.ts'
 import { validateInput } from './core/validator.ts'
-import { generateRawBar, type RudimentType } from './core/generator.ts'
-import { createFormattedBars, shouldCreateMirroredBar } from './core/formatter.ts'
-import { ensureStartsWithRightHand } from './utils/hand-utils.ts'
+import { convert, type RudimentType } from './core/generator.ts'
+import {
+  createFormattedBars,
+  shouldCreateMirroredBar,
+} from './core/formatter.ts'
 
 export interface ParadiddleResult {
   bars: string[]
@@ -18,10 +20,8 @@ export function convertToParadiddles(
 ): ParadiddleResult {
   validateInput(accentMap8)
 
-  let bar = generateRawBar(accentMap8, rudimentType)
-  bar = ensureStartsWithRightHand(bar)
-
-  const isMirrored = shouldCreateMirroredBar(bar)
+  const bar = convert(accentMap8, rudimentType)
+  const isMirrored = shouldCreateMirroredBar({ bar, rudimentType, accentMap8 })
   const bars = createFormattedBars(bar, isMirrored)
 
   return {
