@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import classes from './App.module.css'
 import clsx from 'clsx'
-import { convertToParadiddles } from './converters/paradiddles.ts'
 import type { Accent, RudimentType, Sticking } from './types.ts'
+import { convertToParadiddles } from './converters/paradiddles'
 
 function App() {
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
