@@ -36,7 +36,7 @@
 
 .label.a {
     font-weight: 700;
-    /*font-size: 2rem;*/
+    font-size: min(4vw, 1.2rem);
 }
 
 .label.a::before {
