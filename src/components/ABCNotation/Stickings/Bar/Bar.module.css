@@ -1,0 +1,47 @@
+.labels {
+    display: flex;
+    width: 80.2%;
+    margin-left: auto;
+    margin-right: 8%;
+    aspect-ratio: 20 / 1;
+    font-size: min(3vw, 1rem);
+}
+
+.label {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    /*font-weight: 200;*/
+    line-height: 0;
+    text-transform: uppercase;
+}
+
+.label:nth-child(4n+1) {
+    /*margin-left: 1%;*/
+}
+
+.label:first-child {
+    margin-left: 0;
+}
+
+.label.r {
+    background-color: #f002;
+}
+
+.label.l {
+    background-color: #00f2;
+}
+
+.label.a {
+    font-weight: 700;
+    /*font-size: 2rem;*/
+}
+
+.label.a::before {
+    content: '>';
+    position: absolute;
+    font-weight: 400;
+    top: -5%;
+}

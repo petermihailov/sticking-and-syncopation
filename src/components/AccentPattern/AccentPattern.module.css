@@ -29,15 +29,3 @@
 .eighth input[type="checkbox"]:nth-child(odd) {
     margin-left: 1rem;
 }
-
-.eighth input[type="checkbox"]:nth-child(odd)::after {
-    content: '';
-    height: 0.5rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background-color: #000;
-    position: absolute;
-    top: calc(100% + 1rem);
-    left: 25%;
-    transform: translateX(-50%);
-}
