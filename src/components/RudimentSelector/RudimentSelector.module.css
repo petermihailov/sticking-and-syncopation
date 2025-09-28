@@ -1,0 +1,19 @@
+.patternSelect {
+    margin-bottom: 2rem;
+}
+
+.patternSelect select {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #0003;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+    min-width: 250px;
+}
+
+.patternSelect select:focus {
+    outline: none;
+    border-color: #007acc;
+    box-shadow: 0 0 0 2px #007acc30;
+}

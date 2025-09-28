@@ -1,0 +1,1 @@
+export { AccentPattern } from './AccentPattern'
