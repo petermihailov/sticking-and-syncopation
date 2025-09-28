@@ -1,4 +1,4 @@
-import type { RudimentType } from '../types'
+import type { RudimentType } from '../../types'
 import classes from './RudimentSelector.module.css'
 
 interface RudimentSelectorProps {
