@@ -10,15 +10,22 @@ import {
 } from './notationGenerators'
 
 function App() {
-  const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    [true, true, false, false, false, false, false, false] // 11000000 для отладки
-  )
+  const [checkedItems, setCheckedItems] = useState<boolean[]>([
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+  ])
   const [selectedRudiment, setSelectedRudiment] = useState<RudimentType>(
     'paradiddle_single_accent'
   )
   const [convertResult, setConvertResult] = useState(
     () =>
-      convertToParadiddles([1, 1, 0, 0, 0, 0, 0, 0], 'paradiddle_single_accent') // Соответствует checkedItems
+      convertToParadiddles([0, 0, 0, 0, 0, 0, 0, 0], 'paradiddle_single_accent') // Соответствует checkedItems
   )
 
   const convertWithRudiment = (accents: Accent[]) => {
