@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import classes from './App.module.css'
-import clsx from 'clsx'
-import type { Accent, RudimentType, Sticking } from './types.ts'
+import type { Accent, RudimentType } from './types.ts'
 import { convertToParadiddles } from './converters/paradiddles'
+import { RudimentSelector } from './components/RudimentSelector'
+import { AccentPattern } from './components/AccentPattern'
+import { StickingDisplay } from './components/StickingDisplay'
 
 function App() {
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
@@ -19,15 +20,6 @@ function App() {
     const result = convertToParadiddles(accents, selectedRudiment)
     setConvertResult(result)
   }
-
-  // Получаем массивы символов для каждого такта
-  const firstBarLabels: Sticking[] = convertResult.bars[0]
-    .replace(/\s/g, '')
-    .split('') as Sticking[]
-
-  const secondBarLabels: Sticking[] | null = convertResult.bars[1]
-    ? (convertResult.bars[1].replace(/\s/g, '').split('') as Sticking[])
-    : null
 
   const handleToggle = (index: number) => {
     setCheckedItems(prev => {
@@ -53,72 +45,15 @@ function App() {
 
   return (
     <>
-      <div className={classes.patternSelect}>
-        <select
-          value={selectedRudiment}
-          onChange={e => handleRudimentChange(e.target.value as RudimentType)}
-        >
-          <option value="paradiddle_single_accent">
-            Paradiddle Single Accent
-          </option>
-          <option value="paradiddle_double_accent">
-            Paradiddle Double Accent
-          </option>
-          <option value="invert_paradiddle_single_accent">
-            Invert paradiddle Single Accent
-          </option>
-          <option value="invert_paradiddle_double_accent">
-            Invert paradiddle Double Accent
-          </option>
-        </select>
-      </div>
-      <div className={classes.checkboxLabels}>
-        {['1', '&', '2', '&', '3', '&', '4', '&'].map((label, index) => (
-          <div key={index} className={classes.checkboxLabel}>
-            {label}
-          </div>
-        ))}
-      </div>
-      <div className={clsx(classes.eighth)}>
-        {checkedItems.map((isChecked, index) => (
-          <input
-            key={index}
-            type="checkbox"
-            checked={isChecked}
-            onChange={() => handleToggle(index)}
-          />
-        ))}
-      </div>
-      <div className={classes.labels}>
-        {firstBarLabels.map((label, index) => (
-          <div
-            className={clsx(classes.label, {
-              [classes.r]: label.toLowerCase() === 'r',
-              [classes.l]: label.toLowerCase() === 'l',
-              [classes.a]: label === 'R' || label === 'L',
-            })}
-            key={index}
-          >
-            {label}
-          </div>
-        ))}
-      </div>
-      {secondBarLabels && (
-        <div className={clsx(classes.labels, classes.secondBar)}>
-          {secondBarLabels.map((label, index) => (
-            <div
-              className={clsx(classes.label, {
-                [classes.r]: label.toLowerCase() === 'r',
-                [classes.l]: label.toLowerCase() === 'l',
-                [classes.a]: label === 'R' || label === 'L',
-              })}
-              key={index}
-            >
-              {label}
-            </div>
-          ))}
-        </div>
-      )}
+      <RudimentSelector
+        selectedRudiment={selectedRudiment}
+        onRudimentChange={handleRudimentChange}
+      />
+      <AccentPattern
+        checkedItems={checkedItems}
+        onToggle={handleToggle}
+      />
+      <StickingDisplay bars={convertResult.bars} />
     </>
   )
 }

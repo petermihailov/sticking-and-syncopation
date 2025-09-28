@@ -1,0 +1,48 @@
+.labels {
+    display: flex;
+    aspect-ratio: 15 / 1;
+    margin-top: 4rem;
+}
+
+.secondBar {
+    margin-top: 1rem;
+    opacity: 0.8;
+    position: relative;
+}
+
+.label {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    outline: 1px solid #0001;
+    font-size: 1.5rem;
+    font-weight: 200;
+    line-height: 0;
+    text-transform: uppercase;
+}
+
+.label:nth-child(4n+1) {
+    margin-left: 1rem;
+}
+
+.label.r {
+    background-color: #f002;
+}
+
+.label.l {
+    background-color: #00f2;
+}
+
+.label.a {
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.label.a::before {
+    content: '>';
+    position: absolute;
+    font-weight: 400;
+    top: -6%;
+}
