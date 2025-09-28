@@ -1,0 +1,61 @@
+.container {
+    margin: 1rem 0;
+    padding: 2rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    filter: url(#roughpaper);
+}
+
+.notation {
+    overflow-x: auto;
+    overflow-y: hidden;
+    color: #00184d;
+    animation: squigglevision 1000s infinite alternate;
+}
+
+.notation svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Стили для нот */
+.notation .abcjs-note {
+    fill: #000;
+}
+
+.notation .abcjs-staff {
+    stroke: #000;
+    stroke-width: 1;
+}
+
+.notation .abcjs-barline {
+    stroke: #000;
+    stroke-width: 1.5;
+}
+
+@keyframes squigglevision {
+    0% {
+        filter: url('#sketch-0');
+    }
+    25% {
+        filter: url('#sketch-1');
+    }
+    50% {
+        filter: url('#sketch-2');
+    }
+    75% {
+        filter: url('#sketch-3');
+    }
+    100% {
+        filter: url('#sketch-4');
+    }
+}

@@ -1,0 +1,23 @@
+import type { Sticking } from '../../../types.ts'
+import { Bar } from './Bar'
+
+interface StickingDisplayProps {
+  bars: string[]
+}
+
+export function Stickings({ bars }: StickingDisplayProps) {
+  const firstBarLabels: Sticking[] = bars[0]
+    .replace(/\s/g, '')
+    .split('') as Sticking[]
+
+  const secondBarLabels: Sticking[] | null = bars[1]
+    ? (bars[1].replace(/\s/g, '').split('') as Sticking[])
+    : null
+
+  return (
+    <>
+      <Bar labels={firstBarLabels} style={{ marginTop: '1rem' }} />
+      {secondBarLabels && <Bar labels={secondBarLabels} isSecondBar />}
+    </>
+  )
+}

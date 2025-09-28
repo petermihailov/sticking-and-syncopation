@@ -3,17 +3,22 @@ import type { Accent, RudimentType } from './types.ts'
 import { convertToParadiddles } from './converters/paradiddles'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
-import { StickingDisplay } from './components/StickingDisplay'
+import { ABCNotation } from './components/ABCNotation'
+import {
+  generateAccentNotation,
+  generateRudimentNotation,
+} from './notationGenerators'
 
 function App() {
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    new Array(8).fill(false)
+    [true, true, false, false, false, false, false, false] // 11000000 для отладки
   )
   const [selectedRudiment, setSelectedRudiment] = useState<RudimentType>(
     'paradiddle_single_accent'
   )
-  const [convertResult, setConvertResult] = useState(() =>
-    convertToParadiddles(new Array(8).fill(0), 'paradiddle_single_accent')
+  const [convertResult, setConvertResult] = useState(
+    () =>
+      convertToParadiddles([1, 1, 0, 0, 0, 0, 0, 0], 'paradiddle_single_accent') // Соответствует checkedItems
   )
 
   const convertWithRudiment = (accents: Accent[]) => {
@@ -49,11 +54,13 @@ function App() {
         selectedRudiment={selectedRudiment}
         onRudimentChange={handleRudimentChange}
       />
-      <AccentPattern
-        checkedItems={checkedItems}
-        onToggle={handleToggle}
+      <ABCNotation
+        key={checkedItems.join('')}
+        seeNotation={generateAccentNotation(checkedItems)}
+        playNotation={generateRudimentNotation(convertResult)}
+        bars={convertResult.bars}
       />
-      <StickingDisplay bars={convertResult.bars} />
+      <AccentPattern checkedItems={checkedItems} onToggle={handleToggle} />
     </>
   )
 }
