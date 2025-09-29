@@ -1,6 +1,6 @@
 .container {
     margin: 1rem 0;
-    padding: 2rem 0 0;
+    padding: min(2rem, 2vw) 0 0;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     position: relative;

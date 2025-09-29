@@ -1,19 +1,23 @@
 import clsx from 'clsx'
 import classes from './Bar.module.css'
 import type { Sticking } from '../../../../types.ts'
-import type { CSSProperties } from 'react'
 
 interface StickingBarProps {
   labels: Sticking[]
   isSecondBar?: boolean
-  style?: CSSProperties
+  className?: string
 }
 
-export function Bar({ labels, isSecondBar = false, style }: StickingBarProps) {
+export function Bar({
+  labels,
+  isSecondBar = false,
+  className,
+}: StickingBarProps) {
   return (
     <div
-      style={style}
-      className={clsx(classes.labels, { [classes.secondBar]: isSecondBar })}
+      className={clsx(className, classes.labels, {
+        [classes.secondBar]: isSecondBar,
+      })}
     >
       {labels.map((label, index) => (
         <div

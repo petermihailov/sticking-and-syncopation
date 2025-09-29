@@ -1,5 +1,6 @@
 import type { Sticking } from '../../../types.ts'
 import { Bar } from './Bar'
+import classes from './Stickings.module.css'
 
 interface StickingDisplayProps {
   bars: string[]
@@ -16,7 +17,7 @@ export function Stickings({ bars }: StickingDisplayProps) {
 
   return (
     <>
-      <Bar labels={firstBarLabels} style={{ marginTop: '1rem' }} />
+      <Bar labels={firstBarLabels} className={classes.stickings} />
       {secondBarLabels && <Bar labels={secondBarLabels} isSecondBar />}
     </>
   )

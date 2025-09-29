@@ -1,6 +1,6 @@
 .checkboxLabels {
     display: flex;
-    font-size: 2rem;
+    font-size: min(2rem, 5vw);
     font-weight: 1000;
     color: #000a;
 }
@@ -11,7 +11,11 @@
 }
 
 .checkboxLabel:nth-child(odd) {
-    margin-left: 1rem;
+    margin-left: min(1rem, 2vw);
+}
+
+.checkboxLabel:first-child {
+    margin-left: 0;
 }
 
 .eighth {
@@ -27,5 +31,9 @@
 }
 
 .eighth input[type="checkbox"]:nth-child(odd) {
-    margin-left: 1rem;
+    margin-left: min(1rem, 2vw);
+}
+
+.eighth input[type="checkbox"]:first-child {
+    margin-left: 0;
 }
