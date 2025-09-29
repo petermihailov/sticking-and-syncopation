@@ -19,7 +19,7 @@ L:1/8
 K:C
 %%staves (1 2)
 V:1 clef=none stem=up
-"I see:"|: ${snareGroups.join(' ')} :|
+|: ${snareGroups.join(' ')} :|
 V:2 clef=none stem=down
 |: ${kickPattern} :|`
 }

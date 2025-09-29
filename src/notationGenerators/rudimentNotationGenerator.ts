@@ -30,7 +30,7 @@ L:1/16
 M:4/4
 %%staves (1 2)
 V:1 clef=none stem=up
-"I play:"|: ${noteGroups.join(' ')} :|
+|: ${noteGroups.join(' ')} :|
 V:2 clef=none stem=down
 |: ${kickPattern} :|`
 }

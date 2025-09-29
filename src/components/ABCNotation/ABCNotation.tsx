@@ -63,6 +63,7 @@ export function ABCNotation({
     <div className={classes.container}>
       <SVGFilters />
       <div ref={notationRef} className={classes.notation} />
+      {/*<Labels />*/}
       {bars?.length && <Stickings bars={bars} />}
     </div>
   )

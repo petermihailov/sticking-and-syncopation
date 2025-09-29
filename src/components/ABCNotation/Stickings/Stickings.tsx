@@ -16,9 +16,9 @@ export function Stickings({ bars }: StickingDisplayProps) {
     : null
 
   return (
-    <>
-      <Bar labels={firstBarLabels} className={classes.stickings} />
+    <div className={classes.stickings}>
+      <Bar labels={firstBarLabels} />
       {secondBarLabels && <Bar labels={secondBarLabels} isSecondBar />}
-    </>
+    </div>
   )
 }

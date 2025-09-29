@@ -1,3 +1,5 @@
 .stickings {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
     margin-top: min(1.5rem, 3vw);
 }

@@ -1,11 +1,10 @@
 .container {
     margin: 1rem 0;
-    padding: min(2rem, 2vw) 0 0;
+    padding: min(2rem, 4vw);
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 1.5 / 1;
 }
 
 .container::before {
@@ -20,12 +19,42 @@
     overflow-x: auto;
     overflow-y: hidden;
     color: #00184d;
-    animation: squigglevision 1000s infinite alternate;
+    filter: url('#sketch-2');
 }
 
 .notation svg {
     max-width: 100%;
     height: auto;
+}
+
+.notation > div {
+    position: relative;
+    display: grid;
+    align-items: end;
+    height: min(10rem, 20vw);
+}
+
+.notation > div:nth-child(2) {
+    height: min(11rem, 22vw);
+    margin-block-start: min(2rem, 4vw);
+}
+
+
+.notation > div::before {
+    content: 'I SEE:';
+    position: absolute;
+    top: 0;
+    left: min(1.5rem, 3.2vw);
+    display: flex;
+    gap: min(0.5rem, 1vw);
+    align-items: baseline;
+    font-family: monospace;
+    font-size: min(1.2rem, 2.5vw);
+    font-weight: 600;
+}
+
+.notation > div:nth-child(2):before {
+    content: 'I PLAY:';
 }
 
 /* Стили для нот */
@@ -43,20 +72,20 @@
     stroke-width: 1.5;
 }
 
-@keyframes squigglevision {
-    0% {
-        filter: url('#sketch-0');
-    }
-    25% {
-        filter: url('#sketch-1');
-    }
-    50% {
-        filter: url('#sketch-2');
-    }
-    75% {
-        filter: url('#sketch-3');
-    }
-    100% {
-        filter: url('#sketch-4');
-    }
-}
+/*@keyframes squigglevision {*/
+/*    0% {*/
+/*        filter: url('#sketch-0');*/
+/*    }*/
+/*    25% {*/
+/*        filter: url('#sketch-1');*/
+/*    }*/
+/*    50% {*/
+/*        filter: url('#sketch-2');*/
+/*    }*/
+/*    75% {*/
+/*        filter: url('#sketch-3');*/
+/*    }*/
+/*    100% {*/
+/*        filter: url('#sketch-4');*/
+/*    }*/
+/*}*/
