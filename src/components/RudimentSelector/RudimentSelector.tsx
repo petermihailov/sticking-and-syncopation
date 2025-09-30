@@ -8,7 +8,7 @@ interface RudimentSelectorProps {
 
 export function RudimentSelector({
   selectedRudiment,
-  onRudimentChange
+  onRudimentChange,
 }: RudimentSelectorProps) {
   return (
     <div className={classes.patternSelect}>
@@ -28,6 +28,7 @@ export function RudimentSelector({
         <option value="invert_paradiddle_double_accent">
           Invert paradiddle Double Accent
         </option>
+        {/*<option value="invert_paradiddle_kick">Invert paradiddle Kick</option>*/}
       </select>
     </div>
   )

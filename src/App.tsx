@@ -11,13 +11,13 @@ import {
 
 function App() {
   const [checkedItems, setCheckedItems] = useState<boolean[]>([
-    true,
     false,
-    true,
     false,
-    true,
     false,
-    true,
+    false,
+    false,
+    false,
+    false,
     false,
   ])
   const [selectedRudiment, setSelectedRudiment] = useState<RudimentType>(

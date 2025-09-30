@@ -40,6 +40,10 @@ export const drumRudiments: DrumRudiments = {
     '1': ['Rl', 'Lr'],
     '0': ['rL', 'lR', 'rl', 'lr'],
   },
+  // invert_paradiddle_kick: {
+  //   '1': ['Rl', 'Lr'],
+  //   '0': ['rk', 'lk', 'rl', 'lr'],
+  // },
   // hadnd_to_hand: {
   //   '1': ['Rlr', 'Lrl'],
   //   '0': ['rlr', 'lrl'],

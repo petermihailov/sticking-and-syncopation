@@ -19,7 +19,12 @@
     overflow-x: auto;
     overflow-y: hidden;
     color: #00184d;
-    filter: url('#sketch-2');
+}
+
+@media (min-width: 640px) {
+    .notation {
+        filter: url('#sketch-2');
+    }
 }
 
 .notation svg {
@@ -89,3 +94,4 @@
 /*        filter: url('#sketch-4');*/
 /*    }*/
 /*}*/
+
