@@ -1,4 +1,4 @@
-export type Sticking = 'R' | 'L' | 'r' | 'l' | 'k'
+export type Sticking = 'R' | 'L' | 'r' | 'l'
 export type Sticking2 = `${Sticking}${Sticking}`
 export type Sticking3 = `${Sticking}${Sticking}${Sticking}`
 export type Sticking4 = `${Sticking}${Sticking}${Sticking}${Sticking}`
