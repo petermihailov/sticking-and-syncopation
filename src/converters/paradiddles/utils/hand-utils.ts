@@ -10,6 +10,7 @@ export function flipHands(bar: Sticking[]) {
     l: 'r',
     R: 'L',
     L: 'R',
+    k: 'k',
   }
 
   return bar.map(char => replaces[char]) as Sticking[]

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { convertToParadiddles } from './paradiddles'
-import type { Accent } from '../types'
+import { convertToParadiddles } from './index.ts'
+import type { Accent } from '../../types.ts'
 
 const paradiddleTypes = [
   'paradiddle_single_accent',

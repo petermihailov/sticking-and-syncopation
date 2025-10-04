@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import classes from './Bar.module.css'
-import type { Sticking } from '../../../../types.ts'
+import type { Sticking } from '../../../types.ts'
 
 interface StickingBarProps {
   labels: Sticking[]
@@ -24,6 +24,7 @@ export function Bar({
           className={clsx(classes.label, {
             [classes.r]: label.toLowerCase() === 'r',
             [classes.l]: label.toLowerCase() === 'l',
+            [classes.k]: label.toLowerCase() === 'k',
             [classes.a]: label === 'R' || label === 'L',
           })}
           key={index}

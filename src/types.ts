@@ -1,4 +1,4 @@
-export type Sticking = 'R' | 'L' | 'r' | 'l'
+export type Sticking = 'R' | 'L' | 'r' | 'l' | 'k'
 export type Sticking2 = `${Sticking}${Sticking}`
 export type Sticking3 = `${Sticking}${Sticking}${Sticking}`
 export type Sticking4 = `${Sticking}${Sticking}${Sticking}${Sticking}`
@@ -12,3 +12,5 @@ export type RudimentType =
   | 'paradiddle_double_accent'
   | 'invert_paradiddle_single_accent'
   | 'invert_paradiddle_double_accent'
+  | 'invert_paradiddle_kick_accent'
+  | 'hand_to_hand_triplets'

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import abcjs from 'abcjs'
 import classes from './ABCNotation.module.css'
-import { Stickings } from './Stickings'
+import { Stickings } from '../Stickings'
 import { SVGFilters } from './SVGFilters'
 
 interface ABCNotationProps {

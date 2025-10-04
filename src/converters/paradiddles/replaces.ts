@@ -1,4 +1,4 @@
-import type { StickingPattern } from '../types.ts'
+import type { StickingPattern } from '../../types.ts'
 
 /**
  * Уровни акцентов (0 и 1)
@@ -20,16 +20,17 @@ type DrumRudiments = {
   paradiddle_double_accent: AccentLevel
   invert_paradiddle_single_accent: AccentLevel
   invert_paradiddle_double_accent: AccentLevel
+  invert_paradiddle_kick: AccentLevel
 }
 
 // JSON data
-export const drumRudiments: DrumRudiments = {
+export const paradiddleReplaces: DrumRudiments = {
   paradiddle_single_accent: {
     '1': ['Rl', 'Lr'],
     '0': ['rr', 'll'],
   },
   paradiddle_double_accent: {
-    '1': ['RL', 'LR'],
+    '1': ['RL', 'LR', 'Rl', 'Lr'],
     '0': ['rr', 'll'],
   },
   invert_paradiddle_single_accent: {
@@ -40,12 +41,8 @@ export const drumRudiments: DrumRudiments = {
     '1': ['Rl', 'Lr'],
     '0': ['rL', 'lR', 'rl', 'lr'],
   },
-  // invert_paradiddle_kick: {
-  //   '1': ['Rl', 'Lr'],
-  //   '0': ['rk', 'lk', 'rl', 'lr'],
-  // },
-  // hadnd_to_hand: {
-  //   '1': ['Rlr', 'Lrl'],
-  //   '0': ['rlr', 'lrl'],
-  // },
+  invert_paradiddle_kick: {
+    '1': ['Rl', 'Lr'],
+    '0': ['rl', 'lr', 'rk', 'lk'],
+  },
 }

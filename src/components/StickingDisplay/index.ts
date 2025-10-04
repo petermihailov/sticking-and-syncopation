@@ -1,1 +1,0 @@
-export { StickingDisplay } from './StickingDisplay'

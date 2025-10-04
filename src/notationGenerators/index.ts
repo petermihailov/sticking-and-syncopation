@@ -1,2 +1,2 @@
 export { generateAccentNotation } from './accentNotationGenerator'
-export { generateRudimentNotation } from './rudimentNotationGenerator'
+export { generateParadiddleNotation } from './paradiddleNotationGenerator.ts'

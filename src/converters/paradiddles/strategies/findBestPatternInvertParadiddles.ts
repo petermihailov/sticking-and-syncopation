@@ -1,29 +1,6 @@
 import type { Accent, Sticking, StickingPattern } from '../../../types.ts'
-import { evaluatePatternQuality } from './quality-evaluator.ts'
 import { BAR_LENGTH } from '../../constants.ts'
-
-type FindBestPatternArgs = {
-  result: Sticking[]
-  patterns: StickingPattern[]
-}
-
-export function findBestPattern({
-  result,
-  patterns,
-}: FindBestPatternArgs): StickingPattern {
-  let bestScore = 0
-  let bestPattern = patterns[0]
-
-  for (let i = 0; i < patterns.length; i++) {
-    const score = evaluatePatternQuality(result, patterns[i])
-    if (score > bestScore) {
-      bestScore = score
-      bestPattern = patterns[i]
-    }
-  }
-
-  return bestPattern
-}
+import { findBestPattern } from './findBestPattern.ts'
 
 type FindBestPatternInvertParadiddlesArgs = {
   result: Sticking[]
@@ -42,7 +19,7 @@ export function findBestPatternInvertParadiddles({
     (currentIndex === BAR_LENGTH - 1 && accentMap8[0] === 1) ||
     accentMap8[currentIndex + 1] === 1
 
-  let targetPatterns = []
+  let targetPatterns: StickingPattern[] = []
 
   if (nextIsAccent) {
     targetPatterns = patterns.filter(pattern =>

@@ -1,4 +1,9 @@
-.patternSelect select {
+/* Mobile select (hidden on desktop) */
+.mobileSelect {
+    display: block;
+}
+
+.mobileSelect select {
     padding: 0.5rem 1rem;
     font-size: 1rem;
     border: 2px solid #0003;
@@ -6,10 +11,131 @@
     background-color: white;
     cursor: pointer;
     min-width: 250px;
+    width: 100%;
 }
 
-.patternSelect select:focus {
+.mobileSelect select:focus {
     outline: none;
     border-color: #007acc;
     box-shadow: 0 0 0 2px #007acc30;
+}
+
+/* Custom dropdown (hidden on mobile) */
+.customDropdown {
+    display: none;
+    position: relative;
+    min-width: 250px;
+}
+
+.dropdownTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #0003;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdownTrigger:focus {
+    outline: none;
+    border-color: #007acc;
+    box-shadow: 0 0 0 2px #007acc30;
+}
+
+.selectedOption {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pattern {
+    font-family: monospace;
+    font-weight: 600;
+    width: 2.4rem;
+    color: #007acc;
+}
+
+.label {
+    color: #333;
+}
+
+.arrow {
+    font-size: 0.8rem;
+    color: #666;
+    transition: transform 0.2s;
+}
+
+.dropdownTrigger[aria-expanded="true"] .arrow {
+    transform: rotate(180deg);
+}
+
+.dropdownContent {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+    border: 2px solid #0003;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    margin-top: 0.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.option {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.option:hover {
+    background-color: #f0f8ff;
+}
+
+.option.selected {
+    background-color: #007acc;
+    color: white;
+}
+
+.option.selected .pattern {
+    color: white;
+}
+
+.option.selected .label {
+    color: white;
+}
+
+.option.focused {
+    background-color: #e6f3ff;
+    outline: 2px solid #007acc;
+    outline-offset: -2px;
+}
+
+.option.focused.selected {
+    background-color: #0056b3;
+}
+
+@media (min-width: 640px) {
+    .mobileSelect {
+        display: none;
+    }
+
+    .customDropdown {
+        display: block;
+    }
 }

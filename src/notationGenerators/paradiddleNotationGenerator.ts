@@ -1,6 +1,6 @@
 import type { ParadiddleResult } from '../converters/paradiddles'
 
-export function generateRudimentNotation(
+export function generateParadiddleNotation(
   convertResult: ParadiddleResult
 ): string {
   // Извлекаем символы палочек из результата

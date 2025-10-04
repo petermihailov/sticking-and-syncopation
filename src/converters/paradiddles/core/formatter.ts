@@ -35,15 +35,28 @@ export function shouldCreateMirroredBar({
 }: ShouldCreateMirroredBarArgs): boolean {
   const calcDoubles = (str: string) => (str.match(/rr|ll/g) || []).length
 
+  // склеены два такта: обычный + обычный
   const testNonFlippedSequence = bar.join('') + bar.join('')
+  // склеены два такта: обычный + перевернутый
   const testFlippedSequence = bar.join('') + flipHands(bar).join('')
 
+  // проверка на невозможные переходы типа: rrr, rR, RR
   const nonFlippedValid = !INVALID_TRANSITIONS.some(transition =>
     testNonFlippedSequence.includes(transition)
   )
   const flippedValid = !INVALID_TRANSITIONS.some(transition =>
     testFlippedSequence.includes(transition)
   )
+
+  // проверка для случая когда последний кик
+  if (
+    bar
+      .map(s => s.toLowerCase())
+      .join('')
+      .endsWith('rk')
+  ) {
+    return true
+  }
 
   // Если только flipped проходит валидацию
   if (!nonFlippedValid && flippedValid) {

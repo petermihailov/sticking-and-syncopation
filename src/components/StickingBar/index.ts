@@ -1,1 +1,0 @@
-export { StickingBar } from './StickingBar'

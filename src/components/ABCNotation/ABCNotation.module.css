@@ -24,6 +24,11 @@
 @media (min-width: 640px) {
     .notation {
         filter: url('#sketch-2');
+        /*animation: squigglevision 1s infinite;*/
+    }
+
+    [fill="#ff0000"] {
+        animation: squigglevision 1s infinite;
     }
 }
 
@@ -77,21 +82,21 @@
     stroke-width: 1.5;
 }
 
-/*@keyframes squigglevision {*/
-/*    0% {*/
-/*        filter: url('#sketch-0');*/
-/*    }*/
-/*    25% {*/
-/*        filter: url('#sketch-1');*/
-/*    }*/
-/*    50% {*/
-/*        filter: url('#sketch-2');*/
-/*    }*/
-/*    75% {*/
-/*        filter: url('#sketch-3');*/
-/*    }*/
-/*    100% {*/
-/*        filter: url('#sketch-4');*/
-/*    }*/
-/*}*/
+@keyframes squigglevision {
+    0% {
+        filter: url('#sketch-0');
+    }
+    25% {
+        filter: url('#sketch-1');
+    }
+    50% {
+        filter: url('#sketch-2');
+    }
+    75% {
+        filter: url('#sketch-3');
+    }
+    100% {
+        filter: url('#sketch-4');
+    }
+}
 

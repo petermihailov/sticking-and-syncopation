@@ -17,6 +17,10 @@
     text-transform: uppercase;
 }
 
+/*.labels:not(:last-child) .label {*/
+/*    border-bottom: 1px dashed #00f1;*/
+/*}*/
+
 .label:first-child {
     margin-left: 0;
 }
@@ -25,18 +29,31 @@
     background-color: #f002;
 }
 
+.label.r.a {
+    background-color: #f005;
+}
+
 .label.l {
     background-color: #00f2;
 }
 
+.label.l.a {
+    background-color: #00f5;
+}
+
+.label.k {
+    background-color: #0df4;
+    border-bottom: 1px dashed #0df4;
+}
+
 .label.a {
     font-weight: 700;
-    font-size: min(1.2rem, 3vw);
 }
 
 .label.a::before {
     content: '>';
     position: absolute;
-    font-weight: 400;
+    font-weight: 600;
     top: -5%;
+    color: #000;
 }
