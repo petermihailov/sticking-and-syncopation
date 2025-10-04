@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Accent, RudimentType } from './types.ts'
 import { convertToParadiddles } from './converters/paradiddles'
 import { convertHandToHand } from './converters/triplets/hand-to-hand'
@@ -68,6 +68,24 @@ function App() {
     const accentArray: Accent[] = checkedItems.map(checked => (checked ? 1 : 0))
     convertWithRudiment(accentArray, rudiment)
   }
+
+  const resetAccents = () => {
+    const emptyAccents = new Array(8).fill(false)
+    setCheckedItems(emptyAccents)
+    convertWithRudiment([0, 0, 0, 0, 0, 0, 0, 0])
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === 'KeyR') {
+        event.preventDefault()
+        resetAccents()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <>
