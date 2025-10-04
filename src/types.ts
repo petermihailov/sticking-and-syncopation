@@ -12,5 +12,5 @@ export type RudimentType =
   | 'paradiddle_double_accent'
   | 'invert_paradiddle_single_accent'
   | 'invert_paradiddle_double_accent'
-  | 'invert_paradiddle_kick_accent'
+  | 'invert_paradiddle_kick'
   | 'hand_to_hand_triplets'

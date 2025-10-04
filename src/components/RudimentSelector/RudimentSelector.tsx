@@ -159,7 +159,7 @@ export function RudimentSelector({
             {rudimentOptions.map((option, index) => (
               <button
                 key={option.value}
-                ref={el => (optionRefs.current[index] = el)}
+                ref={el => { optionRefs.current[index] = el }}
                 className={`${classes.option} ${option.value === selectedRudiment ? classes.selected : ''} ${focusedIndex === index ? classes.focused : ''}`}
                 onClick={() => {
                   onRudimentChange(option.value as RudimentType)

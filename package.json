@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --project tsconfig.app.json --noEmit"
   },
   "dependencies": {
     "abcjs": "^6.5.2",

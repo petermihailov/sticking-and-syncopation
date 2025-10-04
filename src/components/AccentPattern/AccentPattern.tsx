@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import clsx from 'clsx'
 import classes from './AccentPattern.module.css'
 
@@ -42,7 +42,7 @@ export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
         {checkedItems.map((isChecked, index) => (
           <input
             key={index}
-            ref={el => checkboxRefs.current[index] = el}
+            ref={el => { checkboxRefs.current[index] = el }}
             type="checkbox"
             checked={isChecked}
             onChange={() => onToggle(index)}
