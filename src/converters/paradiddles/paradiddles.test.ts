@@ -7,6 +7,7 @@ const paradiddleTypes = [
   'paradiddle_double_accent',
   'invert_paradiddle_single_accent',
   'invert_paradiddle_double_accent',
+  'invert_paradiddle_kick',
 ] as const
 
 const testCases = [
@@ -19,6 +20,7 @@ const testCases = [
       paradiddle_double_accent: 'rrll rrll rrll rrll',
       invert_paradiddle_single_accent: 'rllr rllr rllr rllr',
       invert_paradiddle_double_accent: 'rllr rllr rllr rllr',
+      invert_paradiddle_kick: 'rllr rllr rllr rllr',
     },
   },
   {
@@ -27,9 +29,10 @@ const testCases = [
     isMirrored: false,
     expected: {
       paradiddle_single_accent: 'RlRl RlRl RlRl RlRl',
-      paradiddle_double_accent: 'RLRL RLRL RLRL RLRL',
+      paradiddle_double_accent: 'RlRl RlRl RlRl RlRl',
       invert_paradiddle_single_accent: 'RlRl RlRl RlRl RlRl',
       invert_paradiddle_double_accent: 'RlRl RlRl RlRl RlRl',
+      invert_paradiddle_kick: 'RlRl RlRl RlRl RlRl',
     },
   },
   {
@@ -41,6 +44,7 @@ const testCases = [
       paradiddle_double_accent: 'RLrr LRll RLrr LRll',
       invert_paradiddle_single_accent: 'Rllr Lrrl Rllr Lrrl',
       invert_paradiddle_double_accent: 'RllR LrrL RllR LrrL',
+      invert_paradiddle_kick: 'Rllk Rllk Rllk Rllk',
     },
   },
   {
@@ -52,6 +56,7 @@ const testCases = [
       paradiddle_double_accent: 'rrLR llRL rrLR llRL',
       invert_paradiddle_single_accent: 'rlRl lrLr rlRl lrLr',
       invert_paradiddle_double_accent: 'rLRl lRLr rLRl lRLr',
+      invert_paradiddle_kick: 'rkLr rkLr rkLr rkLr',
     },
   },
   {
@@ -60,9 +65,10 @@ const testCases = [
     isMirrored: false,
     expected: {
       paradiddle_single_accent: 'RlRl rrll RlRl rrll',
-      paradiddle_double_accent: 'RLRL rrll RLRL rrll',
+      paradiddle_double_accent: 'RlRL rrll RlRL rrll',
       invert_paradiddle_single_accent: 'RlRl lrrl RlRl lrrl',
       invert_paradiddle_double_accent: 'RlRl lrrL RlRl lrrL',
+      invert_paradiddle_kick: 'RlRl lrrk LrLr rllk',
     },
   },
   {
@@ -71,31 +77,46 @@ const testCases = [
     isMirrored: false,
     expected: {
       paradiddle_single_accent: 'rrll RlRl rrll RlRl',
-      paradiddle_double_accent: 'rrll RLRL rrll RLRL',
+      paradiddle_double_accent: 'rrll RlRL rrll RlRL',
       invert_paradiddle_single_accent: 'rllr LrLr rllr LrLr',
       invert_paradiddle_double_accent: 'rllR LrLr rllR LrLr',
+      invert_paradiddle_kick: 'rllk RlRl lrrk LrLr',
     },
   },
   {
     name: 'Паттерн [1,0,0,0,0,0,0,0]',
     input: [1, 0, 0, 0, 0, 0, 0, 0],
-    isMirrored: true,
+    isMirrored: {
+      paradiddle_single_accent: true,
+      paradiddle_double_accent: true,
+      invert_paradiddle_single_accent: true,
+      invert_paradiddle_double_accent: true,
+      invert_paradiddle_kick: false,
+    },
     expected: {
       paradiddle_single_accent: 'Rlrr llrr llrr llrr',
       paradiddle_double_accent: 'RLrr llrr llrr llrr',
       invert_paradiddle_single_accent: 'Rllr rllr rllr rllr',
       invert_paradiddle_double_accent: 'Rllr rllr rllr rllR',
+      invert_paradiddle_kick: 'Rllr rllr rllr rllk',
     },
   },
   {
     name: 'Паттерн [1,0,0,0,1,0,1,0]',
     input: [1, 0, 0, 0, 1, 0, 1, 0],
-    isMirrored: true,
+    isMirrored: {
+      paradiddle_single_accent: true,
+      paradiddle_double_accent: true,
+      invert_paradiddle_single_accent: true,
+      invert_paradiddle_double_accent: true,
+      invert_paradiddle_kick: false,
+    },
     expected: {
       paradiddle_single_accent: 'Rlrr llrr Lrll Rlrr',
       paradiddle_double_accent: 'RLrr llrr LRll RLrr',
       invert_paradiddle_single_accent: 'Rllr rllr Lrrl Rllr',
       invert_paradiddle_double_accent: 'Rllr rllR LrrL RllR',
+      invert_paradiddle_kick: 'Rllr rllk Rllk Rllk',
     },
   },
   {
@@ -104,20 +125,28 @@ const testCases = [
     isMirrored: false,
     expected: {
       paradiddle_single_accent: 'Rlrr llRl Rlrr llRl',
-      paradiddle_double_accent: 'RLrr llRL RLrr llRL',
+      paradiddle_double_accent: 'RLrr llRl RLrr llRl',
       invert_paradiddle_single_accent: 'Rllr rlRl Rllr rlRl',
       invert_paradiddle_double_accent: 'Rllr rLRl Rllr rLRl',
+      invert_paradiddle_kick: 'Rllr rkLr Lrrl lkRl',
     },
   },
   {
     name: 'Паттерн [0,1,0,0,0,0,0,0]',
     input: [0, 1, 0, 0, 0, 0, 0, 0],
-    isMirrored: true,
+    isMirrored: {
+      paradiddle_single_accent: true,
+      paradiddle_double_accent: true,
+      invert_paradiddle_single_accent: true,
+      invert_paradiddle_double_accent: true,
+      invert_paradiddle_kick: false,
+    },
     expected: {
       paradiddle_single_accent: 'rrLr llrr llrr llrr',
       paradiddle_double_accent: 'rrLR llrr llrr llrr',
       invert_paradiddle_single_accent: 'rlRl lrrl lrrl lrrl',
       invert_paradiddle_double_accent: 'rLRl lrrl lrrl lrrl',
+      invert_paradiddle_kick: 'rkLr rllr rllr rllr',
     },
   },
 ]

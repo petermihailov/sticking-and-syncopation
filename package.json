@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run convert:sounds && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest",
-    "typecheck": "tsc --project tsconfig.app.json --noEmit"
+    "typecheck": "tsc --project tsconfig.app.json --noEmit",
+    "convert:sounds": "sounds/wav2mp3",
+    "copy:wav": "mkdir -p public/sounds && cp sounds/wav/*.wav public/sounds/"
   },
   "dependencies": {
     "abcjs": "^6.5.2",

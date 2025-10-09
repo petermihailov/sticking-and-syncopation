@@ -32,7 +32,10 @@ function App() {
       const stickings = convertHandToHand([0, 0, 0, 0, 0, 0, 0, 0])
       return { stickings }
     }
-    return convertToParadiddles([0, 0, 0, 0, 0, 0, 0, 0], 'paradiddle_single_accent')
+    return convertToParadiddles(
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      'paradiddle_single_accent'
+    )
   })
 
   const convertWithRudiment = (accents: Accent[], rudiment?: RudimentType) => {
@@ -72,7 +75,7 @@ function App() {
   const resetAccents = () => {
     const emptyAccents = new Array(8).fill(false)
     setCheckedItems(emptyAccents)
-    convertWithRudiment([0, 0, 0, 0, 0, 0, 0, 0])
+    convertWithRudiment([0, 0, 0, 0, 0, 0, 0, 0], selectedRudiment)
   }
 
   useEffect(() => {
@@ -94,9 +97,12 @@ function App() {
         onRudimentChange={handleRudimentChange}
       />
       <ABCNotation
-        key={checkedItems.join('')}
         seeNotation={generateAccentNotation(checkedItems)}
-        playNotation={selectedRudiment === 'hand_to_hand_triplets' ? generateHandToHandNotation(convertResult) : generateParadiddleNotation(convertResult)}
+        playNotation={
+          selectedRudiment === 'hand_to_hand_triplets'
+            ? generateHandToHandNotation(convertResult)
+            : generateParadiddleNotation(convertResult)
+        }
         bars={convertResult.bars || [convertResult.stickings?.join('') || '']}
       />
       <AccentPattern checkedItems={checkedItems} onToggle={handleToggle} />

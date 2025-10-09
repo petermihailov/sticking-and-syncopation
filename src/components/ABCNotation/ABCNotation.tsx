@@ -1,8 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import abcjs from 'abcjs'
 import classes from './ABCNotation.module.css'
 import { Stickings } from '../Stickings'
 import { SVGFilters } from './SVGFilters'
+import { Player } from '../../lib/Player'
+import { createDrumKit, resumeAudioContext } from '../../utils/audio'
+import { stickingsToBars } from '../../utils/groove'
+import type { DrumKit } from '../../types/instrument'
 
 interface ABCNotationProps {
   seeNotation: string
@@ -19,6 +23,15 @@ export function ABCNotation({
   bars,
 }: ABCNotationProps) {
   const notationRef = useRef<HTMLDivElement>(null)
+  const [, setSelectedNotes] = useState<Set<string>>(new Set())
+  const playerRef = useRef<Player | null>(null)
+  const [drumKit, setDrumKit] = useState<DrumKit | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentBeat, setCurrentBeat] = useState({ barIndex: 0, rhythmIndex: 0 })
+  const [tempo, setTempo] = useState(80)
+  const [metronomeEnabled, setMetronomeEnabled] = useState(false)
+  const [playerVersion, setPlayerVersion] = useState(0)
 
   useEffect(() => {
     if (notationRef.current && seeNotation) {
@@ -55,9 +68,158 @@ export function ABCNotation({
           gchordfont: 'Arial 10',
           stretchlast: true,
         },
+        clickListener: () =>
+          // abcElem,
+          // tuneNumber,
+          // classes,
+          // analysis,
+          // drag,
+          // mouseEvent
+          {
+            console.log('Clicked note')
+          },
       })
     }
   }, [seeNotation, playNotation, width])
+
+  // Сбрасываем выделение при смене нотации
+  useEffect(() => {
+    setSelectedNotes(new Set())
+  }, [seeNotation, playNotation])
+
+  // Initialize Player and load DrumKit
+  useEffect(() => {
+    const initPlayer = async () => {
+      try {
+        setIsLoading(true)
+        // Use WAV files for development until ffmpeg is set up
+        const kit = await createDrumKit('/sticking-and-syncopation/sounds/', 'wav')
+        setDrumKit(kit)
+
+        const player = new Player()
+        player.setKit(kit)
+        player.setTempo(80)
+        player.setOnBeat((beat) => {
+          setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
+        })
+
+        playerRef.current = player
+        setPlayerVersion(prev => prev + 1)
+        console.log('[ABCNotation] Player initialized')
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Failed to initialize player:', error)
+        setIsLoading(false)
+      }
+    }
+
+    initPlayer()
+
+    // Cleanup
+    return () => {
+      if (playerRef.current && isPlaying) {
+        playerRef.current.stop()
+      }
+    }
+  }, [])
+
+  // Update player bars when stickings change OR when player is ready
+  useEffect(() => {
+    console.log('[ABCNotation] Bars or isLoading changed:', { bars, isLoading, hasPlayer: !!playerRef.current })
+
+    // Wait until player is initialized (isLoading === false)
+    if (isLoading || !playerRef.current) {
+      console.log('[ABCNotation] Player not ready yet, skipping bars setup')
+      return
+    }
+
+    if (bars && bars.length > 0) {
+      console.log('[ABCNotation] Setting player bars:', bars)
+      const playerBars = stickingsToBars(bars)
+      console.log('[ABCNotation] Converted bars:', playerBars)
+      playerRef.current.setBars(playerBars)
+    } else {
+      console.log('[ABCNotation] No bars to set')
+    }
+    // Use string representation to detect content changes, not just reference changes
+    // playerVersion ensures bars are re-set when Player is re-initialized
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bars?.join(','), isLoading, playerVersion])
+
+  // Keyboard shortcut: Space for play/pause (with a11y considerations)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle spacebar
+      if (event.key !== ' ') {
+        return
+      }
+
+      // Don't handle if focus is on an interactive element (a11y)
+      const activeElement = document.activeElement
+      const interactiveTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']
+
+      if (activeElement && interactiveTags.includes(activeElement.tagName)) {
+        return
+      }
+
+      // Prevent page scroll when space is used for playback control
+      event.preventDefault()
+
+      // Toggle playback if player is ready and has bars
+      if (!isLoading && drumKit && bars && bars.length > 0 && playerRef.current) {
+        if (isPlaying) {
+          playerRef.current.stop()
+          setIsPlaying(false)
+          setCurrentBeat({ barIndex: 0, rhythmIndex: 0 })
+        } else {
+          resumeAudioContext()
+          playerRef.current.play()
+          setIsPlaying(true)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isLoading, drumKit, bars, isPlaying])
+
+  const handlePlay = () => {
+    if (playerRef.current && !isPlaying) {
+      resumeAudioContext() // Handle browser autoplay policy
+      playerRef.current.play()
+      setIsPlaying(true)
+    }
+  }
+
+  const handleStop = () => {
+    if (playerRef.current && isPlaying) {
+      playerRef.current.stop()
+      setIsPlaying(false)
+      setCurrentBeat({ barIndex: 0, rhythmIndex: 0 })
+    }
+  }
+
+  const handleTempoChange = (newTempo: number) => {
+    setTempo(newTempo)
+    if (playerRef.current) {
+      playerRef.current.setTempo(newTempo)
+    }
+  }
+
+  const handleMetronomeToggle = () => {
+    const newState = !metronomeEnabled
+    setMetronomeEnabled(newState)
+    if (playerRef.current) {
+      if (newState) {
+        playerRef.current.playMetronome()
+      } else {
+        playerRef.current.stopMetronome()
+      }
+    }
+  }
 
   return (
     <div className={classes.container}>
@@ -65,6 +227,62 @@ export function ABCNotation({
       <div ref={notationRef} className={classes.notation} />
       {/*<Labels />*/}
       {bars?.length && <Stickings bars={bars} />}
+
+      {/* Player Controls */}
+      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {isLoading ? (
+          <div>Loading sounds...</div>
+        ) : (
+          <>
+            {/* Playback controls */}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <button onClick={handlePlay} disabled={isPlaying || !drumKit || !bars || bars.length === 0}>
+                ▶ Play
+              </button>
+              <button onClick={handleStop} disabled={!isPlaying}>
+                ⏹ Stop
+              </button>
+              <div style={{ marginLeft: '1rem', fontSize: '0.9rem' }}>
+                Beat: {currentBeat.rhythmIndex + 1}
+              </div>
+              {(!bars || bars.length === 0) && (
+                <div style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#999' }}>
+                  (No pattern to play)
+                </div>
+              )}
+            </div>
+
+            {/* Tempo control */}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <label htmlFor="tempo-slider" style={{ fontSize: '0.9rem', minWidth: '80px' }}>
+                Tempo: {tempo} BPM
+              </label>
+              <input
+                id="tempo-slider"
+                type="range"
+                min="40"
+                max="200"
+                value={tempo}
+                onChange={(e) => handleTempoChange(Number(e.target.value))}
+                style={{ flex: 1, maxWidth: '200px' }}
+              />
+            </div>
+
+            {/* Metronome toggle */}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <label style={{ fontSize: '0.9rem' }}>
+                <input
+                  type="checkbox"
+                  checked={metronomeEnabled}
+                  onChange={handleMetronomeToggle}
+                  style={{ marginRight: '0.5rem' }}
+                />
+                Metronome
+              </label>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
