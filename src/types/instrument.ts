@@ -51,10 +51,15 @@ export interface Beat {
   instruments: Instrument[];
 }
 
+// Hand type for sticking patterns
+export type Hand = 'r' | 'l' | null;
+
 // Bar represents a measure with rhythm information
 export interface Bar {
   // Array of instruments to play at each rhythm subdivision
   rhythm: Instrument[][];
+  // Optional array of hands for each subdivision (for pitch shifting)
+  hands?: Hand[];
   // Time signature
   beatsPerBar: number; // e.g., 4 for 4/4
   noteValue: number; // e.g., 4 for quarter notes

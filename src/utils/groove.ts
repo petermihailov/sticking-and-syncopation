@@ -1,4 +1,4 @@
-import type { Bar, Instrument, Group } from '../types/instrument';
+import type { Bar, Instrument, Group, Hand } from '../types/instrument';
 
 /**
  * Get instruments to play at a specific rhythm index in a bar
@@ -31,40 +31,52 @@ export function getInstrumentsByIndex(
 /**
  * Convert sticking pattern to Bar format for Player
  * Maps sticking notation to drum instruments:
- * - 'R', 'L' (uppercase) = Regular hits on snare
- * - 'r', 'l' (lowercase) = Ghost notes (quiet hits) on snare
- * - 'k' = Kick drum
+ * - 'R', 'L' (uppercase) = Regular hits on snare (no pitch shift)
+ * - 'r' (lowercase) = Ghost notes with right hand (slightly higher pitch)
+ * - 'l' (lowercase) = Ghost notes with left hand (slightly lower pitch)
+ * - 'k' = Kick drum (no pitch shift)
  *
  * @param stickings - String of stickings (e.g., 'RlrrLrll')
- * @returns Bar object ready for Player
+ * @returns Bar object ready for Player with hand information for pitch shifting
  */
 export function stickingToBar(stickings: string): Bar {
   const rhythm: Instrument[][] = [];
+  const hands: Hand[] = [];
 
   // Split sticking string into individual characters, filtering out spaces
   const chars = stickings.split('').filter(char => char !== ' ');
 
   chars.forEach((char) => {
     const instruments: Instrument[] = [];
+    let hand: Hand = null;
 
-    // Map sticking to instrument
+    // Map sticking to instrument and hand
     if (char === 'R' || char === 'L') {
-      // Uppercase = regular
+      // Uppercase = regular (no pitch shift)
       instruments.push('snSnareRegular');
-    } else if (char === 'r' || char === 'l') {
-      // Lowercase = ghost
+      hand = null;
+    } else if (char === 'r') {
+      // Lowercase r = ghost with right hand
       instruments.push('snSnareGhost');
+      hand = 'r';
+    } else if (char === 'l') {
+      // Lowercase l = ghost with left hand
+      instruments.push('snSnareGhost');
+      hand = 'l';
     } else if (char === 'k') {
-      // Kick
+      // Kick (no pitch shift)
       instruments.push('kiKickRegular');
+      hand = null;
     }
 
     rhythm.push(instruments);
+    hands.push(hand);
   });
 
   // Create bar with 4/4 time signature, 16th note subdivisions
   return {
     rhythm,
+    hands,
     beatsPerBar: 4, // 4/4 time
     noteValue: 4, // Quarter notes
     timeDivision: 4, // 4 subdivisions per beat = 16th notes
