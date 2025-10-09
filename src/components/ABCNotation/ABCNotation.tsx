@@ -92,7 +92,7 @@ export function ABCNotation({
     const initPlayer = async () => {
       try {
         setIsLoading(true)
-        // Use WAV files for development until ffmpeg is set up
+        // Use WAV files (they work in both dev and production)
         const kit = await createDrumKit('/sticking-and-syncopation/sounds/', 'wav')
         setDrumKit(kit)
 

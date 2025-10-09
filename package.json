@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run convert:sounds && tsc -b && vite build",
+    "dev": "npm run copy:wav && vite",
+    "build": "npm run copy:wav && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",

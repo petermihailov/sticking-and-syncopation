@@ -4,8 +4,16 @@ sounds=./public/sounds
 
 rm -rf $sounds && mkdir $sounds
 
-for filename in $dir/wav/*.wav; do
-#  $dir/ffmpeg -i $filename -acodec libopus -b:a 64000 -vbr on $sounds/$(basename $filename .wav).ogg
-  $dir/ffmpeg -i $filename -vn -ar 44100 -ac 2 -b:a 128k $sounds/$(basename $filename .wav).mp3
+# Use system ffmpeg if available, otherwise fallback to copying WAV files
+if command -v ffmpeg &> /dev/null; then
+  FFMPEG=ffmpeg
+  echo "Using system ffmpeg for conversion..."
 
-done
+  for filename in $dir/wav/*.wav; do
+    $FFMPEG -i $filename -vn -ar 44100 -ac 2 -b:a 128k $sounds/$(basename $filename .wav).mp3 2>/dev/null
+  done
+else
+  echo "Warning: ffmpeg not found, copying WAV files instead of converting to MP3"
+  echo "For production builds, install ffmpeg: brew install ffmpeg (macOS) or apt-get install ffmpeg (Ubuntu)"
+  cp $dir/wav/*.wav $sounds/
+fi
