@@ -101,6 +101,12 @@ export function ABCNotation({
         const player = new Player()
         player.setKit(kit)
         player.setTempo(state.tempo)
+
+        // Set metronome initial state
+        if (state.metronome) {
+          player.playMetronome()
+        }
+
         player.setOnBeat((beat) => {
           setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
         })
@@ -147,6 +153,17 @@ export function ABCNotation({
     // playerVersion ensures bars are re-set when Player is re-initialized
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bars?.join(','), isLoading, playerVersion, state.instrumentMapping])
+
+  // Sync metronome state with Player
+  useEffect(() => {
+    if (!playerRef.current) return
+
+    if (state.metronome) {
+      playerRef.current.playMetronome()
+    } else {
+      playerRef.current.stopMetronome()
+    }
+  }, [state.metronome])
 
   // Keyboard shortcut: Space for play/pause (with a11y considerations)
   useEffect(() => {

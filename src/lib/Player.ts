@@ -123,6 +123,18 @@ export class Player {
       const source = this.audioCtx.createBufferSource()
       source.buffer = buffer
 
+      // Create GainNode for volume control
+      const gainNode = this.audioCtx.createGain()
+
+      // Set volume per instrument
+      if (instrument === 'snSnareGhost') {
+        gainNode.gain.value = 0.6 // Ghost notes quieter
+      } else if (instrument === 'cySplashRegular') {
+        gainNode.gain.value = 0.5 // Splash cymbal slightly quieter
+      } else {
+        gainNode.gain.value = 1.0 // Normal volume
+      }
+
       // Apply pitch shift based on hand
       if (hand === 'r') {
         source.playbackRate.value = 1.02 // Right hand: slightly higher pitch
@@ -132,7 +144,9 @@ export class Player {
         source.playbackRate.value = 1.0 // No pitch shift
       }
 
-      source.connect(this.audioCtx.destination)
+      // Connect: source → gainNode → destination
+      source.connect(gainNode)
+      gainNode.connect(this.audioCtx.destination)
       source.start(time)
 
       if (instrument.startsWith('fxMetronome')) {

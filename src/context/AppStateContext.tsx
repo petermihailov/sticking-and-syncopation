@@ -16,6 +16,7 @@ interface AppStateContextValue {
     setMetronome: (enabled: boolean) => void
     setInstrumentMapping: (mapping: StickingMapping) => void
     resetAccents: () => void
+    resetToDefaults: () => void
   }
   shareUrl: string
 }
@@ -108,6 +109,10 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, accents: DEFAULT_APP_STATE.accents }))
   }
 
+  const resetToDefaults = () => {
+    setState(DEFAULT_APP_STATE)
+  }
+
   // Compute shareable URL
   const shareUrl = useMemo(() => {
     const queryString = encodeStateToUrl(state)
@@ -134,6 +139,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       setMetronome,
       setInstrumentMapping,
       resetAccents,
+      resetToDefaults,
     },
     shareUrl,
   }

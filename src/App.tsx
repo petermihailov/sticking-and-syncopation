@@ -27,12 +27,12 @@ function AppContent() {
     }
   }, [state.accents, state.rudiment])
 
-  // Keyboard shortcut: R for reset
+  // Keyboard shortcut: R for reset to defaults
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'KeyR') {
         event.preventDefault()
-        actions.resetAccents()
+        actions.resetToDefaults()
       }
     }
 
