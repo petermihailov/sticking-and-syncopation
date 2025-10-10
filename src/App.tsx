@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import type { Accent, RudimentType } from './types.ts'
+import { useEffect, useMemo } from 'react'
+import type { Accent } from './types.ts'
 import { convertToParadiddles } from './converters/paradiddles'
 import { convertHandToHand } from './converters/triplets/hand-to-hand'
 import { RudimentSelector } from './components/RudimentSelector'
@@ -10,103 +10,65 @@ import {
   generateParadiddleNotation,
 } from './notationGenerators'
 import { generateHandToHandNotation } from './notationGenerators/handToHandNotationGenerator'
-import { LocalStorageManager } from './utils/localStorage'
+import { AppStateProvider, useAppState } from './context/AppStateContext'
 
-function App() {
-  const [checkedItems, setCheckedItems] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ])
-  const [selectedRudiment, setSelectedRudiment] = useState<RudimentType>(() => {
-    const saved = LocalStorageManager.getItem<RudimentType>('selectedRudiment')
-    return saved || 'paradiddle_single_accent'
-  })
-  const [convertResult, setConvertResult] = useState<any>(() => {
-    if (selectedRudiment === 'hand_to_hand_triplets') {
-      const stickings = convertHandToHand([0, 0, 0, 0, 0, 0, 0, 0])
+function AppContent() {
+  const { state, actions } = useAppState()
+
+  // Convert accents to rudiment pattern
+  const convertResult = useMemo(() => {
+    const accentArray: Accent[] = state.accents.map(checked => (checked ? 1 : 0))
+
+    if (state.rudiment === 'hand_to_hand_triplets') {
+      const stickings = convertHandToHand(accentArray)
       return { stickings }
-    }
-    return convertToParadiddles(
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      'paradiddle_single_accent'
-    )
-  })
-
-  const convertWithRudiment = (accents: Accent[], rudiment?: RudimentType) => {
-    const currentRudiment = rudiment || selectedRudiment
-
-    if (currentRudiment === 'hand_to_hand_triplets') {
-      const stickings = convertHandToHand(accents)
-      setConvertResult({ stickings })
     } else {
-      const result = convertToParadiddles(accents, currentRudiment)
-      setConvertResult(result)
+      return convertToParadiddles(accentArray, state.rudiment)
     }
-  }
+  }, [state.accents, state.rudiment])
 
-  const handleToggle = (index: number) => {
-    setCheckedItems(prev => {
-      const newCheckedItems = prev.map((item, i) =>
-        i === index ? !item : item
-      )
-      // Convert boolean array to Accent array
-      const accentArray: Accent[] = newCheckedItems.map(checked =>
-        checked ? 1 : 0
-      )
-      convertWithRudiment(accentArray)
-      return newCheckedItems
-    })
-  }
-
-  const handleRudimentChange = (rudiment: RudimentType) => {
-    setSelectedRudiment(rudiment)
-    LocalStorageManager.setItem('selectedRudiment', rudiment)
-    // Regenerate pattern with new rudiment
-    const accentArray: Accent[] = checkedItems.map(checked => (checked ? 1 : 0))
-    convertWithRudiment(accentArray, rudiment)
-  }
-
-  const resetAccents = () => {
-    const emptyAccents = new Array(8).fill(false)
-    setCheckedItems(emptyAccents)
-    convertWithRudiment([0, 0, 0, 0, 0, 0, 0, 0], selectedRudiment)
-  }
-
+  // Keyboard shortcut: R for reset
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'KeyR') {
         event.preventDefault()
-        resetAccents()
+        actions.resetAccents()
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [actions])
 
   return (
     <>
       <RudimentSelector
-        selectedRudiment={selectedRudiment}
-        onRudimentChange={handleRudimentChange}
+        selectedRudiment={state.rudiment}
+        onRudimentChange={actions.setRudiment}
       />
       <ABCNotation
-        seeNotation={generateAccentNotation(checkedItems)}
+        seeNotation={generateAccentNotation(state.accents)}
         playNotation={
-          selectedRudiment === 'hand_to_hand_triplets'
-            ? generateHandToHandNotation(convertResult)
-            : generateParadiddleNotation(convertResult)
+          state.rudiment === 'hand_to_hand_triplets'
+            ? generateHandToHandNotation(convertResult as { stickings: any[] })
+            : generateParadiddleNotation(convertResult as any)
         }
-        bars={convertResult.bars || [convertResult.stickings?.join('') || '']}
+        bars={
+          state.rudiment === 'hand_to_hand_triplets'
+            ? [(convertResult as { stickings: any[] }).stickings?.join('') || '']
+            : (convertResult as any).bars || []
+        }
       />
-      <AccentPattern checkedItems={checkedItems} onToggle={handleToggle} />
+      <AccentPattern checkedItems={state.accents} onToggle={actions.toggleAccent} />
     </>
+  )
+}
+
+function App() {
+  return (
+    <AppStateProvider>
+      <AppContent />
+    </AppStateProvider>
   )
 }
 

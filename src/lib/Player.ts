@@ -175,7 +175,11 @@ export class Player {
     const safeRhythmIndex = rhythmIndex % currentBar.rhythm.length
 
     // Callback current
-    this.onBeat({ barIndex: safeBarIndex, rhythmIndex: safeRhythmIndex, instruments })
+    this.onBeat({
+      barIndex: safeBarIndex,
+      rhythmIndex: safeRhythmIndex,
+      instruments,
+    })
 
     // Schedule next
     this.nextBeatAt += getNextTimeOffset(this.tempo, currentBar)

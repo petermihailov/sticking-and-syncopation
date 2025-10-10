@@ -1,0 +1,30 @@
+import type { RudimentType } from '../types.ts'
+import type { StickingMapping } from './instrument'
+import { DEFAULT_STICKING_MAPPING } from './instrument'
+
+/**
+ * Application state that can be shared via URL and persisted in localStorage
+ */
+export interface AppState {
+  /** Accent pattern - 8 boolean values representing accent positions */
+  accents: boolean[]
+  /** Selected rudiment type */
+  rudiment: RudimentType
+  /** Playback tempo in BPM (40-200) */
+  tempo: number
+  /** Whether metronome is enabled */
+  metronome: boolean
+  /** Instrument mapping for stickings */
+  instrumentMapping: StickingMapping
+}
+
+/**
+ * Default application state
+ */
+export const DEFAULT_APP_STATE: AppState = {
+  accents: [false, false, false, false, false, false, false, false],
+  rudiment: 'paradiddle_single_accent',
+  tempo: 80,
+  metronome: false,
+  instrumentMapping: DEFAULT_STICKING_MAPPING,
+}

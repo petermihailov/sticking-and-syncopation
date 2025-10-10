@@ -6,8 +6,10 @@ import { SVGFilters } from './SVGFilters'
 import { Player } from '../../lib/Player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
-import type { DrumKit, StickingMapping, Instrument } from '../../types/instrument'
-import { DEFAULT_STICKING_MAPPING, INSTRUMENT_GROUPS } from '../../types/instrument'
+import type { DrumKit, Instrument, StickingMapping } from '../../types/instrument'
+import { INSTRUMENT_GROUPS } from '../../types/instrument'
+import { useAppState } from '../../context/AppStateContext'
+import { ShareButton } from '../ShareButton'
 
 interface ABCNotationProps {
   seeNotation: string
@@ -30,10 +32,8 @@ export function ABCNotation({
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [currentBeat, setCurrentBeat] = useState({ barIndex: 0, rhythmIndex: 0 })
-  const [tempo, setTempo] = useState(80)
-  const [metronomeEnabled, setMetronomeEnabled] = useState(false)
   const [playerVersion, setPlayerVersion] = useState(0)
-  const [instrumentMapping, setInstrumentMapping] = useState<StickingMapping>(DEFAULT_STICKING_MAPPING)
+  const { state, actions } = useAppState()
 
   useEffect(() => {
     if (notationRef.current && seeNotation) {
@@ -100,7 +100,7 @@ export function ABCNotation({
 
         const player = new Player()
         player.setKit(kit)
-        player.setTempo(80)
+        player.setTempo(state.tempo)
         player.setOnBeat((beat) => {
           setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
         })
@@ -137,7 +137,7 @@ export function ABCNotation({
 
     if (bars && bars.length > 0) {
       console.log('[ABCNotation] Setting player bars:', bars)
-      const playerBars = stickingsToBars(bars, instrumentMapping)
+      const playerBars = stickingsToBars(bars, state.instrumentMapping)
       console.log('[ABCNotation] Converted bars:', playerBars)
       playerRef.current.setBars(playerBars)
     } else {
@@ -146,7 +146,7 @@ export function ABCNotation({
     // Use string representation to detect content changes, not just reference changes
     // playerVersion ensures bars are re-set when Player is re-initialized
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bars?.join(','), isLoading, playerVersion, instrumentMapping])
+  }, [bars?.join(','), isLoading, playerVersion, state.instrumentMapping])
 
   // Keyboard shortcut: Space for play/pause (with a11y considerations)
   useEffect(() => {
@@ -205,15 +205,15 @@ export function ABCNotation({
   }
 
   const handleTempoChange = (newTempo: number) => {
-    setTempo(newTempo)
+    actions.setTempo(newTempo)
     if (playerRef.current) {
       playerRef.current.setTempo(newTempo)
     }
   }
 
   const handleMetronomeToggle = () => {
-    const newState = !metronomeEnabled
-    setMetronomeEnabled(newState)
+    const newState = !state.metronome
+    actions.setMetronome(newState)
     if (playerRef.current) {
       if (newState) {
         playerRef.current.playMetronome()
@@ -224,10 +224,10 @@ export function ABCNotation({
   }
 
   const handleMappingChange = (key: keyof StickingMapping, value: Instrument | boolean | undefined) => {
-    setInstrumentMapping(prev => ({
-      ...prev,
+    actions.setInstrumentMapping({
+      ...state.instrumentMapping,
       [key]: value
-    }))
+    })
   }
 
   // Render instrument select
@@ -296,6 +296,7 @@ export function ABCNotation({
               <button onClick={handleStop} disabled={!isPlaying}>
                 ⏹ Stop
               </button>
+              <ShareButton />
               <div style={{ marginLeft: '1rem', fontSize: '0.9rem' }}>
                 Beat: {currentBeat.rhythmIndex + 1}
               </div>
@@ -309,14 +310,14 @@ export function ABCNotation({
             {/* Tempo control */}
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <label htmlFor="tempo-slider" style={{ fontSize: '0.9rem', minWidth: '80px' }}>
-                Tempo: {tempo} BPM
+                Tempo: {state.tempo} BPM
               </label>
               <input
                 id="tempo-slider"
                 type="range"
                 min="40"
                 max="200"
-                value={tempo}
+                value={state.tempo}
                 onChange={(e) => handleTempoChange(Number(e.target.value))}
                 style={{ flex: 1, maxWidth: '200px' }}
               />
@@ -327,7 +328,7 @@ export function ABCNotation({
               <label style={{ fontSize: '0.9rem' }}>
                 <input
                   type="checkbox"
-                  checked={metronomeEnabled}
+                  checked={state.metronome}
                   onChange={handleMetronomeToggle}
                   style={{ marginRight: '0.5rem' }}
                 />
@@ -351,33 +352,33 @@ export function ABCNotation({
                 {/* R (right hand accent) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.2rem' }}>R (accent)</div>
-                  {renderInstrumentSelect('', instrumentMapping.uppercaseR, (v) => handleMappingChange('uppercaseR', v))}
-                  {renderKickCheckbox('+ Kick', instrumentMapping.uppercaseRKick, (v) => handleMappingChange('uppercaseRKick', v))}
+                  {renderInstrumentSelect('', state.instrumentMapping.uppercaseR, (v) => handleMappingChange('uppercaseR', v))}
+                  {renderKickCheckbox('+ Kick', state.instrumentMapping.uppercaseRKick, (v) => handleMappingChange('uppercaseRKick', v))}
                 </div>
 
                 {/* L (left hand accent) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.2rem' }}>L (accent)</div>
-                  {renderInstrumentSelect('', instrumentMapping.uppercaseL, (v) => handleMappingChange('uppercaseL', v))}
-                  {renderKickCheckbox('+ Kick', instrumentMapping.uppercaseLKick, (v) => handleMappingChange('uppercaseLKick', v))}
+                  {renderInstrumentSelect('', state.instrumentMapping.uppercaseL, (v) => handleMappingChange('uppercaseL', v))}
+                  {renderKickCheckbox('+ Kick', state.instrumentMapping.uppercaseLKick, (v) => handleMappingChange('uppercaseLKick', v))}
                 </div>
 
                 {/* r (right hand ghost) */}
                 <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>r (ghost)</div>
-                  {renderInstrumentSelect('', instrumentMapping.lowercaseR, (v) => handleMappingChange('lowercaseR', v))}
+                  {renderInstrumentSelect('', state.instrumentMapping.lowercaseR, (v) => handleMappingChange('lowercaseR', v))}
                 </div>
 
                 {/* l (left hand ghost) */}
                 <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>l (ghost)</div>
-                  {renderInstrumentSelect('', instrumentMapping.lowercaseL, (v) => handleMappingChange('lowercaseL', v))}
+                  {renderInstrumentSelect('', state.instrumentMapping.lowercaseL, (v) => handleMappingChange('lowercaseL', v))}
                 </div>
 
                 {/* k (kick) */}
                 <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px', gridColumn: 'span 2' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>k (kick)</div>
-                  {renderInstrumentSelect('', instrumentMapping.kick, (v) => handleMappingChange('kick', v))}
+                  {renderInstrumentSelect('', state.instrumentMapping.kick, (v) => handleMappingChange('kick', v))}
                 </div>
               </div>
             </div>
