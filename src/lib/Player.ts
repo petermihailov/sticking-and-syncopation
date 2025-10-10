@@ -153,25 +153,38 @@ export class Player {
   }
 
   schedule(barIndex: number, rhythmIndex: number, instruments: Instrument[]) {
-    // Callback current
-    this.onBeat({ barIndex, rhythmIndex, instruments })
-
-    // Validate bar exists
-    const currentBar = this.bars[barIndex]
-    if (!currentBar) {
-      console.warn(`Bar at index ${barIndex} not found, stopping playback`)
+    // Safety check: stop if no bars available
+    if (!this.bars || this.bars.length === 0) {
+      console.warn('No bars available, stopping playback')
       this.stop()
       return
     }
 
+    // Normalize barIndex to handle bars array replacement during playback
+    const safeBarIndex = barIndex % this.bars.length
+
+    // Validate bar exists
+    const currentBar = this.bars[safeBarIndex]
+    if (!currentBar || !currentBar.rhythm || currentBar.rhythm.length === 0) {
+      console.warn(`Invalid bar at index ${safeBarIndex}, stopping playback`)
+      this.stop()
+      return
+    }
+
+    // Normalize rhythmIndex in case bar structure changed
+    const safeRhythmIndex = rhythmIndex % currentBar.rhythm.length
+
+    // Callback current
+    this.onBeat({ barIndex: safeBarIndex, rhythmIndex: safeRhythmIndex, instruments })
+
     // Schedule next
     this.nextBeatAt += getNextTimeOffset(this.tempo, currentBar)
 
-    const nextRhythmIndex = (rhythmIndex + 1) % currentBar.rhythm.length
+    const nextRhythmIndex = (safeRhythmIndex + 1) % currentBar.rhythm.length
     const nextBarIndex =
-      rhythmIndex === currentBar.rhythm.length - 1
-        ? (barIndex + 1) % this.bars.length
-        : barIndex
+      safeRhythmIndex === currentBar.rhythm.length - 1
+        ? (safeBarIndex + 1) % this.bars.length
+        : safeBarIndex
     const nextBar = this.bars[nextBarIndex]
 
     if (!nextBar) {
