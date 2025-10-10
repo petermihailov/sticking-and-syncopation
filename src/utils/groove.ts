@@ -1,4 +1,5 @@
-import type { Bar, Instrument, Group, Hand } from '../types/instrument';
+import type { Bar, Instrument, Group, Hand, StickingMapping } from '../types/instrument';
+import { DEFAULT_STICKING_MAPPING } from '../types/instrument';
 
 /**
  * Get instruments to play at a specific rhythm index in a bar
@@ -31,15 +32,17 @@ export function getInstrumentsByIndex(
 /**
  * Convert sticking pattern to Bar format for Player
  * Maps sticking notation to drum instruments:
- * - 'R', 'L' (uppercase) = Regular hits on snare (no pitch shift)
- * - 'r' (lowercase) = Ghost notes with right hand (slightly higher pitch)
- * - 'l' (lowercase) = Ghost notes with left hand (slightly lower pitch)
- * - 'k' = Kick drum (no pitch shift)
+ * - 'R' (uppercase) = Regular right hand (configurable, no pitch shift)
+ * - 'L' (uppercase) = Regular left hand (configurable, no pitch shift)
+ * - 'r' (lowercase) = Ghost notes with right hand (configurable, slightly higher pitch)
+ * - 'l' (lowercase) = Ghost notes with left hand (configurable, slightly lower pitch)
+ * - 'k' = Kick drum (configurable, no pitch shift)
  *
  * @param stickings - String of stickings (e.g., 'RlrrLrll')
+ * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Bar object ready for Player with hand information for pitch shifting
  */
-export function stickingToBar(stickings: string): Bar {
+export function stickingToBar(stickings: string, mapping: StickingMapping = DEFAULT_STICKING_MAPPING): Bar {
   const rhythm: Instrument[][] = [];
   const hands: Hand[] = [];
 
@@ -50,22 +53,34 @@ export function stickingToBar(stickings: string): Bar {
     const instruments: Instrument[] = [];
     let hand: Hand = null;
 
-    // Map sticking to instrument and hand
-    if (char === 'R' || char === 'L') {
-      // Uppercase = regular (no pitch shift)
-      instruments.push('snSnareRegular');
+    // Map sticking to instrument and hand based on mapping
+    if (char === 'R') {
+      // Uppercase R = regular right hand (no pitch shift)
+      instruments.push(mapping.uppercaseR);
+      // Add optional kick
+      if (mapping.uppercaseRKick) {
+        instruments.push(mapping.kick);
+      }
+      hand = null;
+    } else if (char === 'L') {
+      // Uppercase L = regular left hand (no pitch shift)
+      instruments.push(mapping.uppercaseL);
+      // Add optional kick
+      if (mapping.uppercaseLKick) {
+        instruments.push(mapping.kick);
+      }
       hand = null;
     } else if (char === 'r') {
       // Lowercase r = ghost with right hand
-      instruments.push('snSnareGhost');
+      instruments.push(mapping.lowercaseR);
       hand = 'r';
     } else if (char === 'l') {
       // Lowercase l = ghost with left hand
-      instruments.push('snSnareGhost');
+      instruments.push(mapping.lowercaseL);
       hand = 'l';
     } else if (char === 'k') {
       // Kick (no pitch shift)
-      instruments.push('kiKickRegular');
+      instruments.push(mapping.kick);
       hand = null;
     }
 
@@ -86,10 +101,11 @@ export function stickingToBar(stickings: string): Bar {
 /**
  * Convert multiple sticking patterns to multiple bars
  * @param stickingPatterns - Array of sticking strings
+ * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Array of Bar objects
  */
-export function stickingsToBars(stickingPatterns: string[]): Bar[] {
-  return stickingPatterns.map((pattern) => stickingToBar(pattern));
+export function stickingsToBars(stickingPatterns: string[], mapping?: StickingMapping): Bar[] {
+  return stickingPatterns.map((pattern) => stickingToBar(pattern, mapping));
 }
 
 /**

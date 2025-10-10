@@ -54,6 +54,67 @@ export interface Beat {
 // Hand type for sticking patterns
 export type Hand = 'r' | 'l' | null;
 
+// Sticking mapping configuration
+export interface StickingMapping {
+  uppercaseR: Instrument;          // For R (right hand regular)
+  uppercaseL: Instrument;          // For L (left hand regular)
+  uppercaseRKick: boolean;         // Add kick to R
+  uppercaseLKick: boolean;         // Add kick to L
+  lowercaseR: Instrument;          // For r (right hand ghost)
+  lowercaseL: Instrument;          // For l (left hand ghost)
+  kick: Instrument;                // For k (kick)
+}
+
+// Default sticking mapping
+export const DEFAULT_STICKING_MAPPING: StickingMapping = {
+  uppercaseR: 'snSnareRegular',
+  uppercaseL: 'snSnareRegular',
+  uppercaseRKick: false,
+  uppercaseLKick: false,
+  lowercaseR: 'snSnareGhost',
+  lowercaseL: 'snSnareGhost',
+  kick: 'kiKickRegular',
+};
+
+// Grouped instruments for UI selection
+export const INSTRUMENT_GROUPS = {
+  Snare: [
+    'snSnareRegular',
+    'snSnareAccent',
+    'snSnareGhost',
+    'snRimRegular',
+  ] as Instrument[],
+  'Hi-hat': [
+    'hhCloseRegular',
+    'hhCloseAccent',
+    'hhCloseGhost',
+    'hhOpenRegular',
+    'hhOpenAccent',
+    'hhFootRegular',
+  ] as Instrument[],
+  Toms: [
+    't1HighRegular',
+    't1HighAccent',
+    't2MidRegular',
+    't2MidAccent',
+    't3LowRegular',
+    't3LowAccent',
+  ] as Instrument[],
+  Cymbals: [
+    'cyRideRegular',
+    'cyCrashRegular',
+    'cySplashRegular',
+    'cyChinaRegular',
+    'cyBellRegular',
+    'cyEdgeRegular',
+    'cyTrashRegular',
+    'cyCowbellRegular',
+  ] as Instrument[],
+  Kick: [
+    'kiKickRegular',
+  ] as Instrument[],
+};
+
 // Bar represents a measure with rhythm information
 export interface Bar {
   // Array of instruments to play at each rhythm subdivision
