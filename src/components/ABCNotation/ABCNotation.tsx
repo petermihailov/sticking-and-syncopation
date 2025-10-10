@@ -366,13 +366,6 @@ export function ABCNotation({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {/* R (right hand accent) */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.2rem' }}>R (accent)</div>
-                  {renderInstrumentSelect('', state.instrumentMapping.uppercaseR, (v) => handleMappingChange('uppercaseR', v))}
-                  {renderKickCheckbox('+ Kick', state.instrumentMapping.uppercaseRKick, (v) => handleMappingChange('uppercaseRKick', v))}
-                </div>
-
                 {/* L (left hand accent) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.2rem' }}>L (accent)</div>
@@ -380,16 +373,23 @@ export function ABCNotation({
                   {renderKickCheckbox('+ Kick', state.instrumentMapping.uppercaseLKick, (v) => handleMappingChange('uppercaseLKick', v))}
                 </div>
 
-                {/* r (right hand ghost) */}
-                <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>r (ghost)</div>
-                  {renderInstrumentSelect('', state.instrumentMapping.lowercaseR, (v) => handleMappingChange('lowercaseR', v))}
+                {/* R (right hand accent) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.2rem' }}>R (accent)</div>
+                  {renderInstrumentSelect('', state.instrumentMapping.uppercaseR, (v) => handleMappingChange('uppercaseR', v))}
+                  {renderKickCheckbox('+ Kick', state.instrumentMapping.uppercaseRKick, (v) => handleMappingChange('uppercaseRKick', v))}
                 </div>
 
                 {/* l (left hand ghost) */}
                 <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>l (ghost)</div>
                   {renderInstrumentSelect('', state.instrumentMapping.lowercaseL, (v) => handleMappingChange('lowercaseL', v))}
+                </div>
+
+                {/* r (right hand ghost) */}
+                <div style={{ padding: '0.5rem', background: '#fff', borderRadius: '3px' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555', marginBottom: '0.3rem' }}>r (ghost)</div>
+                  {renderInstrumentSelect('', state.instrumentMapping.lowercaseR, (v) => handleMappingChange('lowercaseR', v))}
                 </div>
 
                 {/* k (kick) */}
