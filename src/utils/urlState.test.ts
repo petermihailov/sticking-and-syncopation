@@ -11,6 +11,7 @@ import {
   decodeStateFromUrl,
 } from './urlState'
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
+import type { Instrument, StickingMapping } from '../types/instrument'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import type { AppState } from '../types/appState'
 
@@ -130,7 +131,7 @@ describe('isDefaultMapping', () => {
   })
 
   it('should return false for modified uppercaseR', () => {
-    const mapping = { ...DEFAULT_STICKING_MAPPING, uppercaseR: 't1HighRegular' as const }
+    const mapping = { ...DEFAULT_STICKING_MAPPING, uppercaseR: ['t1HighRegular'] as Instrument[] }
     expect(isDefaultMapping(mapping)).toBe(false)
   })
 
@@ -147,12 +148,12 @@ describe('encodeOrchestration / decodeOrchestration', () => {
   })
 
   it('should encode custom mapping', () => {
-    const mapping = {
-      uppercaseR: 't1HighRegular' as const,
-      uppercaseL: 't2MidRegular' as const,
-      lowercaseR: 'hhCloseGhost' as const,
-      lowercaseL: 'hhCloseGhost' as const,
-      kick: 'kiKickRegular' as const,
+    const mapping: StickingMapping = {
+      uppercaseR: ['t1HighRegular'],
+      uppercaseL: ['t2MidRegular'],
+      lowercaseR: ['hhCloseGhost'],
+      lowercaseL: ['hhCloseGhost'],
+      kick: ['kiKickRegular'],
       uppercaseRKick: true,
       uppercaseLKick: false,
     }
@@ -163,11 +164,11 @@ describe('encodeOrchestration / decodeOrchestration', () => {
   it('should decode orchestration string', () => {
     const result = decodeOrchestration('t1,t2,hg,hg,ki,1,0')
     expect(result).toEqual({
-      uppercaseR: 't1HighRegular',
-      uppercaseL: 't2MidRegular',
-      lowercaseR: 'hhCloseGhost',
-      lowercaseL: 'hhCloseGhost',
-      kick: 'kiKickRegular',
+      uppercaseR: ['t1HighRegular'],
+      uppercaseL: ['t2MidRegular'],
+      lowercaseR: ['hhCloseGhost'],
+      lowercaseL: ['hhCloseGhost'],
+      kick: ['kiKickRegular'],
       uppercaseRKick: true,
       uppercaseLKick: false,
     })
@@ -179,12 +180,12 @@ describe('encodeOrchestration / decodeOrchestration', () => {
   })
 
   it('should round-trip custom mapping', () => {
-    const original = {
-      uppercaseR: 'cyRideRegular' as const,
-      uppercaseL: 'cyCrashRegular' as const,
-      lowercaseR: 'snSnareGhost' as const,
-      lowercaseL: 'snSnareGhost' as const,
-      kick: 'kiKickRegular' as const,
+    const original: StickingMapping = {
+      uppercaseR: ['cyRideRegular'],
+      uppercaseL: ['cyCrashRegular'],
+      lowercaseR: ['snSnareGhost'],
+      lowercaseL: ['snSnareGhost'],
+      kick: ['kiKickRegular'],
       uppercaseRKick: true,
       uppercaseLKick: true,
     }
@@ -243,14 +244,15 @@ describe('encodeStateToUrl', () => {
       tempo: 180,
       metronome: true,
       instrumentMapping: {
-        uppercaseR: 'cyRideRegular',
-        uppercaseL: 'cyCrashRegular',
-        lowercaseR: 'snSnareGhost',
-        lowercaseL: 'snSnareGhost',
-        kick: 'kiKickRegular',
+        uppercaseR: ['cyRideRegular'],
+        uppercaseL: ['cyCrashRegular'],
+        lowercaseR: ['snSnareGhost'],
+        lowercaseL: ['snSnareGhost'],
+        kick: ['kiKickRegular'],
         uppercaseRKick: true,
         uppercaseLKick: false,
       },
+      metronomeVolume: 1.0,
     }
     const result = encodeStateToUrl(state)
     expect(result).toBe('a=A4&r=ik&t=180&m=1&o=rd%2Ccr%2Csg%2Csg%2Cki%2C1%2C0')
@@ -305,11 +307,11 @@ describe('decodeStateFromUrl', () => {
     expect(result.tempo).toBe(180)
     expect(result.metronome).toBe(true)
     expect(result.instrumentMapping).toEqual({
-      uppercaseR: 'cyRideRegular',
-      uppercaseL: 'cyCrashRegular',
-      lowercaseR: 'snSnareGhost',
-      lowercaseL: 'snSnareGhost',
-      kick: 'kiKickRegular',
+      uppercaseR: ['cyRideRegular'],
+      uppercaseL: ['cyCrashRegular'],
+      lowercaseR: ['snSnareGhost'],
+      lowercaseL: ['snSnareGhost'],
+      kick: ['kiKickRegular'],
       uppercaseRKick: true,
       uppercaseLKick: false,
     })
@@ -349,14 +351,15 @@ describe('full round-trip integration', () => {
       tempo: 120,
       metronome: true,
       instrumentMapping: {
-        uppercaseR: 't1HighRegular',
-        uppercaseL: 't2MidRegular',
-        lowercaseR: 'hhCloseGhost',
-        lowercaseL: 'hhCloseGhost',
-        kick: 'kiKickRegular',
+        uppercaseR: ['t1HighRegular'],
+        uppercaseL: ['t2MidRegular'],
+        lowercaseR: ['hhCloseGhost'],
+        lowercaseL: ['hhCloseGhost'],
+        kick: ['kiKickRegular'],
         uppercaseRKick: false,
         uppercaseLKick: true,
       },
+      metronomeVolume: 1.0,
     }
 
     const encoded = encodeStateToUrl(original)

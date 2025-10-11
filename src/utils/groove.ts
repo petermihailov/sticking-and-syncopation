@@ -44,6 +44,7 @@ export function getInstrumentsByIndex(
  */
 export function stickingToBar(stickings: string, mapping: StickingMapping = DEFAULT_STICKING_MAPPING): Bar {
   const rhythm: Instrument[][] = [];
+  const stickingSymbols: string[] = [];
   const hands: Hand[] = [];
 
   // Split sticking string into individual characters, filtering out spaces
@@ -53,34 +54,38 @@ export function stickingToBar(stickings: string, mapping: StickingMapping = DEFA
     const instruments: Instrument[] = [];
     let hand: Hand = null;
 
+    // Save the sticking symbol for rotation
+    stickingSymbols.push(char);
+
     // Map sticking to instrument and hand based on mapping
+    // For rhythm, use the first instrument in the array (for display/fallback)
     if (char === 'R') {
       // Uppercase R = regular right hand (no pitch shift)
-      instruments.push(mapping.uppercaseR);
+      instruments.push(mapping.uppercaseR[0] || 'snSnareRegular');
       // Add optional kick
       if (mapping.uppercaseRKick) {
-        instruments.push(mapping.kick);
+        instruments.push(mapping.kick[0] || 'kiKickRegular');
       }
       hand = null;
     } else if (char === 'L') {
       // Uppercase L = regular left hand (no pitch shift)
-      instruments.push(mapping.uppercaseL);
+      instruments.push(mapping.uppercaseL[0] || 'snSnareRegular');
       // Add optional kick
       if (mapping.uppercaseLKick) {
-        instruments.push(mapping.kick);
+        instruments.push(mapping.kick[0] || 'kiKickRegular');
       }
       hand = null;
     } else if (char === 'r') {
       // Lowercase r = ghost with right hand
-      instruments.push(mapping.lowercaseR);
+      instruments.push(mapping.lowercaseR[0] || 'snSnareGhost');
       hand = 'r';
     } else if (char === 'l') {
       // Lowercase l = ghost with left hand
-      instruments.push(mapping.lowercaseL);
+      instruments.push(mapping.lowercaseL[0] || 'snSnareGhost');
       hand = 'l';
     } else if (char === 'k') {
       // Kick (no pitch shift)
-      instruments.push(mapping.kick);
+      instruments.push(mapping.kick[0] || 'kiKickRegular');
       hand = null;
     }
 
@@ -91,6 +96,7 @@ export function stickingToBar(stickings: string, mapping: StickingMapping = DEFA
   // Create bar with 4/4 time signature, 16th note subdivisions
   return {
     rhythm,
+    stickings: stickingSymbols,
     hands,
     beatsPerBar: 4, // 4/4 time
     noteValue: 4, // Quarter notes

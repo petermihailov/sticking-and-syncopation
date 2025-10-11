@@ -35,7 +35,6 @@ const INSTRUMENT_CODES: Record<Instrument, string> = {
   'hhCloseGhost': 'hg',
   'hhOpenRegular': 'ho',
   'hhOpenAccent': 'hx',
-  'hhFootRegular': 'hf',
   // Toms
   't1HighRegular': 't1',
   't1HighAccent': 'ta',
@@ -54,6 +53,7 @@ const INSTRUMENT_CODES: Record<Instrument, string> = {
   'cyCowbellRegular': 'cb',
   // Kick
   'kiKickRegular': 'ki',
+  'kiHhFootRegular': 'kf',
   // Metronome
   'fxMetronomeAccent': 'ma',
   'fxMetronomeRegular': 'mr',
@@ -103,36 +103,49 @@ export function decodeRudiment(code: string): RudimentType {
 }
 
 /**
+ * Check if two instrument arrays are equal
+ */
+function arraysEqual(a: Instrument[], b: Instrument[]): boolean {
+  if (a.length !== b.length) return false
+  return a.every((val, idx) => val === b[idx])
+}
+
+/**
  * Check if instrument mapping is default
  */
 export function isDefaultMapping(mapping: StickingMapping): boolean {
   return (
-    mapping.uppercaseR === DEFAULT_STICKING_MAPPING.uppercaseR &&
-    mapping.uppercaseL === DEFAULT_STICKING_MAPPING.uppercaseL &&
+    arraysEqual(mapping.uppercaseR, DEFAULT_STICKING_MAPPING.uppercaseR) &&
+    arraysEqual(mapping.uppercaseL, DEFAULT_STICKING_MAPPING.uppercaseL) &&
     mapping.uppercaseRKick === DEFAULT_STICKING_MAPPING.uppercaseRKick &&
     mapping.uppercaseLKick === DEFAULT_STICKING_MAPPING.uppercaseLKick &&
-    mapping.lowercaseR === DEFAULT_STICKING_MAPPING.lowercaseR &&
-    mapping.lowercaseL === DEFAULT_STICKING_MAPPING.lowercaseL &&
-    mapping.kick === DEFAULT_STICKING_MAPPING.kick
+    arraysEqual(mapping.lowercaseR, DEFAULT_STICKING_MAPPING.lowercaseR) &&
+    arraysEqual(mapping.lowercaseL, DEFAULT_STICKING_MAPPING.lowercaseL) &&
+    arraysEqual(mapping.kick, DEFAULT_STICKING_MAPPING.kick)
   )
 }
 
 /**
  * Encode instrument mapping to compact string
  * Returns null if mapping is default (to omit from URL)
- * Format: "R,L,r,l,k,Rk,Lk" (7 values separated by comma)
+ * Format: "R,L,r,l,k,Rk,Lk" where each field can be pipe-separated for arrays
+ * Example: "sn|rd|bl,sn,sg,sg,ki,1,0" for uppercaseR=[snare, ride, bell]
  */
 export function encodeOrchestration(mapping: StickingMapping): string | null {
   if (isDefaultMapping(mapping)) {
     return null
   }
 
+  const encodeArray = (instruments: Instrument[]): string => {
+    return instruments.map(inst => INSTRUMENT_CODES[inst]).join('|')
+  }
+
   const parts = [
-    INSTRUMENT_CODES[mapping.uppercaseR],
-    INSTRUMENT_CODES[mapping.uppercaseL],
-    INSTRUMENT_CODES[mapping.lowercaseR],
-    INSTRUMENT_CODES[mapping.lowercaseL],
-    INSTRUMENT_CODES[mapping.kick],
+    encodeArray(mapping.uppercaseR),
+    encodeArray(mapping.uppercaseL),
+    encodeArray(mapping.lowercaseR),
+    encodeArray(mapping.lowercaseL),
+    encodeArray(mapping.kick),
     mapping.uppercaseRKick ? '1' : '0',
     mapping.uppercaseLKick ? '1' : '0',
   ]
@@ -142,7 +155,7 @@ export function encodeOrchestration(mapping: StickingMapping): string | null {
 
 /**
  * Decode orchestration string to instrument mapping
- * "sn,sn,sg,sg,ki,1,0" -> StickingMapping
+ * "sn|rd|bl,sn,sg,sg,ki,1,0" -> StickingMapping with arrays
  */
 export function decodeOrchestration(value: string): StickingMapping {
   const parts = value.split(',')
@@ -152,12 +165,21 @@ export function decodeOrchestration(value: string): StickingMapping {
   }
 
   try {
+    const decodeArray = (encoded: string, defaultValue: Instrument[]): Instrument[] => {
+      const codes = encoded.split('|')
+      const instruments = codes
+        .map(code => INSTRUMENT_DECODE[code])
+        .filter(inst => inst !== undefined)
+
+      return instruments.length > 0 ? instruments : defaultValue
+    }
+
     return {
-      uppercaseR: INSTRUMENT_DECODE[parts[0]] || DEFAULT_STICKING_MAPPING.uppercaseR,
-      uppercaseL: INSTRUMENT_DECODE[parts[1]] || DEFAULT_STICKING_MAPPING.uppercaseL,
-      lowercaseR: INSTRUMENT_DECODE[parts[2]] || DEFAULT_STICKING_MAPPING.lowercaseR,
-      lowercaseL: INSTRUMENT_DECODE[parts[3]] || DEFAULT_STICKING_MAPPING.lowercaseL,
-      kick: INSTRUMENT_DECODE[parts[4]] || DEFAULT_STICKING_MAPPING.kick,
+      uppercaseR: decodeArray(parts[0], DEFAULT_STICKING_MAPPING.uppercaseR),
+      uppercaseL: decodeArray(parts[1], DEFAULT_STICKING_MAPPING.uppercaseL),
+      lowercaseR: decodeArray(parts[2], DEFAULT_STICKING_MAPPING.lowercaseR),
+      lowercaseL: decodeArray(parts[3], DEFAULT_STICKING_MAPPING.lowercaseL),
+      kick: decodeArray(parts[4], DEFAULT_STICKING_MAPPING.kick),
       uppercaseRKick: parts[5] === '1',
       uppercaseLKick: parts[6] === '1',
     }

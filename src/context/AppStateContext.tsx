@@ -1,10 +1,35 @@
 import { createContext, useContext, useState, useEffect, useMemo, type FC, type ReactNode } from 'react'
 import type { RudimentType } from '../types.ts'
-import type { StickingMapping } from '../types/instrument'
+import type { StickingMapping, Instrument } from '../types/instrument'
 import type { AppState } from '../types/appState'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
+
+/**
+ * Migrate old StickingMapping format (single instruments) to new format (arrays)
+ * @param mapping - Potentially old format mapping
+ * @returns Migrated mapping with arrays
+ */
+function migrateStickingMapping(mapping: any): StickingMapping {
+  if (!mapping) return DEFAULT_APP_STATE.instrumentMapping
+
+  // Check if already migrated (uppercaseR is an array)
+  if (Array.isArray(mapping.uppercaseR)) {
+    return mapping as StickingMapping
+  }
+
+  // Migrate: convert single instruments to arrays
+  return {
+    uppercaseR: [mapping.uppercaseR] as Instrument[],
+    uppercaseL: [mapping.uppercaseL] as Instrument[],
+    uppercaseRKick: mapping.uppercaseRKick ?? false,
+    uppercaseLKick: mapping.uppercaseLKick ?? false,
+    lowercaseR: [mapping.lowercaseR] as Instrument[],
+    lowercaseL: [mapping.lowercaseL] as Instrument[],
+    kick: [mapping.kick] as Instrument[],
+  }
+}
 
 interface AppStateContextValue {
   state: AppState
@@ -45,7 +70,15 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     const savedTempo = LocalStorageManager.getItem<number>('tempo')
     const savedMetronome = LocalStorageManager.getItem<boolean>('metronome')
     const savedMetronomeVolume = LocalStorageManager.getItem<number>('metronomeVolume')
-    const savedMapping = LocalStorageManager.getItem<StickingMapping>('instrumentMapping')
+    const savedMapping = LocalStorageManager.getItem<any>('instrumentMapping')
+
+    // Migrate saved mapping from old format (single instruments) to new format (arrays)
+    const migratedMapping = savedMapping ? migrateStickingMapping(savedMapping) : DEFAULT_APP_STATE.instrumentMapping
+
+    // Migrate URL mapping if present
+    const finalMapping = urlState.instrumentMapping
+      ? migrateStickingMapping(urlState.instrumentMapping)
+      : migratedMapping
 
     // 3. Merge URL > localStorage > defaults
     return {
@@ -54,7 +87,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
       metronome: urlState.metronome ?? savedMetronome ?? DEFAULT_APP_STATE.metronome,
       metronomeVolume: savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
-      instrumentMapping: urlState.instrumentMapping ?? savedMapping ?? DEFAULT_APP_STATE.instrumentMapping,
+      instrumentMapping: finalMapping,
     }
   })
 

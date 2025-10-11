@@ -15,10 +15,10 @@ export type Instrument =
   | 'hhCloseAccent'
   | 'hhCloseGhost'
   | 'hhCloseRegular'
-  | 'hhFootRegular'
   | 'hhOpenAccent'
   | 'hhOpenRegular'
   // Kick
+  | 'kiHhFootRegular'
   | 'kiKickRegular'
   // Snare
   | 'snRimRegular'
@@ -56,49 +56,42 @@ export type Hand = 'r' | 'l' | null;
 
 // Sticking mapping configuration
 export interface StickingMapping {
-  uppercaseR: Instrument;          // For R (right hand regular)
-  uppercaseL: Instrument;          // For L (left hand regular)
+  uppercaseR: Instrument[];        // For R (right hand regular) - array for rotation
+  uppercaseL: Instrument[];        // For L (left hand regular) - array for rotation
   uppercaseRKick: boolean;         // Add kick to R
   uppercaseLKick: boolean;         // Add kick to L
-  lowercaseR: Instrument;          // For r (right hand ghost)
-  lowercaseL: Instrument;          // For l (left hand ghost)
-  kick: Instrument;                // For k (kick)
+  lowercaseR: Instrument[];        // For r (right hand ghost) - array for rotation
+  lowercaseL: Instrument[];        // For l (left hand ghost) - array for rotation
+  kick: Instrument[];              // For k (kick) - array for rotation
 }
 
 // Default sticking mapping
 export const DEFAULT_STICKING_MAPPING: StickingMapping = {
-  uppercaseR: 'snSnareRegular',
-  uppercaseL: 'snSnareRegular',
+  uppercaseR: ['snSnareRegular'],
+  uppercaseL: ['snSnareRegular'],
   uppercaseRKick: false,
   uppercaseLKick: false,
-  lowercaseR: 'snSnareGhost',
-  lowercaseL: 'snSnareGhost',
-  kick: 'kiKickRegular',
+  lowercaseR: ['snSnareGhost'],
+  lowercaseL: ['snSnareGhost'],
+  kick: ['kiKickRegular'],
 };
 
 // Grouped instruments for UI selection
 export const INSTRUMENT_GROUPS = {
   Snare: [
     'snSnareRegular',
-    'snSnareAccent',
     'snSnareGhost',
     'snRimRegular',
   ] as Instrument[],
   'Hi-hat': [
     'hhCloseRegular',
-    'hhCloseAccent',
     'hhCloseGhost',
     'hhOpenRegular',
-    'hhOpenAccent',
-    'hhFootRegular',
   ] as Instrument[],
   Toms: [
     't1HighRegular',
-    't1HighAccent',
     't2MidRegular',
-    't2MidAccent',
     't3LowRegular',
-    't3LowAccent',
   ] as Instrument[],
   Cymbals: [
     'cyRideRegular',
@@ -112,6 +105,7 @@ export const INSTRUMENT_GROUPS = {
   ] as Instrument[],
   Kick: [
     'kiKickRegular',
+    'kiHhFootRegular',
   ] as Instrument[],
 };
 
@@ -119,6 +113,8 @@ export const INSTRUMENT_GROUPS = {
 export interface Bar {
   // Array of instruments to play at each rhythm subdivision
   rhythm: Instrument[][];
+  // Optional array of sticking symbols for rotation (e.g., ['R', 'l', 'r', 'r', ...])
+  stickings?: string[];
   // Optional array of hands for each subdivision (for pitch shifting)
   hands?: Hand[];
   // Time signature

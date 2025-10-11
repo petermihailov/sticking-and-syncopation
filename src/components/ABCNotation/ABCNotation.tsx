@@ -112,6 +112,7 @@ export function ABCNotation({
         const player = new Player()
         player.setKit(kit)
         player.setTempo(state.tempo)
+        player.setInstrumentMapping(state.instrumentMapping)
 
         // Set metronome initial state
         if (state.metronome) {
@@ -189,6 +190,12 @@ export function ABCNotation({
     if (!playerRef.current) return
     playerRef.current.setMetronomeVolume(state.metronomeVolume)
   }, [state.metronomeVolume])
+
+  // Sync instrument mapping with Player
+  useEffect(() => {
+    if (!playerRef.current) return
+    playerRef.current.setInstrumentMapping(state.instrumentMapping)
+  }, [state.instrumentMapping])
 
   // Keyboard shortcut: Space for play/pause (with a11y considerations)
   useEffect(() => {
@@ -280,7 +287,7 @@ export function ABCNotation({
 
   const handleMappingChange = (
     key: keyof StickingMapping,
-    value: Instrument | boolean | undefined
+    value: Instrument[] | boolean
   ) => {
     actions.setInstrumentMapping({
       ...state.instrumentMapping,
@@ -288,40 +295,87 @@ export function ABCNotation({
     })
   }
 
-  // Render instrument select
-  const renderInstrumentSelect = (
-    label: string,
-    value: Instrument,
-    onChange: (value: Instrument) => void
-  ) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-      {label && (
-        <label style={{ fontSize: '0.85rem', minWidth: '60px' }}>
-          {label}:
-        </label>
-      )}
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value as Instrument)}
-        style={{
-          fontSize: '0.85rem',
-          padding: '2px 4px',
-          flex: 1,
-          minWidth: 0,
-        }}
-      >
-        {Object.entries(INSTRUMENT_GROUPS).map(([groupName, instruments]) => (
-          <optgroup key={groupName} label={groupName}>
-            {instruments.map(inst => (
-              <option key={inst} value={inst}>
-                {inst.replace(/([a-z])([A-Z])/g, '$1 $2')}
-              </option>
+  // Render instrument multi-select with rotation
+  const renderInstrumentMultiSelect = (
+    values: Instrument[],
+    onChange: (values: Instrument[]) => void
+  ) => {
+    const handleAdd = (instrument: Instrument) => {
+      onChange([...values, instrument])
+    }
+
+    const handleRemove = (index: number) => {
+      onChange(values.filter((_, i) => i !== index))
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        {/* Selected instruments */}
+        {values.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+            {values.map((inst, index) => (
+              <div
+                key={`${inst}-${index}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.2rem 0.4rem',
+                  background: '#e3f2fd',
+                  border: '1px solid #90caf9',
+                  borderRadius: '3px',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <span>{inst.replace(/([a-z])([A-Z])/g, '$1 $2')}</span>
+                <button
+                  onClick={() => handleRemove(index)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: '0',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    color: '#666',
+                    lineHeight: 1,
+                  }}
+                  title="Remove"
+                >
+                  ×
+                </button>
+              </div>
             ))}
-          </optgroup>
-        ))}
-      </select>
-    </div>
-  )
+          </div>
+        )}
+
+        {/* Dropdown to add instruments */}
+        <select
+          value=""
+          onChange={e => {
+            if (e.target.value) {
+              handleAdd(e.target.value as Instrument)
+              e.target.value = '' // Reset dropdown
+            }
+          }}
+          style={{
+            fontSize: '0.75rem',
+            padding: '0.3rem',
+          }}
+        >
+          <option value="">+ Add instrument</option>
+          {Object.entries(INSTRUMENT_GROUPS).map(([groupName, instruments]) => (
+            <optgroup key={groupName} label={groupName}>
+              {instruments.map(inst => (
+                <option key={inst} value={inst}>
+                  {inst.replace(/([a-z])([A-Z])/g, '$1 $2')}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+    )
+  }
 
   // Render kick checkbox
   const renderKickCheckbox = (
@@ -507,8 +561,7 @@ export function ABCNotation({
                   >
                     L (accent)
                   </div>
-                  {renderInstrumentSelect(
-                    '',
+                  {renderInstrumentMultiSelect(
                     state.instrumentMapping.uppercaseL,
                     v => handleMappingChange('uppercaseL', v)
                   )}
@@ -540,8 +593,7 @@ export function ABCNotation({
                   >
                     R (accent)
                   </div>
-                  {renderInstrumentSelect(
-                    '',
+                  {renderInstrumentMultiSelect(
                     state.instrumentMapping.uppercaseR,
                     v => handleMappingChange('uppercaseR', v)
                   )}
@@ -570,8 +622,7 @@ export function ABCNotation({
                   >
                     l (ghost)
                   </div>
-                  {renderInstrumentSelect(
-                    '',
+                  {renderInstrumentMultiSelect(
                     state.instrumentMapping.lowercaseL,
                     v => handleMappingChange('lowercaseL', v)
                   )}
@@ -595,8 +646,7 @@ export function ABCNotation({
                   >
                     r (ghost)
                   </div>
-                  {renderInstrumentSelect(
-                    '',
+                  {renderInstrumentMultiSelect(
                     state.instrumentMapping.lowercaseR,
                     v => handleMappingChange('lowercaseR', v)
                   )}
@@ -621,7 +671,7 @@ export function ABCNotation({
                   >
                     k (kick)
                   </div>
-                  {renderInstrumentSelect('', state.instrumentMapping.kick, v =>
+                  {renderInstrumentMultiSelect(state.instrumentMapping.kick, v =>
                     handleMappingChange('kick', v)
                   )}
                 </div>

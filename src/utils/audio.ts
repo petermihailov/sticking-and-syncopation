@@ -64,10 +64,10 @@ export async function createDrumKit(
     'hhCloseAccent',
     'hhCloseGhost',
     'hhCloseRegular',
-    'hhFootRegular',
     'hhOpenAccent',
     'hhOpenRegular',
     // Kick
+    'kiHhFootRegular',
     'kiKickRegular',
     // Snare
     'snRimRegular',

@@ -5,7 +5,9 @@ import type {
   DrumKit,
   Group,
   Hand,
+  StickingMapping,
 } from '../types/instrument'
+import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
 import { getAudioContext } from '../utils/audio'
 import { getInstrumentsByIndex } from '../utils/groove'
 
@@ -22,6 +24,8 @@ export class Player {
   private hhOpenBuffers: AudioBufferSourceNode[]
   private fxOpenBuffers: AudioBufferSourceNode[]
   private timeoutId: number | undefined
+  private instrumentCounters: Map<string, number>
+  private mapping: StickingMapping
 
   constructor() {
     this.kit = {} as DrumKit
@@ -35,6 +39,8 @@ export class Player {
     this.audioCtx = getAudioContext()
     this.hhOpenBuffers = []
     this.fxOpenBuffers = []
+    this.instrumentCounters = new Map()
+    this.mapping = DEFAULT_STICKING_MAPPING
   }
 
   public setKit(kit: DrumKit) {
@@ -59,6 +65,10 @@ export class Player {
 
   public setMetronomeVolume(volume: number) {
     this.metronomeVolume = volume
+  }
+
+  public setInstrumentMapping(mapping: StickingMapping) {
+    this.mapping = mapping
   }
 
   public mute(group: Group) {
@@ -90,7 +100,14 @@ export class Player {
       return
     }
 
-    const instruments = getInstrumentsByIndex(bar, 0, this.muted)
+    // Resolve instruments with rotation if stickings are available
+    let instruments: Instrument[]
+    if (bar.stickings && bar.stickings[0]) {
+      instruments = this.resolveStickingToInstruments(bar.stickings[0])
+    } else {
+      instruments = getInstrumentsByIndex(bar, 0, this.muted)
+    }
+
     const hand = bar.hands?.[0] ?? null
 
     this.nextBeatAt = this.audioCtx.currentTime
@@ -106,12 +123,83 @@ export class Player {
     this.fxOpenBuffers.forEach(buffer => buffer.stop())
     this.hhOpenBuffers = []
     this.fxOpenBuffers = []
+    this.instrumentCounters.clear()
 
     this.onBeat({
       barIndex: 0,
       rhythmIndex: 0,
       instruments: [],
     })
+  }
+
+  /**
+   * Resolve a sticking symbol to instruments with rotation
+   * Each sticking has its own counter that increments on each use
+   */
+  private resolveStickingToInstruments(sticking: string): Instrument[] {
+    const instruments: Instrument[] = []
+
+    if (sticking === 'R') {
+      // Uppercase R with rotation
+      const array = this.mapping.uppercaseR
+      if (array.length > 0) {
+        const counter = this.instrumentCounters.get('uppercaseR') || 0
+        instruments.push(array[counter % array.length])
+        this.instrumentCounters.set('uppercaseR', counter + 1)
+      }
+      // Add optional kick
+      if (this.mapping.uppercaseRKick) {
+        const kickArray = this.mapping.kick
+        if (kickArray.length > 0) {
+          const kickCounter = this.instrumentCounters.get('kick_R') || 0
+          instruments.push(kickArray[kickCounter % kickArray.length])
+          this.instrumentCounters.set('kick_R', kickCounter + 1)
+        }
+      }
+    } else if (sticking === 'L') {
+      // Uppercase L with rotation
+      const array = this.mapping.uppercaseL
+      if (array.length > 0) {
+        const counter = this.instrumentCounters.get('uppercaseL') || 0
+        instruments.push(array[counter % array.length])
+        this.instrumentCounters.set('uppercaseL', counter + 1)
+      }
+      // Add optional kick
+      if (this.mapping.uppercaseLKick) {
+        const kickArray = this.mapping.kick
+        if (kickArray.length > 0) {
+          const kickCounter = this.instrumentCounters.get('kick_L') || 0
+          instruments.push(kickArray[kickCounter % kickArray.length])
+          this.instrumentCounters.set('kick_L', kickCounter + 1)
+        }
+      }
+    } else if (sticking === 'r') {
+      // Lowercase r with rotation
+      const array = this.mapping.lowercaseR
+      if (array.length > 0) {
+        const counter = this.instrumentCounters.get('lowercaseR') || 0
+        instruments.push(array[counter % array.length])
+        this.instrumentCounters.set('lowercaseR', counter + 1)
+      }
+    } else if (sticking === 'l') {
+      // Lowercase l with rotation
+      const array = this.mapping.lowercaseL
+      if (array.length > 0) {
+        const counter = this.instrumentCounters.get('lowercaseL') || 0
+        instruments.push(array[counter % array.length])
+        this.instrumentCounters.set('lowercaseL', counter + 1)
+      }
+    } else if (sticking === 'k') {
+      // Kick with rotation
+      const array = this.mapping.kick
+      if (array.length > 0) {
+        const counter = this.instrumentCounters.get('kick') || 0
+        instruments.push(array[counter % array.length])
+        this.instrumentCounters.set('kick', counter + 1)
+      }
+    }
+
+    return instruments
   }
 
   private playNotesAtNextBeatTime(
@@ -229,11 +317,18 @@ export class Player {
       this.scheduleMetronome(nextBar)
     }
 
-    const nextInstruments = getInstrumentsByIndex(
-      nextBar,
-      nextRhythmIndex,
-      this.muted
-    )
+    // Resolve instruments with rotation if stickings are available
+    let nextInstruments: Instrument[]
+    if (nextBar.stickings && nextBar.stickings[nextRhythmIndex]) {
+      nextInstruments = this.resolveStickingToInstruments(nextBar.stickings[nextRhythmIndex])
+    } else {
+      nextInstruments = getInstrumentsByIndex(
+        nextBar,
+        nextRhythmIndex,
+        this.muted
+      )
+    }
+
     const nextHand = nextBar.hands?.[nextRhythmIndex] ?? null
 
     // Schedule next beat
