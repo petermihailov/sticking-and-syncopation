@@ -14,6 +14,8 @@ export interface AppState {
   tempo: number
   /** Whether metronome is enabled */
   metronome: boolean
+  /** Metronome volume (0.0 - 1.0), stored in localStorage only */
+  metronomeVolume: number
   /** Instrument mapping for stickings */
   instrumentMapping: StickingMapping
 }
@@ -26,5 +28,6 @@ export const DEFAULT_APP_STATE: AppState = {
   rudiment: 'paradiddle_single_accent',
   tempo: 80,
   metronome: false,
+  metronomeVolume: 1.0,
   instrumentMapping: DEFAULT_STICKING_MAPPING,
 }

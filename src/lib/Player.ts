@@ -15,6 +15,7 @@ export class Player {
   private bars: Bar[]
   private tempo: number
   private metronome: boolean
+  private metronomeVolume: number
   private muted: Group[]
   private nextBeatAt: number
   private onBeat: (beat: Beat) => void
@@ -27,6 +28,7 @@ export class Player {
     this.bars = []
     this.tempo = 80
     this.metronome = false
+    this.metronomeVolume = 1.0
     this.muted = []
     this.nextBeatAt = 0
     this.onBeat = () => undefined
@@ -53,6 +55,10 @@ export class Player {
 
   public stopMetronome() {
     this.metronome = false
+  }
+
+  public setMetronomeVolume(volume: number) {
+    this.metronomeVolume = volume
   }
 
   public mute(group: Group) {
@@ -133,6 +139,11 @@ export class Player {
         gainNode.gain.value = 0.5 // Splash cymbal slightly quieter
       } else {
         gainNode.gain.value = 1.0 // Normal volume
+      }
+
+      // Apply metronome volume
+      if (instrument.startsWith('fxMetronome')) {
+        gainNode.gain.value *= this.metronomeVolume
       }
 
       // Apply pitch shift based on hand

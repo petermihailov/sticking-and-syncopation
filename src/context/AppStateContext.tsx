@@ -14,6 +14,7 @@ interface AppStateContextValue {
     setRudiment: (rudiment: RudimentType) => void
     setTempo: (tempo: number) => void
     setMetronome: (enabled: boolean) => void
+    setMetronomeVolume: (volume: number) => void
     setInstrumentMapping: (mapping: StickingMapping) => void
     resetAccents: () => void
     resetToDefaults: () => void
@@ -43,6 +44,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     const savedRudiment = LocalStorageManager.getItem<RudimentType>('selectedRudiment')
     const savedTempo = LocalStorageManager.getItem<number>('tempo')
     const savedMetronome = LocalStorageManager.getItem<boolean>('metronome')
+    const savedMetronomeVolume = LocalStorageManager.getItem<number>('metronomeVolume')
     const savedMapping = LocalStorageManager.getItem<StickingMapping>('instrumentMapping')
 
     // 3. Merge URL > localStorage > defaults
@@ -51,6 +53,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       rudiment: urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
       tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
       metronome: urlState.metronome ?? savedMetronome ?? DEFAULT_APP_STATE.metronome,
+      metronomeVolume: savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
       instrumentMapping: urlState.instrumentMapping ?? savedMapping ?? DEFAULT_APP_STATE.instrumentMapping,
     }
   })
@@ -71,6 +74,10 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
   useEffect(() => {
     LocalStorageManager.setItem('metronome', state.metronome)
   }, [state.metronome])
+
+  useEffect(() => {
+    LocalStorageManager.setItem('metronomeVolume', state.metronomeVolume)
+  }, [state.metronomeVolume])
 
   useEffect(() => {
     LocalStorageManager.setItem('instrumentMapping', state.instrumentMapping)
@@ -99,6 +106,10 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
 
   const setMetronome = (metronome: boolean) => {
     setState(prev => ({ ...prev, metronome }))
+  }
+
+  const setMetronomeVolume = (metronomeVolume: number) => {
+    setState(prev => ({ ...prev, metronomeVolume }))
   }
 
   const setInstrumentMapping = (instrumentMapping: StickingMapping) => {
@@ -137,6 +148,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       setRudiment,
       setTempo,
       setMetronome,
+      setMetronomeVolume,
       setInstrumentMapping,
       resetAccents,
       resetToDefaults,
