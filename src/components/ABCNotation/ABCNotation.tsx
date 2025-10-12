@@ -6,14 +6,12 @@ import { SVGFilters } from './SVGFilters'
 import { Player } from '../../lib/Player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
-import type {
-  DrumKit,
-  Instrument,
-  StickingMapping,
-} from '../../types/instrument'
-import { INSTRUMENT_GROUPS } from '../../types/instrument'
+import type { DrumKit, StickingMapping } from '../../types/instrument'
 import { useAppState } from '../../context/AppStateContext'
-import { ShareButton } from '../ShareButton'
+import { PlayerControls } from '../PlayerControls/PlayerControls'
+import { TempoControl } from '../TempoControl/TempoControl'
+import { MetronomeControls } from '../MetronomeControls/MetronomeControls'
+import { OrchestrationPanel } from '../OrchestrationPanel/OrchestrationPanel'
 
 interface ABCNotationProps {
   seeNotation: string
@@ -40,7 +38,9 @@ export function ABCNotation({
     rhythmIndex: 0,
   })
   const [playerVersion, setPlayerVersion] = useState(0)
-  const [isOrchestrationOpen, setIsOrchestrationOpen] = useState(false)
+  const [instrumentCounters, setInstrumentCounters] = useState<
+    Map<string, number>
+  >(new Map())
   const { state, actions } = useAppState()
 
   useEffect(() => {
@@ -125,6 +125,8 @@ export function ABCNotation({
             barIndex: beat.barIndex,
             rhythmIndex: beat.rhythmIndex,
           })
+          // Update instrument counters for rotation visualization
+          setInstrumentCounters(player.getInstrumentCounters())
         })
 
         playerRef.current = player
@@ -256,6 +258,7 @@ export function ABCNotation({
       playerRef.current.stop()
       setIsPlaying(false)
       setCurrentBeat({ barIndex: 0, rhythmIndex: 0 })
+      setInstrumentCounters(new Map()) // Reset counters on stop
     }
   }
 
@@ -287,114 +290,13 @@ export function ABCNotation({
 
   const handleMappingChange = (
     key: keyof StickingMapping,
-    value: Instrument[] | boolean
+    value: unknown
   ) => {
     actions.setInstrumentMapping({
       ...state.instrumentMapping,
       [key]: value,
     })
   }
-
-  // Render instrument multi-select with rotation
-  const renderInstrumentMultiSelect = (
-    values: Instrument[],
-    onChange: (values: Instrument[]) => void
-  ) => {
-    const handleAdd = (instrument: Instrument) => {
-      onChange([...values, instrument])
-    }
-
-    const handleRemove = (index: number) => {
-      onChange(values.filter((_, i) => i !== index))
-    }
-
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {/* Selected instruments */}
-        {values.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-            {values.map((inst, index) => (
-              <div
-                key={`${inst}-${index}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.3rem',
-                  padding: '0.2rem 0.4rem',
-                  background: '#e3f2fd',
-                  border: '1px solid #90caf9',
-                  borderRadius: '3px',
-                  fontSize: '0.75rem',
-                }}
-              >
-                <span>{inst.replace(/([a-z])([A-Z])/g, '$1 $2')}</span>
-                <button
-                  onClick={() => handleRemove(index)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: '0',
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                    color: '#666',
-                    lineHeight: 1,
-                  }}
-                  title="Remove"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Dropdown to add instruments */}
-        <select
-          value=""
-          onChange={e => {
-            if (e.target.value) {
-              handleAdd(e.target.value as Instrument)
-              e.target.value = '' // Reset dropdown
-            }
-          }}
-          style={{
-            fontSize: '0.75rem',
-            padding: '0.3rem',
-          }}
-        >
-          <option value="">+ Add instrument</option>
-          {Object.entries(INSTRUMENT_GROUPS).map(([groupName, instruments]) => (
-            <optgroup key={groupName} label={groupName}>
-              {instruments.map(inst => (
-                <option key={inst} value={inst}>
-                  {inst.replace(/([a-z])([A-Z])/g, '$1 $2')}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-      </div>
-    )
-  }
-
-  // Render kick checkbox
-  const renderKickCheckbox = (
-    label: string,
-    checked: boolean,
-    onChange: (checked: boolean) => void
-  ) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-      <label style={{ fontSize: '0.8rem', color: '#666' }}>
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={e => onChange(e.target.checked)}
-          style={{ marginRight: '0.3rem' }}
-        />
-        {label}
-      </label>
-    </div>
-  )
 
   return (
     <div className={classes.container}>
@@ -404,283 +306,35 @@ export function ABCNotation({
       {bars?.length && <Stickings bars={bars} />}
 
       {/* Player Controls */}
-      <div
-        style={{
-          marginTop: '1rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-        }}
-      >
-        {isLoading ? (
-          <div>Loading sounds...</div>
-        ) : (
-          <>
-            {/* Playback controls */}
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <button
-                onClick={handlePlay}
-                disabled={isPlaying || !drumKit || !bars || bars.length === 0}
-              >
-                ▶ Play
-              </button>
-              <button onClick={handleStop} disabled={!isPlaying}>
-                ⏹ Stop
-              </button>
-              <ShareButton />
-              <div style={{ marginLeft: '1rem', fontSize: '0.9rem' }}>
-                Beat: {currentBeat.rhythmIndex + 1}
-              </div>
-              {(!bars || bars.length === 0) && (
-                <div
-                  style={{
-                    marginLeft: '1rem',
-                    fontSize: '0.8rem',
-                    color: '#999',
-                  }}
-                >
-                  (No pattern to play)
-                </div>
-              )}
-            </div>
+      {isLoading ? (
+        <div className={classes.loading}>Loading sounds...</div>
+      ) : (
+        <div className={classes.controls}>
+          <PlayerControls
+            isPlaying={isPlaying}
+            isDisabled={!drumKit || !bars || bars.length === 0}
+            currentBeat={currentBeat.rhythmIndex + 1}
+            onPlay={handlePlay}
+            onStop={handleStop}
+            hasPattern={!!(bars && bars.length > 0)}
+          />
 
-            {/* Tempo control */}
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <label
-                htmlFor="tempo-slider"
-                style={{ fontSize: '0.9rem', minWidth: '120px' }}
-              >
-                Tempo: {state.tempo} BPM
-              </label>
-              <input
-                id="tempo-slider"
-                type="range"
-                min="40"
-                max="200"
-                value={state.tempo}
-                onChange={e => handleTempoChange(Number(e.target.value))}
-                style={{ flex: 1, maxWidth: '200px' }}
-              />
-            </div>
+          <TempoControl tempo={state.tempo} onChange={handleTempoChange} />
 
-            {/* Metronome toggle */}
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <label style={{ fontSize: '0.9rem' }}>
-                <input
-                  type="checkbox"
-                  checked={state.metronome}
-                  onChange={handleMetronomeToggle}
-                  style={{ marginRight: '0.5rem' }}
-                />
-                Metronome
-              </label>
-            </div>
+          <MetronomeControls
+            enabled={state.metronome}
+            volume={state.metronomeVolume}
+            onToggle={handleMetronomeToggle}
+            onVolumeChange={handleMetronomeVolumeChange}
+          />
 
-            {/* Metronome volume control */}
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <label
-                htmlFor="metronome-volume-slider"
-                style={{ fontSize: '0.9rem', minWidth: '120px' }}
-              >
-                Metronome: {Math.round(state.metronomeVolume * 100)}%
-              </label>
-              <input
-                id="metronome-volume-slider"
-                type="range"
-                min="0"
-                max="100"
-                value={state.metronomeVolume * 100}
-                onChange={e =>
-                  handleMetronomeVolumeChange(Number(e.target.value) / 100)
-                }
-                style={{ flex: 1, maxWidth: '200px' }}
-              />
-            </div>
-
-            {/* Instrument mapping */}
-            <div
-              style={{
-                marginTop: '1rem',
-                padding: '0.75rem',
-                background: '#f5f5f5',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-              }}
-            >
-              <div
-                onClick={() => setIsOrchestrationOpen(!isOrchestrationOpen)}
-                style={{
-                  fontSize: '0.9rem',
-                  fontWeight: 'bold',
-                  marginBottom: isOrchestrationOpen ? '0.75rem' : '0',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <span>{isOrchestrationOpen ? '▼' : '▶'}</span>
-                <span>Orchestration</span>
-              </div>
-
-              {isOrchestrationOpen && (
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '1rem',
-                  }}
-                >
-                {/* L (left hand accent) */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.3rem',
-                    padding: '0.5rem',
-                    background: '#fff',
-                    borderRadius: '3px',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      color: '#555',
-                      marginBottom: '0.2rem',
-                    }}
-                  >
-                    L (accent)
-                  </div>
-                  {renderInstrumentMultiSelect(
-                    state.instrumentMapping.uppercaseL,
-                    v => handleMappingChange('uppercaseL', v)
-                  )}
-                  {renderKickCheckbox(
-                    '+ Kick',
-                    state.instrumentMapping.uppercaseLKick,
-                    v => handleMappingChange('uppercaseLKick', v)
-                  )}
-                </div>
-
-                {/* R (right hand accent) */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.3rem',
-                    padding: '0.5rem',
-                    background: '#fff',
-                    borderRadius: '3px',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      color: '#555',
-                      marginBottom: '0.2rem',
-                    }}
-                  >
-                    R (accent)
-                  </div>
-                  {renderInstrumentMultiSelect(
-                    state.instrumentMapping.uppercaseR,
-                    v => handleMappingChange('uppercaseR', v)
-                  )}
-                  {renderKickCheckbox(
-                    '+ Kick',
-                    state.instrumentMapping.uppercaseRKick,
-                    v => handleMappingChange('uppercaseRKick', v)
-                  )}
-                </div>
-
-                {/* l (left hand ghost) */}
-                <div
-                  style={{
-                    padding: '0.5rem',
-                    background: '#fff',
-                    borderRadius: '3px',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      color: '#555',
-                      marginBottom: '0.3rem',
-                    }}
-                  >
-                    l (ghost)
-                  </div>
-                  {renderInstrumentMultiSelect(
-                    state.instrumentMapping.lowercaseL,
-                    v => handleMappingChange('lowercaseL', v)
-                  )}
-                </div>
-
-                {/* r (right hand ghost) */}
-                <div
-                  style={{
-                    padding: '0.5rem',
-                    background: '#fff',
-                    borderRadius: '3px',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      color: '#555',
-                      marginBottom: '0.3rem',
-                    }}
-                  >
-                    r (ghost)
-                  </div>
-                  {renderInstrumentMultiSelect(
-                    state.instrumentMapping.lowercaseR,
-                    v => handleMappingChange('lowercaseR', v)
-                  )}
-                </div>
-
-                {/* k (kick) */}
-                <div
-                  style={{
-                    padding: '0.5rem',
-                    background: '#fff',
-                    borderRadius: '3px',
-                    gridColumn: 'span 2',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      color: '#555',
-                      marginBottom: '0.3rem',
-                    }}
-                  >
-                    k (kick)
-                  </div>
-                  {renderInstrumentMultiSelect(state.instrumentMapping.kick, v =>
-                    handleMappingChange('kick', v)
-                  )}
-                </div>
-              </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+          <OrchestrationPanel
+            mapping={state.instrumentMapping}
+            onChange={handleMappingChange}
+            instrumentCounters={instrumentCounters}
+          />
+        </div>
+      )}
     </div>
   )
 }

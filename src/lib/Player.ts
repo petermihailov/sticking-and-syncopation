@@ -71,6 +71,10 @@ export class Player {
     this.mapping = mapping
   }
 
+  public getInstrumentCounters(): Map<string, number> {
+    return new Map(this.instrumentCounters)
+  }
+
   public mute(group: Group) {
     this.muted.push(group)
   }
