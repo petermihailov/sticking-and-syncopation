@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toggleContainer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.volumeContainer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.volumeLabel {
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.slider {
+  flex: 1;
+  max-width: 200px;
+  cursor: pointer;
+}

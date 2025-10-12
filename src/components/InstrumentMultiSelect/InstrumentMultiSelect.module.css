@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.chip,
+.chipCurrent,
+.chipNext {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
+
+/* Default chip - blue */
+.chip {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+}
+
+/* Current instrument (playing now) - yellow */
+.chipCurrent {
+  background: #fff9c4;
+  border: 1px solid #fdd835;
+}
+
+/* Next instrument - blue (same as default for now based on the user's modification) */
+.chipNext {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+}
+
+.icon {
+  line-height: 1;
+}
+
+.chipText {
+  flex: 1;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.removeButton:hover {
+  color: #333;
+}
+
+.dropdown {
+  font-size: 0.75rem;
+  padding: 0.3rem;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+}
