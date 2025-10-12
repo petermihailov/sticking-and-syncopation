@@ -20,16 +20,27 @@ import type {
  * Thin layer that coordinates between services
  */
 export class Player {
+  private readonly audioEngine: IAudioEngine
+  private readonly scheduler: IScheduler
+  private readonly resolver: IInstrumentResolver
+  private readonly state: IStateManager
+  private readonly buffers: IBufferManager
   private nextBeatAt: number = 0
   private timeoutId: number | undefined
 
   constructor(
-    private readonly audioEngine: IAudioEngine,
-    private readonly scheduler: IScheduler,
-    private readonly resolver: IInstrumentResolver,
-    private readonly state: IStateManager,
-    private readonly buffers: IBufferManager
-  ) {}
+    audioEngine: IAudioEngine,
+    scheduler: IScheduler,
+    resolver: IInstrumentResolver,
+    state: IStateManager,
+    buffers: IBufferManager
+  ) {
+    this.audioEngine = audioEngine
+    this.scheduler = scheduler
+    this.resolver = resolver
+    this.state = state
+    this.buffers = buffers
+  }
 
   // === Public API ===
 

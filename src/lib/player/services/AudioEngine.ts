@@ -5,9 +5,12 @@ import type { IAudioEngine, PlayOptions } from '../di/types'
  * Audio engine service - handles Web Audio API interactions
  */
 export class AudioEngine implements IAudioEngine {
+  private readonly audioCtx: AudioContext
   private kit: DrumKit = {}
 
-  constructor(private readonly audioCtx: AudioContext) {}
+  constructor(audioCtx: AudioContext) {
+    this.audioCtx = audioCtx
+  }
 
   /**
    * Set the drum kit (audio buffers)
