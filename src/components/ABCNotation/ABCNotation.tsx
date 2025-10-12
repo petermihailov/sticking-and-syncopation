@@ -3,7 +3,7 @@ import abcjs from 'abcjs'
 import classes from './ABCNotation.module.css'
 import { Stickings } from '../Stickings'
 import { SVGFilters } from './SVGFilters'
-import { Player } from '../../lib/Player'
+import { createPlayer, type Player } from '../../lib/player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
 import type { DrumKit, StickingMapping } from '../../types/instrument'
@@ -109,7 +109,7 @@ export function ABCNotation({
         )
         setDrumKit(kit)
 
-        const player = new Player()
+        const player = createPlayer()
         player.setKit(kit)
         player.setTempo(state.tempo)
         player.setInstrumentMapping(state.instrumentMapping)

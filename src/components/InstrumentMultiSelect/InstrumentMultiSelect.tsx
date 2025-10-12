@@ -48,8 +48,8 @@ export function InstrumentMultiSelect({
       {values.length > 0 && (
         <div className={classes.chipList}>
           {values.map((inst, index) => {
-            const isCurrent = index === currentIndex
-            const isNext = index === nextIndex && values.length > 1
+            // const isCurrent = index === currentIndex
+            // const isNext = index === nextIndex && values.length > 1
 
             return (
               <div key={`${inst}-${index}`} className={getChipClass(index)}>
