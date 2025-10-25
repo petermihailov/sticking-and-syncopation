@@ -8,9 +8,9 @@ export type StickingPattern = Sticking2 | Sticking3 | Sticking4
 export type Accent = 0 | 1
 
 export type RudimentType =
-  | 'paradiddle_single_accent'
-  | 'paradiddle_double_accent'
-  | 'invert_paradiddle_single_accent'
-  | 'invert_paradiddle_double_accent'
-  | 'invert_paradiddle_kick'
-  | 'hand_to_hand_triplets'
+  | '16th-paradiddle-single-accent'
+  | '16th-paradiddle-double-accent'
+  | '16th-invert-paradiddle-single-accent'
+  | '16th-invert-paradiddle-double-accent'
+  | '16th-invert-paradiddle-kick'
+  | '8th-hand-to-hand-triplets'

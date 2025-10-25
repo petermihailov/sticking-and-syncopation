@@ -71,50 +71,50 @@ describe('encodeAccents / decodeAccents', () => {
 })
 
 describe('encodeRudiment / decodeRudiment', () => {
-  it('should encode paradiddle_single_accent to ps', () => {
-    expect(encodeRudiment('paradiddle_single_accent')).toBe('ps')
+  it('should encode 16th-paradiddle-single-accent to ps', () => {
+    expect(encodeRudiment('16th-paradiddle-single-accent')).toBe('ps')
   })
 
-  it('should encode paradiddle_double_accent to pd', () => {
-    expect(encodeRudiment('paradiddle_double_accent')).toBe('pd')
+  it('should encode 16th-paradiddle-double-accent to pd', () => {
+    expect(encodeRudiment('16th-paradiddle-double-accent')).toBe('pd')
   })
 
-  it('should encode invert_paradiddle_single_accent to is', () => {
-    expect(encodeRudiment('invert_paradiddle_single_accent')).toBe('is')
+  it('should encode 16th-invert-paradiddle-single-accent to is', () => {
+    expect(encodeRudiment('16th-invert-paradiddle-single-accent')).toBe('is')
   })
 
-  it('should encode invert_paradiddle_double_accent to id', () => {
-    expect(encodeRudiment('invert_paradiddle_double_accent')).toBe('id')
+  it('should encode 16th-invert-paradiddle-double-accent to id', () => {
+    expect(encodeRudiment('16th-invert-paradiddle-double-accent')).toBe('id')
   })
 
-  it('should encode invert_paradiddle_kick to ik', () => {
-    expect(encodeRudiment('invert_paradiddle_kick')).toBe('ik')
+  it('should encode 16th-invert-paradiddle-kick to ik', () => {
+    expect(encodeRudiment('16th-invert-paradiddle-kick')).toBe('ik')
   })
 
-  it('should encode hand_to_hand_triplets to h3', () => {
-    expect(encodeRudiment('hand_to_hand_triplets')).toBe('h3')
+  it('should encode 8th-hand-to-hand-triplets to h3', () => {
+    expect(encodeRudiment('8th-hand-to-hand-triplets')).toBe('h3')
   })
 
-  it('should decode ps to paradiddle_single_accent', () => {
-    expect(decodeRudiment('ps')).toBe('paradiddle_single_accent')
+  it('should decode ps to 16th-paradiddle-single-accent', () => {
+    expect(decodeRudiment('ps')).toBe('16th-paradiddle-single-accent')
   })
 
-  it('should decode h3 to hand_to_hand_triplets', () => {
-    expect(decodeRudiment('h3')).toBe('hand_to_hand_triplets')
+  it('should decode h3 to 8th-hand-to-hand-triplets', () => {
+    expect(decodeRudiment('h3')).toBe('8th-hand-to-hand-triplets')
   })
 
   it('should decode unknown code to default', () => {
-    expect(decodeRudiment('xx')).toBe('paradiddle_single_accent')
+    expect(decodeRudiment('xx')).toBe('16th-paradiddle-single-accent')
   })
 
   it('should round-trip all rudiment types', () => {
     const rudiments = [
-      'paradiddle_single_accent',
-      'paradiddle_double_accent',
-      'invert_paradiddle_single_accent',
-      'invert_paradiddle_double_accent',
-      'invert_paradiddle_kick',
-      'hand_to_hand_triplets',
+      '16th-paradiddle-single-accent',
+      '16th-paradiddle-double-accent',
+      '16th-invert-paradiddle-single-accent',
+      '16th-invert-paradiddle-double-accent',
+      '16th-invert-paradiddle-kick',
+      '8th-hand-to-hand-triplets',
     ] as const
 
     rudiments.forEach(rudiment => {
@@ -231,7 +231,7 @@ describe('encodeStateToUrl', () => {
     const state: AppState = {
       ...DEFAULT_APP_STATE,
       accents: [true, true, false, false, false, false, true, true],
-      rudiment: 'hand_to_hand_triplets',
+      rudiment: '8th-hand-to-hand-triplets',
     }
     const result = encodeStateToUrl(state)
     expect(result).toBe('a=C3&r=h3')
@@ -240,7 +240,7 @@ describe('encodeStateToUrl', () => {
   it('should encode full state with orchestration', () => {
     const state: AppState = {
       accents: [true, false, true, false, false, true, false, false],
-      rudiment: 'invert_paradiddle_kick',
+      rudiment: '16th-invert-paradiddle-kick',
       tempo: 180,
       metronome: true,
       instrumentMapping: {
@@ -282,14 +282,14 @@ describe('decodeStateFromUrl', () => {
     const params = new URLSearchParams('a=A4&r=ps')
     const result = decodeStateFromUrl(params)
     expect(result.accents).toEqual([true, false, true, false, false, true, false, false])
-    expect(result.rudiment).toBe('paradiddle_single_accent')
+    expect(result.rudiment).toBe('16th-paradiddle-single-accent')
   })
 
   it('should decode URL with tempo', () => {
     const params = new URLSearchParams('a=FF&r=h3&t=140')
     const result = decodeStateFromUrl(params)
     expect(result.accents).toEqual([true, true, true, true, true, true, true, true])
-    expect(result.rudiment).toBe('hand_to_hand_triplets')
+    expect(result.rudiment).toBe('8th-hand-to-hand-triplets')
     expect(result.tempo).toBe(140)
   })
 
@@ -303,7 +303,7 @@ describe('decodeStateFromUrl', () => {
     const params = new URLSearchParams('a=C3&r=ik&t=180&m=1&o=rd,cr,sg,sg,ki,1,0')
     const result = decodeStateFromUrl(params)
     expect(result.accents).toEqual([true, true, false, false, false, false, true, true])
-    expect(result.rudiment).toBe('invert_paradiddle_kick')
+    expect(result.rudiment).toBe('16th-invert-paradiddle-kick')
     expect(result.tempo).toBe(180)
     expect(result.metronome).toBe(true)
     expect(result.instrumentMapping).toEqual({
@@ -339,7 +339,7 @@ describe('decodeStateFromUrl', () => {
     const params = new URLSearchParams('a=ZZ&r=ps')
     const result = decodeStateFromUrl(params)
     // Should return empty accents or skip accents field
-    expect(result.rudiment).toBe('paradiddle_single_accent')
+    expect(result.rudiment).toBe('16th-paradiddle-single-accent')
   })
 })
 
@@ -347,7 +347,7 @@ describe('full round-trip integration', () => {
   it('should preserve state through encode->decode cycle', () => {
     const original: AppState = {
       accents: [true, false, true, true, false, false, true, false],
-      rudiment: 'paradiddle_double_accent',
+      rudiment: '16th-paradiddle-double-accent',
       tempo: 120,
       metronome: true,
       instrumentMapping: {

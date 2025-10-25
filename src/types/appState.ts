@@ -25,7 +25,7 @@ export interface AppState {
  */
 export const DEFAULT_APP_STATE: AppState = {
   accents: [false, false, false, false, false, false, false, false],
-  rudiment: 'paradiddle_single_accent',
+  rudiment: '16th-paradiddle-single-accent',
   tempo: 80,
   metronome: false,
   metronomeVolume: 1.0,

@@ -8,12 +8,12 @@ import { DEFAULT_APP_STATE } from '../types/appState'
  * Rudiment type to 2-character code mapping
  */
 const RUDIMENT_CODES: Record<RudimentType, string> = {
-  'paradiddle_single_accent': 'ps',
-  'paradiddle_double_accent': 'pd',
-  'invert_paradiddle_single_accent': 'is',
-  'invert_paradiddle_double_accent': 'id',
-  'invert_paradiddle_kick': 'ik',
-  'hand_to_hand_triplets': 'h3',
+  '16th-paradiddle-single-accent': 'ps',
+  '16th-paradiddle-double-accent': 'pd',
+  '16th-invert-paradiddle-single-accent': 'is',
+  '16th-invert-paradiddle-double-accent': 'id',
+  '16th-invert-paradiddle-kick': 'ik',
+  '8th-hand-to-hand-triplets': 'h3',
 }
 
 const RUDIMENT_DECODE: Record<string, RudimentType> = Object.fromEntries(
@@ -99,7 +99,7 @@ export function encodeRudiment(rudiment: RudimentType): string {
  * Decode 2-character code to rudiment type
  */
 export function decodeRudiment(code: string): RudimentType {
-  return RUDIMENT_DECODE[code] || 'paradiddle_single_accent'
+  return RUDIMENT_DECODE[code] || '16th-paradiddle-single-accent'
 }
 
 /**

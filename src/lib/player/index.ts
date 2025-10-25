@@ -1,4 +1,4 @@
-import { Container } from './di/Container'
+import { Container } from '../di'
 import { TOKENS } from './di/tokens'
 import { Player } from './Player'
 import { AudioEngine } from './services/AudioEngine'
@@ -11,14 +11,17 @@ import { getAudioContext } from '../../utils/audio'
 /**
  * Create a Player instance with all dependencies configured via DI
  *
- * @param audioContext - Optional AudioContext to inject (useful for testing)
+ * @param audioContext - Optional AudioContext to inject
  * @returns Configured Player instance
  */
 export function createPlayer(audioContext?: AudioContext): Player {
   const container = new Container()
 
   // Register AudioContext (singleton)
-  container.register(TOKENS.AudioContext, () => audioContext ?? getAudioContext())
+  container.register(
+    TOKENS.AudioContext,
+    () => audioContext ?? getAudioContext()
+  )
 
   // Register services (all singletons)
   container.register(TOKENS.AudioEngine, () => {

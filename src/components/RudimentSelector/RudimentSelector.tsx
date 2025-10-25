@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { RudimentType } from '../../types'
+import { getRudimentOptions } from '../../converters/registry'
 import classes from './RudimentSelector.module.css'
 
 interface RudimentSelectorProps {
@@ -7,38 +8,7 @@ interface RudimentSelectorProps {
   onRudimentChange: (rudiment: RudimentType) => void
 }
 
-const rudimentOptions = [
-  {
-    value: 'paradiddle_single_accent',
-    pattern: 'Rlrr',
-    label: 'Paradiddle Single Accent',
-  },
-  {
-    value: 'paradiddle_double_accent',
-    pattern: 'RLrr',
-    label: 'Paradiddle Double Accent',
-  },
-  {
-    value: 'invert_paradiddle_single_accent',
-    pattern: 'Rllr',
-    label: 'Invert paradiddle Single Accent',
-  },
-  {
-    value: 'invert_paradiddle_double_accent',
-    pattern: 'RllR',
-    label: 'Invert paradiddle Double Accent',
-  },
-  {
-    value: 'invert_paradiddle_kick',
-    pattern: 'Rllk',
-    label: 'Invert paradiddle Kick',
-  },
-  {
-    value: 'hand_to_hand_triplets',
-    pattern: 'Rlr',
-    label: 'Hand to Hand Triplets',
-  },
-] as const
+const rudimentOptions = getRudimentOptions()
 
 export function RudimentSelector({
   selectedRudiment,
