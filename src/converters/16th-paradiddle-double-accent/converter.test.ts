@@ -60,7 +60,7 @@ describe('16th-paradiddle-double-accent', () => {
   testCases.forEach(testCase => {
     it(testCase.name, () => {
       const bar = convert(testCase.input as Accent[])
-      const result = createFormattedBars(bar, testCase.input as Accent[])
+      const result = createFormattedBars(bar)
       expect(result[0]).toBe(testCase.expected)
     })
   })

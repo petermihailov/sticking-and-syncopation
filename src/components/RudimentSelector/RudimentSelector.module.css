@@ -54,11 +54,16 @@
     align-items: center;
 }
 
+.selectedOption .pattern {
+    width: auto;
+}
+
 .pattern {
     font-family: monospace;
     font-weight: 600;
-    width: 2.4rem;
+    width: 3.2rem;
     color: #007acc;
+    white-space: nowrap;
 }
 
 .label {

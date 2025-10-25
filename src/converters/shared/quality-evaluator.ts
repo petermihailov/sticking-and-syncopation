@@ -26,7 +26,7 @@ export function evaluatePatternQuality(
   result: Sticking[],
   pattern: string
 ): number {
-  const testSequence = result.join() + pattern
+  const testSequence = result.join('') + pattern
 
   if (
     INVALID_TRANSITIONS.some(transition => testSequence.includes(transition))

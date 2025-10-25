@@ -1,23 +1,21 @@
 import type { Sticking } from '../../types.ts'
+import { flipHands } from '../../converters/shared/hand-utils'
 import { Bar } from './Bar'
 import classes from './Stickings.module.css'
 
 interface StickingDisplayProps {
-  bars: string[]
+  stickings: Sticking[]
+  isMirrored?: boolean
 }
 
-export function Stickings({ bars }: StickingDisplayProps) {
-  const firstBarLabels: Sticking[] = bars[0]
-    .replace(/\s/g, '')
-    .split('') as Sticking[]
-
-  const secondBarLabels: Sticking[] | null = bars[1]
-    ? (bars[1].replace(/\s/g, '').split('') as Sticking[])
+export function Stickings({ stickings, isMirrored = false }: StickingDisplayProps) {
+  const secondBarLabels: Sticking[] | null = isMirrored
+    ? flipHands(stickings)
     : null
 
   return (
     <div className={classes.stickings}>
-      <Bar labels={firstBarLabels} />
+      <Bar labels={stickings} />
       {secondBarLabels && <Bar labels={secondBarLabels} isSecondBar />}
     </div>
   )

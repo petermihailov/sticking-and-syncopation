@@ -7,6 +7,7 @@ import { createPlayer, type Player } from '../../lib/player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
 import type { DrumKit, StickingMapping } from '../../types/instrument'
+import type { Sticking } from '../../types'
 import { useAppState } from '../../context/AppStateContext'
 import { PlayerControls } from '../PlayerControls/PlayerControls'
 import { TempoControl } from '../TempoControl/TempoControl'
@@ -16,7 +17,8 @@ import { OrchestrationPanel } from '../OrchestrationPanel/OrchestrationPanel'
 interface ABCNotationProps {
   seeNotation: string
   playNotation?: string
-  bars?: string[]
+  stickings?: Sticking[]
+  isMirrored?: boolean
   width?: number
   height?: number
 }
@@ -25,7 +27,8 @@ export function ABCNotation({
   seeNotation,
   playNotation,
   width = 420,
-  bars,
+  stickings,
+  isMirrored = false,
 }: ABCNotationProps) {
   const notationRef = useRef<HTMLDivElement>(null)
   const [, setSelectedNotes] = useState<Set<string>>(new Set())
@@ -151,8 +154,8 @@ export function ABCNotation({
 
   // Update player bars when stickings change OR when player is ready
   useEffect(() => {
-    console.log('[ABCNotation] Bars or isLoading changed:', {
-      bars,
+    console.log('[ABCNotation] Stickings or isLoading changed:', {
+      stickings,
       isLoading,
       hasPlayer: !!playerRef.current,
     })
@@ -163,18 +166,18 @@ export function ABCNotation({
       return
     }
 
-    if (bars && bars.length > 0) {
-      console.log('[ABCNotation] Setting player bars:', bars)
-      const playerBars = stickingsToBars(bars, state.instrumentMapping)
+    if (stickings && stickings.length > 0) {
+      console.log('[ABCNotation] Setting player bars from stickings:', stickings)
+      const playerBars = stickingsToBars([stickings], state.instrumentMapping)
       console.log('[ABCNotation] Converted bars:', playerBars)
       playerRef.current.setBars(playerBars)
     } else {
-      console.log('[ABCNotation] No bars to set')
+      console.log('[ABCNotation] No stickings to set')
     }
     // Use string representation to detect content changes, not just reference changes
     // playerVersion ensures bars are re-set when Player is re-initialized
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bars?.join(','), isLoading, playerVersion, state.instrumentMapping])
+  }, [stickings?.join(','), isLoading, playerVersion, state.instrumentMapping])
 
   // Sync metronome state with Player
   useEffect(() => {
@@ -218,12 +221,12 @@ export function ABCNotation({
       // Prevent page scroll when space is used for playback control
       event.preventDefault()
 
-      // Toggle playback if player is ready and has bars
+      // Toggle playback if player is ready and has stickings
       if (
         !isLoading &&
         drumKit &&
-        bars &&
-        bars.length > 0 &&
+        stickings &&
+        stickings.length > 0 &&
         playerRef.current
       ) {
         if (isPlaying) {
@@ -243,7 +246,7 @@ export function ABCNotation({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isLoading, drumKit, bars, isPlaying])
+  }, [isLoading, drumKit, stickings, isPlaying])
 
   const handlePlay = () => {
     if (playerRef.current && !isPlaying) {
@@ -303,7 +306,7 @@ export function ABCNotation({
       <SVGFilters />
       <div ref={notationRef} className={classes.notation} />
       {/*<Labels />*/}
-      {bars?.length && <Stickings bars={bars} />}
+      {stickings?.length && <Stickings stickings={stickings} isMirrored={isMirrored} />}
 
       {/* Player Controls */}
       {isLoading ? (
@@ -312,11 +315,11 @@ export function ABCNotation({
         <div className={classes.controls}>
           <PlayerControls
             isPlaying={isPlaying}
-            isDisabled={!drumKit || !bars || bars.length === 0}
+            isDisabled={!drumKit || !stickings || stickings.length === 0}
             currentBeat={currentBeat.rhythmIndex + 1}
             onPlay={handlePlay}
             onStop={handleStop}
-            hasPattern={!!(bars && bars.length > 0)}
+            hasPattern={!!(stickings && stickings.length > 0)}
           />
 
           <TempoControl tempo={state.tempo} onChange={handleTempoChange} />

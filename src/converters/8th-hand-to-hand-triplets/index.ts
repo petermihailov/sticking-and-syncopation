@@ -3,7 +3,7 @@ import type { Accent, Sticking } from '../../types.ts'
 
 export { replaces } from './replaces.ts'
 export const converterName = '8th hand-to-hand triplets'
-export const pattern = 'Rlr' // replaces['11'] = '101' -> Rlr pattern
+export const pattern = 'Rlr'
 
 /** Convert to 8th hand-to-hand triplets */
 export function convert(accentMap8: Accent[]): Sticking[] {
@@ -22,7 +22,6 @@ export function convert(accentMap8: Accent[]): Sticking[] {
     triplets.push(triplet)
   }
 
-  // Generate rlrlrlrlrlrl pattern and apply accents
   const handPattern = 'rlrlrlrlrlrl'
   const result: Sticking[] = []
 

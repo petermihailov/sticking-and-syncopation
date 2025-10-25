@@ -9,7 +9,7 @@ export function formatBar(bar: Sticking[]): string {
   for (let i = 0; i < bar.length; i += QUARTER_LENGTH) {
     quarters.push(bar.slice(i, i + QUARTER_LENGTH).join(''))
   }
-  return quarters.join(' ')
+  return quarters.join('')
 }
 
 export function shouldCreateMirroredBar(

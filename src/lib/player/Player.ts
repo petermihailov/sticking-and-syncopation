@@ -246,7 +246,9 @@ export class Player {
     // Resolve instruments with rotation if stickings are available
     let nextInstruments: Instrument[]
     if (nextBar.stickings && nextBar.stickings[nextRhythmIndex]) {
-      nextInstruments = this.resolver.resolve(nextBar.stickings[nextRhythmIndex])
+      nextInstruments = this.resolver.resolve(
+        nextBar.stickings[nextRhythmIndex]
+      )
     } else {
       nextInstruments = getInstrumentsByIndex(
         nextBar,
@@ -276,10 +278,7 @@ export class Player {
 
     for (let i = 0; i < bar.beatsPerBar; i++) {
       const instrument = i === 0 ? 'fxMetronomeAccent' : 'fxMetronomeRegular'
-      this.playNotesAtNextBeatTime(
-        [instrument],
-        this.nextBeatAt + timeStep * i
-      )
+      this.playNotesAtNextBeatTime([instrument], this.nextBeatAt + timeStep * i)
     }
   }
 }

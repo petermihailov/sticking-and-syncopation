@@ -1,4 +1,4 @@
-import type { Sticking, Accent } from '../../types.ts'
+import type { Sticking } from '../../types.ts'
 import { flipHands } from '../shared/hand-utils.ts'
 import { INVALID_TRANSITIONS } from '../shared/quality-evaluator.ts'
 
@@ -9,13 +9,10 @@ export function formatBar(bar: Sticking[]): string {
   for (let i = 0; i < bar.length; i += QUARTER_LENGTH) {
     quarters.push(bar.slice(i, i + QUARTER_LENGTH).join(''))
   }
-  return quarters.join(' ')
+  return quarters.join('')
 }
 
-export function shouldCreateMirroredBar(
-  bar: Sticking[],
-  accentMap8: Accent[]
-): boolean {
+export function shouldCreateMirroredBar(bar: Sticking[]): boolean {
   const calcDoubles = (str: string) => (str.match(/rr|ll/g) || []).length
 
   // склеены два такта: обычный + обычный
@@ -62,12 +59,9 @@ export function shouldCreateMirroredBar(
   return false
 }
 
-export function createFormattedBars(
-  bar: Sticking[],
-  accentMap8: Accent[]
-): string[] {
+export function createFormattedBars(bar: Sticking[]): string[] {
   const bars = [formatBar(bar)]
-  const includeMirrored = shouldCreateMirroredBar(bar, accentMap8)
+  const includeMirrored = shouldCreateMirroredBar(bar)
 
   if (includeMirrored) {
     const mirroredBar = flipHands(bar)

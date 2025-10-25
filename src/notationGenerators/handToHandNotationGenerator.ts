@@ -1,11 +1,7 @@
-import type { Sticking } from '../types'
-
-export interface HandToHandResult {
-  stickings: Sticking[]
-}
+import type { ConvertResult, Sticking } from '../types'
 
 export function generateHandToHandNotation(
-  convertResult: HandToHandResult
+  convertResult: ConvertResult
 ): string {
   // Извлекаем символы палочек из результата (12 символов для триолей)
   const stickings = convertResult.stickings || ['r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l']

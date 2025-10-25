@@ -1,14 +1,14 @@
-import type { ParadiddleResult } from '../converters/paradiddles'
+import type { ConvertResult } from '../types.ts'
 
 export function generateParadiddleNotation(
-  convertResult: ParadiddleResult
+  convertResult: ConvertResult
 ): string {
   // Извлекаем символы палочек из результата
-  const firstBar = convertResult.bars[0].replace(/\s/g, '') // Убираем пробелы
-  const hasKick = firstBar.includes('k')
+  const barString = convertResult.stickings.join('').replace(/\s/g, '') // Убираем пробелы
+  const hasKick = barString.includes('k')
 
   // Создаем ноты с акцентами, ghost notes и sticking аннотациями
-  const notes = firstBar.split('').map(char => {
+  const notes = barString.split('').map(char => {
     const isAccent = char === char.toUpperCase() // Большая буква = акцент
     const isKick = char === 'k'
 

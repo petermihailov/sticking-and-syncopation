@@ -26,10 +26,11 @@ export function Bar({
             [classes.l]: label.toLowerCase() === 'l',
             [classes.k]: label.toLowerCase() === 'k',
             [classes.a]: label === 'R' || label === 'L',
+            [classes.pause]: label === ' ',
           })}
           key={index}
         >
-          {label}
+          {label === ' ' ? '—' : label}
         </div>
       ))}
     </div>

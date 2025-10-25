@@ -14,6 +14,7 @@ const RUDIMENT_CODES: Record<RudimentType, string> = {
   '16th-invert-paradiddle-double-accent': 'id',
   '16th-invert-paradiddle-kick': 'ik',
   '8th-hand-to-hand-triplets': 'h3',
+  '16th-hand-to-hand-triplets': '16',
 }
 
 const RUDIMENT_DECODE: Record<string, RudimentType> = Object.fromEntries(

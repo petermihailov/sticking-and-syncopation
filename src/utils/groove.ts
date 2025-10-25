@@ -1,5 +1,6 @@
 import type { Bar, Instrument, Group, Hand, StickingMapping } from '../types/instrument';
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument';
+import type { Sticking } from '../types';
 
 /**
  * Get instruments to play at a specific rhythm index in a bar
@@ -37,20 +38,18 @@ export function getInstrumentsByIndex(
  * - 'r' (lowercase) = Ghost notes with right hand (configurable, slightly higher pitch)
  * - 'l' (lowercase) = Ghost notes with left hand (configurable, slightly lower pitch)
  * - 'k' = Kick drum (configurable, no pitch shift)
+ * - ' ' (space) = Pause (no sound)
  *
- * @param stickings - String of stickings (e.g., 'RlrrLrll')
+ * @param stickings - Array of Sticking symbols
  * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Bar object ready for Player with hand information for pitch shifting
  */
-export function stickingToBar(stickings: string, mapping: StickingMapping = DEFAULT_STICKING_MAPPING): Bar {
+export function stickingToBar(stickings: Sticking[], mapping: StickingMapping = DEFAULT_STICKING_MAPPING): Bar {
   const rhythm: Instrument[][] = [];
-  const stickingSymbols: string[] = [];
+  const stickingSymbols: Sticking[] = [];
   const hands: Hand[] = [];
 
-  // Split sticking string into individual characters, filtering out spaces
-  const chars = stickings.split('').filter(char => char !== ' ');
-
-  chars.forEach((char) => {
+  stickings.forEach((char) => {
     const instruments: Instrument[] = [];
     let hand: Hand = null;
 
@@ -87,30 +86,41 @@ export function stickingToBar(stickings: string, mapping: StickingMapping = DEFA
       // Kick (no pitch shift)
       instruments.push(mapping.kick[0] || 'kiKickRegular');
       hand = null;
+    } else if (char === ' ') {
+      // Space = pause (no instruments, no hand)
+      // instruments array stays empty
+      hand = null;
     }
 
     rhythm.push(instruments);
     hands.push(hand);
   });
 
-  // Create bar with 4/4 time signature, 16th note subdivisions
+  // Calculate timeDivision based on pattern length
+  // This allows different rudiments to play at correct speeds:
+  // - 12 notes = 8th triplets (3 notes per beat)
+  // - 16 notes = 16th notes (4 notes per beat)
+  // - 24 notes = 16th triplets (6 notes per beat)
+  const noteCount = stickings.length;
+  const timeDivision = noteCount / 4; // 4 beats in 4/4 time
+
   return {
     rhythm,
     stickings: stickingSymbols,
     hands,
     beatsPerBar: 4, // 4/4 time
     noteValue: 4, // Quarter notes
-    timeDivision: 4, // 4 subdivisions per beat = 16th notes
+    timeDivision, // Dynamically calculated based on note count
   };
 }
 
 /**
  * Convert multiple sticking patterns to multiple bars
- * @param stickingPatterns - Array of sticking strings
+ * @param stickingPatterns - Array of sticking arrays
  * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Array of Bar objects
  */
-export function stickingsToBars(stickingPatterns: string[], mapping?: StickingMapping): Bar[] {
+export function stickingsToBars(stickingPatterns: Sticking[][], mapping?: StickingMapping): Bar[] {
   return stickingPatterns.map((pattern) => stickingToBar(pattern, mapping));
 }
 

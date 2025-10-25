@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { Container, Lifecycle } from './Container'
+import { Container } from './Container'
 import { createToken, createTokenRegistry } from './tokens'
 
 // Test interfaces
