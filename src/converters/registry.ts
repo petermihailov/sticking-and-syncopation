@@ -7,6 +7,7 @@ import * as invertParadiddleDouble from './16th-inverted-paradiddle-double-accen
 import * as invertParadiddleKick from './16th-inverted-paradiddle-kick/index.ts'
 import * as handToHandTriplet8 from './8th-hand-to-hand-triplets/index.ts'
 import * as handToHandTriplet16 from './16th-hand-to-hand-triplets/index.ts'
+import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/index.ts'
 
 export const converters = {
   '16th-paradiddle-single-accent': paradiddleSingle,
@@ -17,6 +18,7 @@ export const converters = {
   // triplets
   '8th-hand-to-hand-triplets': handToHandTriplet8,
   '16th-hand-to-hand-triplets': handToHandTriplet16,
+  '8th-inverted-doubles-in-triplets': invertedDoublesInTriplets8,
 } as const
 
 export function getRudimentOptions() {

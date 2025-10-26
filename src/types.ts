@@ -23,3 +23,4 @@ export type RudimentType =
   | '16th-invert-paradiddle-kick'
   | '8th-hand-to-hand-triplets'
   | '16th-hand-to-hand-triplets'
+  | '8th-inverted-doubles-in-triplets'

@@ -59,7 +59,9 @@ function AppContent() {
             ? generateHandToHandNotation(convertResult)
             : state.rudiment === '16th-hand-to-hand-triplets'
               ? generate16thHandToHandNotation(convertResult)
-              : generateParadiddleNotation(convertResult)
+              : state.rudiment === '8th-inverted-doubles-in-triplets'
+                ? generateHandToHandNotation(convertResult)
+                : generateParadiddleNotation(convertResult)
         }
         stickings={convertResult.stickings}
         isMirrored={convertResult.isMirrored}
