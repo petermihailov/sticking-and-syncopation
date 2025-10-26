@@ -1,4 +1,5 @@
 import { ShareButton } from '../ShareButton'
+import { FavoritesButton } from '../FavoritesButton'
 import classes from './PlayerControls.module.css'
 
 interface PlayerControlsProps {
@@ -34,6 +35,7 @@ export function PlayerControls({
       >
         ⏹ Stop
       </button>
+      <FavoritesButton />
       <ShareButton />
       <div className={classes.beatCounter}>Beat: {currentBeat}</div>
       {!hasPattern && (

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo, type FC, type ReactNode } from 'react'
 import type { RudimentType } from '../types.ts'
 import type { StickingMapping, Instrument } from '../types/instrument'
-import type { AppState } from '../types/appState'
+import type { AppState, FavoritePreset } from '../types/appState'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
@@ -43,6 +43,7 @@ interface AppStateContextValue {
     setInstrumentMapping: (mapping: StickingMapping) => void
     resetAccents: () => void
     resetToDefaults: () => void
+    loadPreset: (preset: FavoritePreset) => void
   }
   shareUrl: string
 }
@@ -157,6 +158,16 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     setState(DEFAULT_APP_STATE)
   }
 
+  const loadPreset = (preset: FavoritePreset) => {
+    setState(prev => ({
+      ...prev,
+      accents: preset.accents,
+      rudiment: preset.rudiment,
+      tempo: preset.tempo,
+      instrumentMapping: preset.instrumentMapping,
+    }))
+  }
+
   // Compute shareable URL
   const shareUrl = useMemo(() => {
     const queryString = encodeStateToUrl(state)
@@ -185,6 +196,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       setInstrumentMapping,
       resetAccents,
       resetToDefaults,
+      loadPreset,
     },
     shareUrl,
   }
