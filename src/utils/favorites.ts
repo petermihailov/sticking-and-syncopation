@@ -1,5 +1,7 @@
 import { LocalStorageManager } from './localStorage'
 import type { FavoritePreset } from '../types/appState'
+import type { RudimentType } from '../types'
+import { converters } from '../converters/registry'
 
 const FAVORITES_KEY = 'favorites'
 
@@ -8,6 +10,26 @@ const FAVORITES_KEY = 'favorites'
  */
 function generateId(): string {
   return `preset-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+}
+
+/**
+ * Generate a default preset name based on current settings
+ * Format: "{converterName} - {tempo} BPM - [{accentPattern}]"
+ * Example: "16th paradiddle single - 80 BPM - [X__X____]"
+ */
+export function generateDefaultPresetName(
+  rudiment: RudimentType,
+  tempo: number,
+  accents: boolean[]
+): string {
+  // Get converter name
+  const converter = converters[rudiment]
+  const converterPattern = converter?.pattern || rudiment
+
+  // Format accent pattern: X = accent, _ = no accent
+  const pattern = accents.map(accent => (accent ? 'x' : '.')).join('')
+
+  return `${converterPattern} - ${tempo} BPM - ${pattern}`
 }
 
 /**
@@ -166,7 +188,7 @@ export function uploadFavoritesFile(merge = true): Promise<number> {
     input.type = 'file'
     input.accept = '.json'
 
-    input.onchange = (e) => {
+    input.onchange = e => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) {
         reject(new Error('No file selected'))
@@ -174,7 +196,7 @@ export function uploadFavoritesFile(merge = true): Promise<number> {
       }
 
       const reader = new FileReader()
-      reader.onload = (event) => {
+      reader.onload = event => {
         try {
           const json = event.target?.result as string
           const count = importFavorites(json, merge)

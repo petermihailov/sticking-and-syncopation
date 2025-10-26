@@ -10,6 +10,7 @@ import {
   duplicateFavorite,
   downloadFavoritesFile,
   uploadFavoritesFile,
+  generateDefaultPresetName,
 } from '../../utils/favorites'
 import classes from './FavoritesModal.module.css'
 
@@ -36,6 +37,18 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
       setFavorites(loadFavorites())
     }
   }, [isOpen])
+
+  // Auto-generate default preset name based on current settings
+  useEffect(() => {
+    if (isOpen) {
+      const defaultName = generateDefaultPresetName(
+        state.rudiment,
+        state.tempo,
+        state.accents
+      )
+      setNewPresetName(defaultName)
+    }
+  }, [isOpen, state.rudiment, state.tempo, state.accents])
 
   // Close on Escape key
   useEffect(() => {
@@ -134,7 +147,9 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
     try {
       const count = await uploadFavoritesFile(true)
       setFavorites(loadFavorites())
-      onMessage(`Successfully imported ${count} preset${count !== 1 ? 's' : ''}`)
+      onMessage(
+        `Successfully imported ${count} preset${count !== 1 ? 's' : ''}`
+      )
     } catch (error) {
       onMessage('Failed to import favorites', true)
     }
@@ -147,12 +162,11 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
   }
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString()
+    return new Date(timestamp).toLocaleDateString('ru-RU')
   }
 
   const getPresetSummary = (preset: FavoritePreset) => {
-    const accentCount = preset.accents.filter(Boolean).length
-    return `${preset.rudiment} | ${preset.tempo} BPM | ${accentCount} accent${accentCount !== 1 ? 's' : ''}`
+    return `${preset.rudiment} | ${preset.tempo} BPM`
   }
 
   return createPortal(
@@ -176,10 +190,10 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
             <input
               type="text"
               className={classes.input}
-              placeholder="Enter preset name..."
+              placeholder="Preset name"
               value={newPresetName}
-              onChange={(e) => setNewPresetName(e.target.value)}
-              onKeyDown={(e) => {
+              onChange={e => setNewPresetName(e.target.value)}
+              onKeyDown={e => {
                 if (e.key === 'Enter') {
                   handleSave()
                 }
@@ -206,7 +220,7 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
             </div>
           ) : (
             <div className={classes.presetList}>
-              {favorites.map((preset) => (
+              {favorites.map(preset => (
                 <div key={preset.id} className={classes.presetItem}>
                   <div className={classes.presetInfo}>
                     {editingId === preset.id ? (
@@ -214,8 +228,8 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
                         type="text"
                         className={classes.renameInput}
                         value={editingName}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        onKeyDown={(e) => {
+                        onChange={e => setEditingName(e.target.value)}
+                        onKeyDown={e => {
                           if (e.key === 'Enter') {
                             handleSaveRename(preset.id)
                           } else if (e.key === 'Escape') {
@@ -228,7 +242,8 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
                       <div className={classes.presetName}>{preset.name}</div>
                     )}
                     <div className={classes.presetDetails}>
-                      {getPresetSummary(preset)} • {formatDate(preset.createdAt)}
+                      {getPresetSummary(preset)} •{' '}
+                      {formatDate(preset.createdAt)}
                     </div>
                   </div>
                   <div className={classes.presetActions}>
@@ -239,14 +254,14 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
                           onClick={() => handleSaveRename(preset.id)}
                           title="Save"
                         >
-                          ✓
+                          ✅
                         </button>
                         <button
                           className={classes.iconButton}
                           onClick={handleCancelRename}
                           title="Cancel"
                         >
-                          ✕
+                          ❌
                         </button>
                       </>
                     ) : (
@@ -256,28 +271,28 @@ export const FavoritesModal: FC<FavoritesModalProps> = ({
                           onClick={() => handleLoad(preset)}
                           title="Load preset"
                         >
-                          ▶
+                          ▶️
                         </button>
                         <button
                           className={classes.iconButton}
                           onClick={() => handleStartRename(preset)}
                           title="Rename"
                         >
-                          ✎
+                          ✏️
                         </button>
                         <button
                           className={classes.iconButton}
                           onClick={() => handleDuplicate(preset.id)}
                           title="Duplicate"
                         >
-                          ⎘
+                          📋
                         </button>
                         <button
                           className={classes.iconButton}
                           onClick={() => handleDelete(preset.id)}
                           title="Delete"
                         >
-                          🗑
+                          🗑️
                         </button>
                       </>
                     )}

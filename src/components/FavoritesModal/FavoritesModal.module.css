@@ -100,6 +100,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.9rem;
+  font-family: monospace;
 }
 
 .input:focus {
@@ -161,6 +162,7 @@
 }
 
 .presetInfo {
+  display: flex;
   flex: 1;
   min-width: 0;
 }
@@ -169,6 +171,7 @@
   font-weight: 500;
   margin-bottom: 0.25rem;
   word-break: break-word;
+  font-family: monospace;
 }
 
 .presetDetails {
@@ -231,6 +234,7 @@
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 500;
+  font-family: monospace;
 }
 
 .renameInput:focus {
