@@ -3,21 +3,7 @@ import type { Instrument, StickingMapping } from '../types/instrument'
 import type { AppState } from '../types/appState'
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
 import { DEFAULT_APP_STATE } from '../types/appState'
-
-const RUDIMENT_CODES: Record<RudimentType, string> = {
-  '16th-paradiddle-single-accent': 'ps',
-  '16th-paradiddle-double-accent': 'pd',
-  '16th-invert-paradiddle-single-accent': 'is',
-  '16th-invert-paradiddle-double-accent': 'id',
-  '16th-invert-paradiddle-kick': 'ik',
-  '8th-hand-to-hand-triplets': 'h3',
-  '16th-hand-to-hand-triplets': '16',
-  '8th-inverted-doubles-in-triplets': 'id3',
-}
-
-const RUDIMENT_DECODE: Record<string, RudimentType> = Object.fromEntries(
-  Object.entries(RUDIMENT_CODES).map(([k, v]) => [v, k as RudimentType])
-)
+import { converters } from '../converters/registry.ts'
 
 /**
  * Instrument to 2-character code mapping
@@ -25,22 +11,16 @@ const RUDIMENT_DECODE: Record<string, RudimentType> = Object.fromEntries(
 const INSTRUMENT_CODES: Record<Instrument, string> = {
   // Snare
   snSnareRegular: 'sn',
-  snSnareAccent: 'sa',
   snSnareGhost: 'sg',
   snRimRegular: 'sr',
   // Hi-hat
   hhCloseRegular: 'hc',
-  hhCloseAccent: 'ha',
   hhCloseGhost: 'hg',
   hhOpenRegular: 'ho',
-  hhOpenAccent: 'hx',
   // Toms
   t1HighRegular: 't1',
-  t1HighAccent: 'ta',
   t2MidRegular: 't2',
-  t2MidAccent: 'tb',
   t3LowRegular: 't3',
-  t3LowAccent: 'tc',
   // Cymbals
   cyRideRegular: 'rd',
   cyCrashRegular: 'cr',
@@ -88,17 +68,22 @@ export function decodeAccents(hex: string): boolean[] {
 }
 
 /**
- * Encode rudiment type to 2-character code
+ * Encode rudiment type (returns the value as-is)
  */
 export function encodeRudiment(rudiment: RudimentType): string {
-  return RUDIMENT_CODES[rudiment] || 'ps'
+  return rudiment
 }
 
 /**
- * Decode 2-character code to rudiment type
+ * Decode rudiment string, validating against known converters
  */
 export function decodeRudiment(code: string): RudimentType {
-  return RUDIMENT_DECODE[code] || '16th-paradiddle-single-accent'
+  // Check if the code is a valid RudimentType
+  if (code in converters) {
+    return code as RudimentType
+  }
+  // Return default if not found
+  return DEFAULT_APP_STATE.rudiment
 }
 
 /**

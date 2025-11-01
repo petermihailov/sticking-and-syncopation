@@ -61,25 +61,19 @@ export async function createDrumKit(
     'cySplashRegular',
     'cyTrashRegular',
     // Hi-hat
-    'hhCloseAccent',
     'hhCloseGhost',
     'hhCloseRegular',
-    'hhOpenAccent',
     'hhOpenRegular',
     // Kick
     'kiHhFootRegular',
     'kiKickRegular',
     // Snare
     'snRimRegular',
-    'snSnareAccent',
     'snSnareGhost',
     'snSnareRegular',
     // Toms
-    't1HighAccent',
     't1HighRegular',
-    't2MidAccent',
     't2MidRegular',
-    't3LowAccent',
     't3LowRegular',
     // Metronome
     'fxMetronomeAccent',

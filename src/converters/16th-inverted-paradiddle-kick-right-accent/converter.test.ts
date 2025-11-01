@@ -6,14 +6,14 @@ import { standardTestInputs } from '../shared/test-cases.ts'
 const expectations = [
   'rllrrlrlrlrlrlrl', // Все нули
   'RlRlRlRlRlRlRlRl', // Все единицы
-  'RllkLrrkLrrkLrrk', // Чередование с 1
-  'rkLrrkLrrkLrrkLr', // Чередование с 0
-  'RlRllrrkLrLrrlrk', // Парные единицы
-  'rllkLrLrrlrkLrLr', // Парные нули
+  'RllkRlrkRlrkRlrk', // Чередование с 1
+  'rkRllkRlrkRlrkRl', // Чередование с 0
+  'RlRllrrkRlRlrlrk', // Парные единицы
+  'rllkRlRlrlrkRlRl', // Парные нули
   'Rllrrlrlrlrlrlrk', // Паттерн [1,0,0,0,0,0,0,0]
-  'RllrrlrkLrrkLrrk', // Паттерн [1,0,0,0,1,0,1,0]
-  'RllrrkLrLrrlrkLr', // Паттерн [1,0,0,1,1,0,0,1]
-  'rkLrrlrlrlrlrlrl', // Паттерн [0,1,0,0,0,0,0,0]
+  'RllrrlrkRlrkRlrk', // Паттерн [1,0,0,0,1,0,1,0]
+  'RllrrkRlRlrlrkRl', // Паттерн [1,0,0,1,1,0,0,1]
+  'rkRllrrlrlrlrlrl', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
 describe('16th-invert-paradiddle-kick', () => {
