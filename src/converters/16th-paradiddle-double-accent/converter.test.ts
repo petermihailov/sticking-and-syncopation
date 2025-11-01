@@ -1,65 +1,28 @@
 import { describe, it, expect } from 'vitest'
 import { convert } from './index.ts'
 import type { Accent } from '../../types.ts'
+import { standardTestInputs } from '../shared/test-cases.ts'
 
-const testCases = [
-  {
-    name: 'Все нули [0,0,0,0,0,0,0,0]',
-    input: [0, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'rrllrrllrrllrrll',
-  },
-  {
-    name: 'Все единицы [1,1,1,1,1,1,1,1]',
-    input: [1, 1, 1, 1, 1, 1, 1, 1],
-    expected: 'RlRlRlRlRlRlRlRl',
-  },
-  {
-    name: 'Чередование с 1 [1,0,1,0,1,0,1,0]',
-    input: [1, 0, 1, 0, 1, 0, 1, 0],
-    expected: 'RLrrLRllRLrrLRll',
-  },
-  {
-    name: 'Чередование с 0 [0,1,0,1,0,1,0,1]',
-    input: [0, 1, 0, 1, 0, 1, 0, 1],
-    expected: 'rrLRllRLrrLRllRL',
-  },
-  {
-    name: 'Парные единицы [1,1,0,0,1,1,0,0]',
-    input: [1, 1, 0, 0, 1, 1, 0, 0],
-    expected: 'RlRLrrllRlRLrrll',
-  },
-  {
-    name: 'Парные нули [0,0,1,1,0,0,1,1]',
-    input: [0, 0, 1, 1, 0, 0, 1, 1],
-    expected: 'rrllRlRLrrllRlRL',
-  },
-  {
-    name: 'Паттерн [1,0,0,0,0,0,0,0]',
-    input: [1, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'RLrrllrrllrrllrr',
-  },
-  {
-    name: 'Паттерн [1,0,0,0,1,0,1,0]',
-    input: [1, 0, 0, 0, 1, 0, 1, 0],
-    expected: 'RLrrllrrLRllRLrr',
-  },
-  {
-    name: 'Паттерн [1,0,0,1,1,0,0,1]',
-    input: [1, 0, 0, 1, 1, 0, 0, 1],
-    expected: 'RLrrllRlRLrrllRl',
-  },
-  {
-    name: 'Паттерн [0,1,0,0,0,0,0,0]',
-    input: [0, 1, 0, 0, 0, 0, 0, 0],
-    expected: 'rrLRllrrllrrllrr',
-  },
+const expectations = [
+  'rrllrrllrrllrrll', // Все нули
+  'RlRlRlRlRlRlRlRl', // Все единицы
+  'RLrrLRllRLrrLRll', // Чередование с 1
+  'rrLRllRLrrLRllRL', // Чередование с 0
+  'RlRLrrllRlRLrrll', // Парные единицы
+  'rrllRlRLrrllRlRL', // Парные нули
+  'RLrrllrrllrrllrr', // Паттерн [1,0,0,0,0,0,0,0]
+  'RLrrllrrLRllRLrr', // Паттерн [1,0,0,0,1,0,1,0]
+  'RLrrllRlRLrrllRl', // Паттерн [1,0,0,1,1,0,0,1]
+  'rrLRllrrllrrllrr', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
 describe('16th-paradiddle-double-accent', () => {
-  testCases.forEach(testCase => {
-    it(testCase.name, () => {
-      const result = convert(testCase.input as Accent[])
-      expect(result.join('')).toBe(testCase.expected)
+  describe('standard patterns', () => {
+    standardTestInputs.forEach((testInput, index) => {
+      it(testInput.name, () => {
+        const result = convert(testInput.input as Accent[])
+        expect(result.join('')).toBe(expectations[index])
+      })
     })
   })
 })

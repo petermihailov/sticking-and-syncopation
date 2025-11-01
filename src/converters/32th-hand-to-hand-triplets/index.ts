@@ -2,7 +2,7 @@ import { replaces } from './replaces.ts'
 import { createConverter } from '../shared/config-converter.ts'
 
 const config = createConverter({
-  converterName: '16th hand-to-hand triplets',
+  converterName: '32th hand-to-hand triplets',
   pattern: replaces['10'][0],
   replaces,
   mode: 'pairs',

@@ -6,7 +6,7 @@ import * as invertParadiddleSingle from './16th-inverted-paradiddle-single-accen
 import * as invertParadiddleDouble from './16th-inverted-paradiddle-double-accent/index.ts'
 import * as invertParadiddleKick from './16th-inverted-paradiddle-kick/index.ts'
 import * as handToHandTriplet8 from './8th-hand-to-hand-triplets/index.ts'
-import * as handToHandTriplet16 from './16th-hand-to-hand-triplets/index.ts'
+import * as handToHandTriplet16 from './32th-hand-to-hand-triplets/index.ts'
 import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/index.ts'
 
 export const converters = {

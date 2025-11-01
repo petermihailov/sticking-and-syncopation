@@ -1,74 +1,29 @@
 import { describe, it, expect } from 'vitest'
 import { convert } from './index.ts'
 import type { Accent } from '../../types.ts'
+import { standardTestInputs } from '../shared/test-cases.ts'
 
-const testCases = [
-  {
-    name: 'Все нули [0,0,0,0,0,0,0,0]',
-    input: [0, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'rlrlrlrlrlrl',
-  },
-  {
-    name: 'Все единицы [1,1,1,1,1,1,1,1]',
-    input: [1, 1, 1, 1, 1, 1, 1, 1],
-    expected: 'RlRLrLRlRLrL',
-  },
-  {
-    name: 'Чередование с 1 [1,0,1,0,1,0,1,0]',
-    input: [1, 0, 1, 0, 1, 0, 1, 0],
-    expected: 'RlrLrlRlrLrl',
-  },
-  {
-    name: 'Чередование с 0 [0,1,0,1,0,1,0,1]',
-    input: [0, 1, 0, 1, 0, 1, 0, 1],
-    expected: 'rlRlrLrlRlrL',
-  },
-  {
-    name: 'Парные единицы [1,1,0,0,1,1,0,0]',
-    input: [1, 1, 0, 0, 1, 1, 0, 0],
-    expected: 'RlRlrlRlRlrl',
-  },
-  {
-    name: 'Парные нули [0,0,1,1,0,0,1,1]',
-    input: [0, 0, 1, 1, 0, 0, 1, 1],
-    expected: 'rlrLrLrlrLrL',
-  },
-  {
-    name: 'Первый акцент [1,0,0,0,0,0,0,0]',
-    input: [1, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'Rlrlrlrlrlrl',
-  },
-  {
-    name: 'Первый& акцент [0,1,0,0,0,0,0,0]',
-    input: [0, 1, 0, 0, 0, 0, 0, 0],
-    expected: 'rlRlrlrlrlrl',
-  },
-  {
-    name: 'Паттерн [1,0,0,0,1,0,1,0]',
-    input: [1, 0, 0, 0, 1, 0, 1, 0],
-    expected: 'RlrlrlRlrLrl',
-  },
-  {
-    name: 'Паттерн [1,0,0,1,1,0,0,1]',
-    input: [1, 0, 0, 1, 1, 0, 0, 1],
-    expected: 'RlrlrLRlrlrL',
-  },
+const expectations = [
+  'rlrlrlrlrlrl', // Все нули
+  'RlRLrLRlRLrL', // Все единицы
+  'RlrLrlRlrLrl', // Чередование с 1
+  'rlRlrLrlRlrL', // Чередование с 0
+  'RlRlrlRlRlrl', // Парные единицы
+  'rlrLrLrlrLrL', // Парные нули
+  'Rlrlrlrlrlrl', // Паттерн [1,0,0,0,0,0,0,0]
+  'RlrlrlRlrLrl', // Паттерн [1,0,0,0,1,0,1,0]
+  'RlrlrLRlrlrL', // Паттерн [1,0,0,1,1,0,0,1]
+  'rlRlrlrlrlrl', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
 describe('convertHandToHand', () => {
-  testCases.forEach(testCase => {
-    it(testCase.name, () => {
-      const result = convert(testCase.input as Accent[])
-      const resultString = result.join('')
-      expect(resultString).toBe(testCase.expected)
-    })
-  })
-
-  describe('error handling', () => {
-    it('should handle input with odd length by padding with 0', () => {
-      const result = convert([1, 0, 1] as Accent[])
-      expect(result.length).toBe(12)
-      expect(result.join('')).toBe('RlrLrlrlrlrl')
+  describe('standard patterns', () => {
+    standardTestInputs.forEach((testInput, index) => {
+      it(testInput.name, () => {
+        const result = convert(testInput.input as Accent[])
+        const resultString = result.join('')
+        expect(resultString).toBe(expectations[index])
+      })
     })
   })
 })
