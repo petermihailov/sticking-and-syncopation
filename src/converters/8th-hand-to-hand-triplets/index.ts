@@ -7,33 +7,15 @@ export const pattern = 'Rlr'
 
 /** Convert to 8th hand-to-hand triplets */
 export function convert(accentMap8: Accent[]): Sticking[] {
-  const pairs = []
-
-  // Convert 8 individual accents to 4 pairs
-  for (let i = 0; i < accentMap8.length; i += 2) {
-    const pair = `${accentMap8[i]}${accentMap8[i + 1] || 0}`
-    pairs.push(pair)
-  }
-
-  // Convert each pair to triplet using accentReplaces
-  const triplets: string[] = []
-  for (const pair of pairs) {
-    const triplet = replaces[pair as keyof typeof replaces]
-    triplets.push(triplet)
-  }
-
   const handPattern = 'rlrlrlrlrlrl'
-  const result: Sticking[] = []
 
-  const accentPattern = triplets.join('')
+  const accentPattern = Array.from({ length: 4 }, (_, i) => {
+    const pair = `${accentMap8[i * 2]}${accentMap8[i * 2 + 1] || 0}`
+    return replaces[pair as keyof typeof replaces]
+  }).join('')
 
-  for (let i = 0; i < handPattern.length; i++) {
-    const hand = handPattern[i] as 'r' | 'l'
+  return Array.from(handPattern, (hand, i) => {
     const isAccent = accentPattern[i] === '1'
-    result.push(
-      isAccent ? (hand.toUpperCase() as Sticking) : (hand as Sticking)
-    )
-  }
-
-  return result
+    return (isAccent ? hand.toUpperCase() : hand) as Sticking
+  })
 }

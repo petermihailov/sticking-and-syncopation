@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useEffect, useMemo, type FC, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  type FC,
+  type ReactNode,
+} from 'react'
 import type { RudimentType } from '../types.ts'
 import type { StickingMapping, Instrument } from '../types/instrument'
 import type { AppState, FavoritePreset } from '../types/appState'
@@ -48,51 +56,48 @@ interface AppStateContextValue {
   shareUrl: string
 }
 
-const AppStateContext = createContext<AppStateContextValue | undefined>(undefined)
+const AppStateContext = createContext<AppStateContextValue | undefined>(
+  undefined
+)
 
 interface AppStateProviderProps {
   children: ReactNode
 }
 
-/**
- * Provider for application state with URL and localStorage persistence
- * Priority: URL params > localStorage > defaults
- */
 export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
-  // Initialize state from URL, then localStorage, then defaults
   const [state, setState] = useState<AppState>(() => {
-    // 1. Try to load from URL (highest priority)
     const searchParams = new URLSearchParams(window.location.search)
     const urlState = decodeStateFromUrl(searchParams)
 
-    // 2. Try to load from localStorage (fallback)
     const savedAccents = LocalStorageManager.getItem<boolean[]>('accents')
-    const savedRudiment = LocalStorageManager.getItem<RudimentType>('selectedRudiment')
+    const savedRudiment =
+      LocalStorageManager.getItem<RudimentType>('selectedRudiment')
     const savedTempo = LocalStorageManager.getItem<number>('tempo')
     const savedMetronome = LocalStorageManager.getItem<boolean>('metronome')
-    const savedMetronomeVolume = LocalStorageManager.getItem<number>('metronomeVolume')
+    const savedMetronomeVolume =
+      LocalStorageManager.getItem<number>('metronomeVolume')
     const savedMapping = LocalStorageManager.getItem<any>('instrumentMapping')
 
-    // Migrate saved mapping from old format (single instruments) to new format (arrays)
-    const migratedMapping = savedMapping ? migrateStickingMapping(savedMapping) : DEFAULT_APP_STATE.instrumentMapping
+    const migratedMapping = savedMapping
+      ? migrateStickingMapping(savedMapping)
+      : DEFAULT_APP_STATE.instrumentMapping
 
-    // Migrate URL mapping if present
     const finalMapping = urlState.instrumentMapping
       ? migrateStickingMapping(urlState.instrumentMapping)
       : migratedMapping
 
-    // 3. Merge URL > localStorage > defaults
     return {
       accents: urlState.accents ?? savedAccents ?? DEFAULT_APP_STATE.accents,
-      rudiment: urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
+      rudiment:
+        urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
       tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
-      metronome: urlState.metronome ?? savedMetronome ?? DEFAULT_APP_STATE.metronome,
-      metronomeVolume: savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
+      metronome: savedMetronome ?? DEFAULT_APP_STATE.metronome,
+      metronomeVolume:
+        savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
       instrumentMapping: finalMapping,
     }
   })
 
-  // Save to localStorage on state changes
   useEffect(() => {
     LocalStorageManager.setItem('accents', state.accents)
   }, [state.accents])

@@ -1,67 +1,65 @@
 import { describe, it, expect } from 'vitest'
 import { convert } from './index.ts'
-import { createFormattedBars } from './formatter.ts'
 import type { Accent } from '../../types.ts'
 
 const testCases = [
   {
     name: 'Все нули [0,0,0,0,0,0,0,0]',
     input: [0, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'rllr rllr rllr rllr',
+    expected: 'rllrrlrlrlrlrlrl',
   },
   {
     name: 'Все единицы [1,1,1,1,1,1,1,1]',
     input: [1, 1, 1, 1, 1, 1, 1, 1],
-    expected: 'RlRl RlRl RlRl RlRl',
+    expected: 'RlRlRlRlRlRlRlRl',
   },
   {
     name: 'Чередование с 1 [1,0,1,0,1,0,1,0]',
     input: [1, 0, 1, 0, 1, 0, 1, 0],
-    expected: 'Rllk Rllk Rllk Rllk',
+    expected: 'RllkLrrkLrrkLrrk',
   },
   {
     name: 'Чередование с 0 [0,1,0,1,0,1,0,1]',
     input: [0, 1, 0, 1, 0, 1, 0, 1],
-    expected: 'rkRl lkRl lkRl lkRl',
+    expected: 'rkLrrkLrrkLrrkLr',
   },
   {
     name: 'Парные единицы [1,1,0,0,1,1,0,0]',
     input: [1, 1, 0, 0, 1, 1, 0, 0],
-    expected: 'RlRl lrrk RlRl lrrk',
+    expected: 'RlRllrrkLrLrrlrk',
   },
   {
     name: 'Парные нули [0,0,1,1,0,0,1,1]',
     input: [0, 0, 1, 1, 0, 0, 1, 1],
-    expected: 'rllk RlRl lrrk RlRl',
+    expected: 'rllkLrLrrlrkLrLr',
   },
   {
     name: 'Паттерн [1,0,0,0,0,0,0,0]',
     input: [1, 0, 0, 0, 0, 0, 0, 0],
-    expected: 'Rllr rllr rllr rllk',
+    expected: 'Rllrrlrlrlrlrlrk',
   },
   {
     name: 'Паттерн [1,0,0,0,1,0,1,0]',
     input: [1, 0, 0, 0, 1, 0, 1, 0],
-    expected: 'Rllr rllk Rllk Rllk',
+    expected: 'RllrrlrkLrrkLrrk',
   },
   {
     name: 'Паттерн [1,0,0,1,1,0,0,1]',
     input: [1, 0, 0, 1, 1, 0, 0, 1],
-    expected: 'Rllr rkRl Rllr rkRl',
+    expected: 'RllrrkLrLrrlrkLr',
   },
   {
     name: 'Паттерн [0,1,0,0,0,0,0,0]',
     input: [0, 1, 0, 0, 0, 0, 0, 0],
-    expected: 'rkRl lrrl lrrl lrrl',
+    expected: 'rkLrrlrlrlrlrlrl',
   },
 ]
 
 describe('16th-invert-paradiddle-kick', () => {
   testCases.forEach(testCase => {
     it(testCase.name, () => {
-      const bar = convert(testCase.input as Accent[])
-      const result = createFormattedBars(bar)
-      expect(result[0]).toBe(testCase.expected)
+      const result = convert(testCase.input as Accent[])
+      expect(result.join('')).toBe(testCase.expected)
     })
   })
 })

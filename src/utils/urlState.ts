@@ -4,9 +4,6 @@ import type { AppState } from '../types/appState'
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
 import { DEFAULT_APP_STATE } from '../types/appState'
 
-/**
- * Rudiment type to 2-character code mapping
- */
 const RUDIMENT_CODES: Record<RudimentType, string> = {
   '16th-paradiddle-single-accent': 'ps',
   '16th-paradiddle-double-accent': 'pd',
@@ -27,38 +24,38 @@ const RUDIMENT_DECODE: Record<string, RudimentType> = Object.fromEntries(
  */
 const INSTRUMENT_CODES: Record<Instrument, string> = {
   // Snare
-  'snSnareRegular': 'sn',
-  'snSnareAccent': 'sa',
-  'snSnareGhost': 'sg',
-  'snRimRegular': 'sr',
+  snSnareRegular: 'sn',
+  snSnareAccent: 'sa',
+  snSnareGhost: 'sg',
+  snRimRegular: 'sr',
   // Hi-hat
-  'hhCloseRegular': 'hc',
-  'hhCloseAccent': 'ha',
-  'hhCloseGhost': 'hg',
-  'hhOpenRegular': 'ho',
-  'hhOpenAccent': 'hx',
+  hhCloseRegular: 'hc',
+  hhCloseAccent: 'ha',
+  hhCloseGhost: 'hg',
+  hhOpenRegular: 'ho',
+  hhOpenAccent: 'hx',
   // Toms
-  't1HighRegular': 't1',
-  't1HighAccent': 'ta',
-  't2MidRegular': 't2',
-  't2MidAccent': 'tb',
-  't3LowRegular': 't3',
-  't3LowAccent': 'tc',
+  t1HighRegular: 't1',
+  t1HighAccent: 'ta',
+  t2MidRegular: 't2',
+  t2MidAccent: 'tb',
+  t3LowRegular: 't3',
+  t3LowAccent: 'tc',
   // Cymbals
-  'cyRideRegular': 'rd',
-  'cyCrashRegular': 'cr',
-  'cySplashRegular': 'sp',
-  'cyChinaRegular': 'ch',
-  'cyBellRegular': 'bl',
-  'cyEdgeRegular': 'ed',
-  'cyTrashRegular': 'tr',
-  'cyCowbellRegular': 'cb',
+  cyRideRegular: 'rd',
+  cyCrashRegular: 'cr',
+  cySplashRegular: 'sp',
+  cyChinaRegular: 'ch',
+  cyBellRegular: 'bl',
+  cyEdgeRegular: 'ed',
+  cyTrashRegular: 'tr',
+  cyCowbellRegular: 'cb',
   // Kick
-  'kiKickRegular': 'ki',
-  'kiHhFootRegular': 'kf',
+  kiKickRegular: 'ki',
+  kiHhFootRegular: 'kf',
   // Metronome
-  'fxMetronomeAccent': 'ma',
-  'fxMetronomeRegular': 'mr',
+  fxMetronomeAccent: 'ma',
+  fxMetronomeRegular: 'mr',
 }
 
 const INSTRUMENT_DECODE: Record<string, Instrument> = Object.fromEntries(
@@ -75,7 +72,7 @@ export function encodeAccents(accents: boolean[]): string {
   }
 
   // Convert boolean array to binary string, then to hex
-  const binary = accents.map(a => a ? '1' : '0').join('')
+  const binary = accents.map(a => (a ? '1' : '0')).join('')
   const decimal = parseInt(binary, 2)
   return decimal.toString(16).toUpperCase().padStart(2, '0')
 }
@@ -127,12 +124,6 @@ export function isDefaultMapping(mapping: StickingMapping): boolean {
   )
 }
 
-/**
- * Encode instrument mapping to compact string
- * Returns null if mapping is default (to omit from URL)
- * Format: "R,L,r,l,k,Rk,Lk" where each field can be pipe-separated for arrays
- * Example: "sn|rd|bl,sn,sg,sg,ki,1,0" for uppercaseR=[snare, ride, bell]
- */
 export function encodeOrchestration(mapping: StickingMapping): string | null {
   if (isDefaultMapping(mapping)) {
     return null
@@ -167,7 +158,10 @@ export function decodeOrchestration(value: string): StickingMapping {
   }
 
   try {
-    const decodeArray = (encoded: string, defaultValue: Instrument[]): Instrument[] => {
+    const decodeArray = (
+      encoded: string,
+      defaultValue: Instrument[]
+    ): Instrument[] => {
       const codes = encoded.split('|')
       const instruments = codes
         .map(code => INSTRUMENT_DECODE[code])
@@ -210,11 +204,6 @@ export function encodeStateToUrl(state: AppState): string {
     params.set('t', state.tempo.toString())
   }
 
-  // Include metronome if enabled
-  if (state.metronome) {
-    params.set('m', '1')
-  }
-
   // Include orchestration if not default
   const orchestration = encodeOrchestration(state.instrumentMapping)
   if (orchestration) {
@@ -224,11 +213,9 @@ export function encodeStateToUrl(state: AppState): string {
   return params.toString()
 }
 
-/**
- * Decode URL query params to partial app state
- * Returns only the params that were present in URL
- */
-export function decodeStateFromUrl(searchParams: URLSearchParams): Partial<AppState> {
+export function decodeStateFromUrl(
+  searchParams: URLSearchParams
+): Partial<AppState> {
   const state: Partial<AppState> = {}
 
   // Decode accents
@@ -254,12 +241,6 @@ export function decodeStateFromUrl(searchParams: URLSearchParams): Partial<AppSt
     if (!isNaN(tempo) && tempo >= 40 && tempo <= 200) {
       state.tempo = tempo
     }
-  }
-
-  // Decode metronome
-  const metronomeParam = searchParams.get('m')
-  if (metronomeParam) {
-    state.metronome = metronomeParam === '1'
   }
 
   // Decode orchestration
