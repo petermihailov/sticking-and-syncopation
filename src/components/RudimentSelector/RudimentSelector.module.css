@@ -91,8 +91,27 @@
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     margin-top: 0.25rem;
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
+}
+
+.group {
+    /* Container for each main group */
+}
+
+.groupHeader {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+}
+
+.group:first-child .groupHeader {
+    border-top: none;
 }
 
 .option {

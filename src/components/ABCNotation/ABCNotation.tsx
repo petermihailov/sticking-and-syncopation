@@ -81,16 +81,9 @@ export function ABCNotation({
           gchordfont: 'Arial 10',
           stretchlast: true,
         },
-        clickListener: () =>
-          // abcElem,
-          // tuneNumber,
-          // classes,
-          // analysis,
-          // drag,
-          // mouseEvent
-          {
-            console.log('Clicked note')
-          },
+        clickListener: () => {
+          console.log('Clicked note')
+        },
       })
     }
   }, [seeNotation, playNotation, width])
@@ -134,7 +127,6 @@ export function ABCNotation({
 
         playerRef.current = player
         setPlayerVersion(prev => prev + 1)
-        console.log('[ABCNotation] Player initialized')
         setIsLoading(false)
       } catch (error) {
         console.error('Failed to initialize player:', error)
@@ -154,28 +146,17 @@ export function ABCNotation({
 
   // Update player bars when stickings change OR when player is ready
   useEffect(() => {
-    console.log('[ABCNotation] Stickings or isLoading changed:', {
-      stickings,
-      isLoading,
-      hasPlayer: !!playerRef.current,
-    })
-
     // Wait until player is initialized (isLoading === false)
     if (isLoading || !playerRef.current) {
-      console.log('[ABCNotation] Player not ready yet, skipping bars setup')
       return
     }
 
     if (stickings && stickings.length > 0) {
-      console.log('[ABCNotation] Setting player bars from stickings:', stickings)
       const playerBars = stickingsToBars([stickings], state.instrumentMapping)
-      console.log('[ABCNotation] Converted bars:', playerBars)
       playerRef.current.setBars(playerBars)
     } else {
-      console.log('[ABCNotation] No stickings to set')
+      //
     }
-    // Use string representation to detect content changes, not just reference changes
-    // playerVersion ensures bars are re-set when Player is re-initialized
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stickings?.join(','), isLoading, playerVersion, state.instrumentMapping])
 
@@ -291,10 +272,7 @@ export function ABCNotation({
     }
   }
 
-  const handleMappingChange = (
-    key: keyof StickingMapping,
-    value: unknown
-  ) => {
+  const handleMappingChange = (key: keyof StickingMapping, value: unknown) => {
     actions.setInstrumentMapping({
       ...state.instrumentMapping,
       [key]: value,
@@ -306,7 +284,9 @@ export function ABCNotation({
       <SVGFilters />
       <div ref={notationRef} className={classes.notation} />
       {/*<Labels />*/}
-      {stickings?.length && <Stickings stickings={stickings} isMirrored={isMirrored} />}
+      {stickings?.length && (
+        <Stickings stickings={stickings} isMirrored={isMirrored} />
+      )}
 
       {/* Player Controls */}
       {isLoading ? (

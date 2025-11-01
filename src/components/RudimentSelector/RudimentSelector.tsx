@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { getRudimentOptions, type RudimentType } from '../../converters/registry'
+import {
+  getRudimentGroups,
+  getRudimentOptions,
+  type RudimentType,
+} from '../../converters/registry'
 import classes from './RudimentSelector.module.css'
 
 interface RudimentSelectorProps {
@@ -7,6 +11,7 @@ interface RudimentSelectorProps {
   onRudimentChange: (rudiment: RudimentType) => void
 }
 
+const rudimentGroups = getRudimentGroups()
 const rudimentOptions = getRudimentOptions()
 
 export function RudimentSelector({
@@ -112,10 +117,14 @@ export function RudimentSelector({
           value={selectedRudiment}
           onChange={e => onRudimentChange(e.target.value as RudimentType)}
         >
-          {rudimentOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.pattern} · {option.label}
-            </option>
+          {rudimentGroups.map(group => (
+            <optgroup key={group.groupName} label={group.groupName}>
+              {group.options.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.pattern} · {option.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>
@@ -140,25 +149,41 @@ export function RudimentSelector({
 
         {isOpen && (
           <div className={classes.dropdownContent} role="listbox">
-            {rudimentOptions.map((option, index) => (
-              <button
-                key={option.value}
-                ref={el => { optionRefs.current[index] = el }}
-                className={`${classes.option} ${option.value === selectedRudiment ? classes.selected : ''} ${focusedIndex === index ? classes.focused : ''}`}
-                onClick={() => {
-                  onRudimentChange(option.value as RudimentType)
-                  setIsOpen(false)
-                  setFocusedIndex(-1)
-                }}
-                onMouseEnter={() => setFocusedIndex(index)}
-                onKeyDown={handleKeyDown}
-                role="option"
-                aria-selected={option.value === selectedRudiment}
-                tabIndex={focusedIndex === index ? 0 : -1}
-              >
-                <span className={classes.pattern}>{option.pattern}</span>
-                <span className={classes.label}>{option.label}</span>
-              </button>
+            {rudimentGroups.map((group, groupIndex) => (
+              <div key={group.groupName} className={classes.group}>
+                <div className={classes.groupHeader}>{group.groupName}</div>
+                {group.options.map((option, optionIndex) => {
+                  // Calculate flat index for navigation
+                  let flatIndex = 0
+                  for (let gi = 0; gi < groupIndex; gi++) {
+                    flatIndex += rudimentGroups[gi].options.length
+                  }
+                  flatIndex += optionIndex
+
+                  return (
+                    <button
+                      key={option.value}
+                      ref={el => {
+                        optionRefs.current[flatIndex] = el
+                      }}
+                      className={`${classes.option} ${option.value === selectedRudiment ? classes.selected : ''} ${focusedIndex === flatIndex ? classes.focused : ''}`}
+                      onClick={() => {
+                        onRudimentChange(option.value as RudimentType)
+                        setIsOpen(false)
+                        setFocusedIndex(-1)
+                      }}
+                      onMouseEnter={() => setFocusedIndex(flatIndex)}
+                      onKeyDown={handleKeyDown}
+                      role="option"
+                      aria-selected={option.value === selectedRudiment}
+                      tabIndex={focusedIndex === flatIndex ? 0 : -1}
+                    >
+                      <span className={classes.pattern}>{option.pattern}</span>
+                      <span className={classes.label}>{option.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
             ))}
           </div>
         )}

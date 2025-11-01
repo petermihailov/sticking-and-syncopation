@@ -5,10 +5,10 @@ export function generateNotation(convertResult: ConvertResult): string {
 
   const notes = stickings.map((sticking: Sticking) => {
     if (sticking === ' ') {
-      return 'z/1'
+      return 'z/2'
     }
     const isAccent = sticking === 'R' || sticking === 'L'
-    const baseNote = isAccent ? '!>!c/1' : 'c/1'
+    const baseNote = isAccent ? '!>!c/2' : 'c/2'
     return baseNote
   })
 
@@ -18,7 +18,7 @@ export function generateNotation(convertResult: ConvertResult): string {
     noteGroups.push(`(6${group.join('')}`)
   }
 
-  const kickPattern = 'F2 F2 F2 F2'
+  const kickPattern = 'F1 F1 F1 F1'
 
   return `X:16th Hand to Hand Triplets
 L:1/24
