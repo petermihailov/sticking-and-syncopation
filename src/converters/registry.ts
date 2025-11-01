@@ -3,6 +3,7 @@ import * as paradiddleDouble from './16th-paradiddle-double-accent/index.ts'
 import * as invertParadiddleSingle from './16th-inverted-paradiddle-single-accent/index.ts'
 import * as invertParadiddleDouble from './16th-inverted-paradiddle-double-accent/index.ts'
 import * as invertParadiddleKick from './16th-inverted-paradiddle-kick/index.ts'
+import * as invertParadiddleKickRightAccent from './16th-inverted-paradiddle-kick-right-accent/index.ts'
 import * as handToHandTriplet8 from './8th-hand-to-hand-triplets/index.ts'
 import * as handToHandTriplet16 from './16th-hand-to-hand-triplets/index.ts'
 import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/index.ts'
@@ -13,6 +14,7 @@ export const converters = {
   '16th-invert-paradiddle-single-accent': invertParadiddleSingle,
   '16th-invert-paradiddle-double-accent': invertParadiddleDouble,
   '16th-invert-paradiddle-kick': invertParadiddleKick,
+  '16th-invert-paradiddle-kick-right-accent': invertParadiddleKickRightAccent,
   // triplets
   '8th-hand-to-hand-triplets': handToHandTriplet8,
   '8th-inverted-doubles-in-triplets': invertedDoublesInTriplets8,
@@ -61,6 +63,11 @@ export function getRudimentGroups(): RudimentGroup[] {
           value: '16th-invert-paradiddle-kick',
           label: invertParadiddleKick.converterName,
           pattern: invertParadiddleKick.pattern,
+        },
+        {
+          value: '16th-invert-paradiddle-kick-right-accent',
+          label: invertParadiddleKickRightAccent.converterName,
+          pattern: invertParadiddleKickRightAccent.pattern,
         },
       ],
     },
