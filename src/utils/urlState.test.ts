@@ -224,7 +224,7 @@ describe('encodeStateToUrl', () => {
       metronome: true,
     }
     const result = encodeStateToUrl(state)
-    expect(result).toBe('a=55&m=1')
+    expect(result).toBe('a=55')
   })
 
   it('should encode state with custom rudiment', () => {
@@ -255,7 +255,7 @@ describe('encodeStateToUrl', () => {
       metronomeVolume: 1.0,
     }
     const result = encodeStateToUrl(state)
-    expect(result).toBe('a=A4&r=ik&t=180&m=1&o=rd%2Ccr%2Csg%2Csg%2Cki%2C1%2C0')
+    expect(result).toBe('a=A4&r=ik&t=180&o=rd%2Ccr%2Csg%2Csg%2Cki%2C1%2C0')
   })
 
   it('should omit orchestration if default', () => {
@@ -296,7 +296,8 @@ describe('decodeStateFromUrl', () => {
   it('should decode URL with metronome', () => {
     const params = new URLSearchParams('a=55&r=pd&m=1')
     const result = decodeStateFromUrl(params)
-    expect(result.metronome).toBe(true)
+    // Metronome is no longer synced from URL
+    expect(result.metronome).toBeUndefined()
   })
 
   it('should decode full URL with orchestration', () => {
@@ -305,7 +306,8 @@ describe('decodeStateFromUrl', () => {
     expect(result.accents).toEqual([true, true, false, false, false, false, true, true])
     expect(result.rudiment).toBe('16th-invert-paradiddle-kick')
     expect(result.tempo).toBe(180)
-    expect(result.metronome).toBe(true)
+    // Metronome is no longer synced from URL
+    expect(result.metronome).toBeUndefined()
     expect(result.instrumentMapping).toEqual({
       uppercaseR: ['cyRideRegular'],
       uppercaseL: ['cyCrashRegular'],
@@ -369,7 +371,8 @@ describe('full round-trip integration', () => {
     expect(decoded.accents).toEqual(original.accents)
     expect(decoded.rudiment).toBe(original.rudiment)
     expect(decoded.tempo).toBe(original.tempo)
-    expect(decoded.metronome).toBe(original.metronome)
+    // Metronome is no longer synced from URL
+    expect(decoded.metronome).toBeUndefined()
     expect(decoded.instrumentMapping).toEqual(original.instrumentMapping)
   })
 

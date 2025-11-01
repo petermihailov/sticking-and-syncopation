@@ -85,7 +85,7 @@ export function processPairs(
   const result: Sticking[] = []
 
   for (let i = 0; i < PAIRS_COUNT; i++) {
-    const pair = `${accentMap8[i * 2]}${accentMap8[i * 2 + 1] || 0}`
+    const pair = `${accentMap8[i * 2] || 0}${accentMap8[i * 2 + 1] || 0}`
     const availablePatterns = replaces[pair as keyof typeof replaces] as StickingPattern[]
 
     const chosenPattern = options?.selectPattern

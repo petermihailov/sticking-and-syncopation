@@ -1,12 +1,13 @@
 import { replaces } from './replaces.ts'
-import type { Accent, Sticking } from '../../types.ts'
-import { processAccentsSimple } from '../shared/converter-utils.ts'
+import { createConverter } from '../shared/config-converter.ts'
 
-export { replaces } from './replaces.ts'
-export const converterName = '16th paradiddle single accent'
-export const pattern = replaces['1'][0] + replaces['0'][0]
+const config = createConverter({
+  converterName: '16th paradiddle single accent',
+  pattern: replaces['1'][0] + replaces['0'][0],
+  replaces,
+  mode: 'accents',
+  filterConfig: { type: 'none' },
+})
 
-/** Convert to 16th paradiddle single accent */
-export function convert(accentMap8: Accent[]): Sticking[] {
-  return processAccentsSimple(accentMap8, replaces)
-}
+export const { converterName, pattern, convert } = config
+export { replaces }
