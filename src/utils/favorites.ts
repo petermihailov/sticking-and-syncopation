@@ -1,7 +1,6 @@
 import { LocalStorageManager } from './localStorage'
 import type { FavoritePreset } from '../types/appState'
-import type { RudimentType } from '../types'
-import { converters } from '../converters/registry'
+import { converters, type RudimentType } from '../converters/registry'
 
 const FAVORITES_KEY = 'favorites'
 

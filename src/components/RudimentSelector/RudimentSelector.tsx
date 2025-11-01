@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import type { RudimentType } from '../../types'
-import { getRudimentOptions } from '../../converters/registry'
+import { getRudimentOptions, type RudimentType } from '../../converters/registry'
 import classes from './RudimentSelector.module.css'
 
 interface RudimentSelectorProps {

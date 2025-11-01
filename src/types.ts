@@ -16,13 +16,3 @@ export interface ConvertResult {
   stickings: Sticking[]
   isMirrored: boolean
 }
-
-export type RudimentType =
-  | '16th-paradiddle-single-accent'
-  | '16th-paradiddle-double-accent'
-  | '16th-invert-paradiddle-single-accent'
-  | '16th-invert-paradiddle-double-accent'
-  | '16th-invert-paradiddle-kick'
-  | '8th-hand-to-hand-triplets'
-  | '32th-hand-to-hand-triplets'
-  | '8th-inverted-doubles-in-triplets'

@@ -1,5 +1,3 @@
-import type { RudimentType } from '../types.ts'
-
 import * as paradiddleSingle from './16th-paradiddle-single-accent/index.ts'
 import * as paradiddleDouble from './16th-paradiddle-double-accent/index.ts'
 import * as invertParadiddleSingle from './16th-inverted-paradiddle-single-accent/index.ts'
@@ -20,6 +18,8 @@ export const converters = {
   '32th-hand-to-hand-triplets': handToHandTriplet32,
   '8th-inverted-doubles-in-triplets': invertedDoublesInTriplets8,
 } as const
+
+export type RudimentType = keyof typeof converters
 
 export function getRudimentOptions() {
   return Object.entries(converters).map(([value, converter]) => ({

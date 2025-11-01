@@ -1,4 +1,4 @@
-import type { RudimentType } from '../types.ts'
+import type { RudimentType } from '../converters/registry.ts'
 import type { Instrument, StickingMapping } from '../types/instrument'
 import type { AppState } from '../types/appState'
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
@@ -11,7 +11,7 @@ const RUDIMENT_CODES: Record<RudimentType, string> = {
   '16th-invert-paradiddle-double-accent': 'id',
   '16th-invert-paradiddle-kick': 'ik',
   '8th-hand-to-hand-triplets': 'h3',
-  '16th-hand-to-hand-triplets': '16',
+  '32th-hand-to-hand-triplets': '16',
   '8th-inverted-doubles-in-triplets': 'id3',
 }
 
