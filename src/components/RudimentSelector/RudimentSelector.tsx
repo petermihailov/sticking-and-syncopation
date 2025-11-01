@@ -17,6 +17,7 @@ export function RudimentSelector({
   const [isOpen, setIsOpen] = useState(false)
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const selectedOption = rudimentOptions.find(
@@ -49,11 +50,20 @@ export function RudimentSelector({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isOpen) {
-      if (
-        event.key === 'Enter' ||
-        event.key === ' ' ||
-        event.key === 'ArrowDown'
-      ) {
+      // When dropdown is closed, arrow keys change rudiment directly
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        const nextIndex = selectedIndex < rudimentOptions.length - 1 ? selectedIndex + 1 : 0
+        onRudimentChange(rudimentOptions[nextIndex].value as RudimentType)
+        return
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        const prevIndex = selectedIndex > 0 ? selectedIndex - 1 : rudimentOptions.length - 1
+        onRudimentChange(rudimentOptions[prevIndex].value as RudimentType)
+        return
+      }
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         setIsOpen(true)
         setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0)
@@ -66,6 +76,8 @@ export function RudimentSelector({
         event.preventDefault()
         setIsOpen(false)
         setFocusedIndex(-1)
+        // Return focus to trigger button
+        triggerRef.current?.focus()
         break
       case 'ArrowDown':
         event.preventDefault()
@@ -86,6 +98,8 @@ export function RudimentSelector({
           onRudimentChange(rudimentOptions[focusedIndex].value as RudimentType)
           setIsOpen(false)
           setFocusedIndex(-1)
+          // Return focus to trigger button after selection
+          triggerRef.current?.focus()
         }
         break
     }
@@ -110,6 +124,7 @@ export function RudimentSelector({
       {/* Desktop: Custom dropdown */}
       <div className={classes.customDropdown} ref={dropdownRef}>
         <button
+          ref={triggerRef}
           className={classes.dropdownTrigger}
           onClick={() => setIsOpen(!isOpen)}
           onKeyDown={handleKeyDown}
