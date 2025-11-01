@@ -17,3 +17,4 @@ const config = createConverter({
 
 export const { converterName, pattern, convert } = config
 export { replaces }
+export { generateNotation } from './generateNotation.ts'

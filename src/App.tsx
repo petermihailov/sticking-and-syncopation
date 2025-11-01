@@ -5,12 +5,7 @@ import { shouldCreateMirroredBar } from './converters/shared/mirror-checker'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { ABCNotation } from './components/ABCNotation'
-import {
-  generateAccentNotation,
-  generateParadiddleNotation,
-} from './notationGenerators'
-import { generateHandToHandNotation } from './notationGenerators/handToHandNotationGenerator'
-import { generate16thHandToHandNotation } from './notationGenerators/16thHandToHandNotationGenerator'
+import { generateAccentNotation } from './notationGenerators'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
 
 function AppContent() {
@@ -54,15 +49,7 @@ function AppContent() {
       />
       <ABCNotation
         seeNotation={generateAccentNotation(state.accents)}
-        playNotation={
-          state.rudiment === '8th-hand-to-hand-triplets'
-            ? generateHandToHandNotation(convertResult)
-            : state.rudiment === '16th-hand-to-hand-triplets'
-              ? generate16thHandToHandNotation(convertResult)
-              : state.rudiment === '8th-inverted-doubles-in-triplets'
-                ? generateHandToHandNotation(convertResult)
-                : generateParadiddleNotation(convertResult)
-        }
+        playNotation={converters[state.rudiment].generateNotation(convertResult)}
         stickings={convertResult.stickings}
         isMirrored={convertResult.isMirrored}
       />
