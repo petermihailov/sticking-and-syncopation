@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import type { Accent, ConvertResult } from './types.ts'
 import { converters } from './converters/registry'
+import { Lessons } from './components/Lessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { ABCNotation } from './components/ABCNotation'
@@ -49,9 +50,13 @@ function AppContent() {
       />
       <ABCNotation
         seeNotation={generateAccentNotation(state.accents)}
-        playNotation={converters[state.rudiment].generateNotation(convertResult)}
+        playNotation={converters[state.rudiment].generateNotation(
+          convertResult
+        )}
         bars={convertResult.bars}
       />
+
+      <Lessons />
     </>
   )
 }
