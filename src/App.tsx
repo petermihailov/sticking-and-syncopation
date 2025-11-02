@@ -34,12 +34,17 @@ function AppContent() {
     }
   }, [state.accents, state.rudiment])
 
-  // Keyboard shortcut: R for reset to defaults
+  // Keyboard shortcuts: R for reset to defaults, Escape to blur active element
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'KeyR') {
         event.preventDefault()
         actions.resetToDefaults()
+      } else if (event.code === 'Escape') {
+        // Blur any active element
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur()
+        }
       }
     }
 
