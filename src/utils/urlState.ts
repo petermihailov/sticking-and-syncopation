@@ -115,7 +115,7 @@ export function encodeOrchestration(mapping: StickingMapping): string | null {
   }
 
   const encodeArray = (instruments: Instrument[]): string => {
-    return instruments.map(inst => INSTRUMENT_CODES[inst]).join('|')
+    return instruments.map(inst => INSTRUMENT_CODES[inst]).join('')
   }
 
   const parts = [
@@ -128,15 +128,15 @@ export function encodeOrchestration(mapping: StickingMapping): string | null {
     mapping.uppercaseLKick ? '1' : '0',
   ]
 
-  return parts.join(',')
+  return parts.join('.')
 }
 
 /**
  * Decode orchestration string to instrument mapping
- * "sn|rd|bl,sn,sg,sg,ki,1,0" -> StickingMapping with arrays
+ * "snrdbl.sn.sg.sg.ki.1.0" -> StickingMapping with arrays
  */
 export function decodeOrchestration(value: string): StickingMapping {
-  const parts = value.split(',')
+  const parts = value.split('.')
 
   if (parts.length !== 7) {
     return DEFAULT_STICKING_MAPPING
@@ -147,7 +147,12 @@ export function decodeOrchestration(value: string): StickingMapping {
       encoded: string,
       defaultValue: Instrument[]
     ): Instrument[] => {
-      const codes = encoded.split('|')
+      // Parse instruments by splitting every 2 characters
+      const codes: string[] = []
+      for (let i = 0; i < encoded.length; i += 2) {
+        codes.push(encoded.slice(i, i + 2))
+      }
+
       const instruments = codes
         .map(code => INSTRUMENT_DECODE[code])
         .filter(inst => inst !== undefined)

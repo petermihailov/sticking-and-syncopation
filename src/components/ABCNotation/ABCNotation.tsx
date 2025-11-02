@@ -7,6 +7,7 @@ import { createPlayer, type Player } from '../../lib/player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
 import type { DrumKit, StickingMapping } from '../../types/instrument'
+import { DEFAULT_STICKING_MAPPING } from '../../types/instrument'
 import type { Sticking } from '../../types'
 import { useAppState } from '../../context/AppStateContext'
 import { PlayerControls } from '../PlayerControls/PlayerControls'
@@ -279,6 +280,10 @@ export function ABCNotation({
     })
   }
 
+  const handleOrchestrationReset = () => {
+    actions.setInstrumentMapping(DEFAULT_STICKING_MAPPING)
+  }
+
   return (
     <div className={classes.container}>
       <SVGFilters />
@@ -314,6 +319,7 @@ export function ABCNotation({
           <OrchestrationPanel
             mapping={state.instrumentMapping}
             onChange={handleMappingChange}
+            onReset={handleOrchestrationReset}
             instrumentCounters={instrumentCounters}
           />
         </div>

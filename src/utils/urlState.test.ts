@@ -200,11 +200,11 @@ describe('encodeOrchestration / decodeOrchestration', () => {
       uppercaseLKick: false,
     }
     const result = encodeOrchestration(mapping)
-    expect(result).toBe('t1,t2,hg,hg,ki,1,0')
+    expect(result).toBe('t1.t2.hg.hg.ki.1.0')
   })
 
   it('should decode orchestration string', () => {
-    const result = decodeOrchestration('t1,t2,hg,hg,ki,1,0')
+    const result = decodeOrchestration('t1.t2.hg.hg.ki.1.0')
     expect(result).toEqual({
       uppercaseR: ['t1HighRegular'],
       uppercaseL: ['t2MidRegular'],
@@ -235,6 +235,33 @@ describe('encodeOrchestration / decodeOrchestration', () => {
     expect(encoded).not.toBeNull()
     const decoded = decodeOrchestration(encoded!)
     expect(decoded).toEqual(original)
+  })
+
+  it('should encode mapping with multiple instruments using concatenation', () => {
+    const mapping: StickingMapping = {
+      uppercaseR: ['snSnareRegular', 'cyRideRegular', 'cyBellRegular'],
+      uppercaseL: ['snSnareRegular'],
+      lowercaseR: ['hhCloseGhost'],
+      lowercaseL: ['snSnareGhost'],
+      kick: ['kiKickRegular'],
+      uppercaseRKick: true,
+      uppercaseLKick: false,
+    }
+    const result = encodeOrchestration(mapping)
+    expect(result).toBe('snrdbl.sn.hg.sg.ki.1.0')
+  })
+
+  it('should decode mapping with multiple instruments from concatenated string', () => {
+    const result = decodeOrchestration('snrdbl.sn.hg.sg.ki.1.0')
+    expect(result).toEqual({
+      uppercaseR: ['snSnareRegular', 'cyRideRegular', 'cyBellRegular'],
+      uppercaseL: ['snSnareRegular'],
+      lowercaseR: ['hhCloseGhost'],
+      lowercaseL: ['snSnareGhost'],
+      kick: ['kiKickRegular'],
+      uppercaseRKick: true,
+      uppercaseLKick: false,
+    })
   })
 })
 
@@ -298,7 +325,7 @@ describe('encodeStateToUrl', () => {
     }
     const result = encodeStateToUrl(state)
     expect(result).toBe(
-      'a=A4&r=16th-invert-paradiddle-kick&t=180&o=rd%2Ccr%2Csg%2Csg%2Cki%2C1%2C0'
+      'a=A4&r=16th-invert-paradiddle-kick&t=180&o=rd.cr.sg.sg.ki.1.0'
     )
   })
 
@@ -375,7 +402,7 @@ describe('decodeStateFromUrl', () => {
 
   it('should decode full URL with orchestration', () => {
     const params = new URLSearchParams(
-      'a=C3&r=16th-invert-paradiddle-kick&t=180&o=rd,cr,sg,sg,ki,1,0'
+      'a=C3&r=16th-invert-paradiddle-kick&t=180&o=rd.cr.sg.sg.ki.1.0'
     )
     const result = decodeStateFromUrl(params)
     expect(result.accents).toEqual([

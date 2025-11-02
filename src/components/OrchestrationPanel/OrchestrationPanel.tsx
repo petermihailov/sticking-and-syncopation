@@ -7,20 +7,38 @@ interface OrchestrationPanelProps {
   mapping: StickingMapping
   onChange: (key: keyof StickingMapping, value: Instrument[] | boolean) => void
   instrumentCounters: Map<string, number>
+  onReset?: () => void
 }
 
 export function OrchestrationPanel({
   mapping,
   onChange,
   instrumentCounters,
+  onReset,
 }: OrchestrationPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
+
+  const handleResetClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onReset?.()
+  }
 
   return (
     <div className={classes.container}>
       <div className={classes.header} onClick={() => setIsOpen(!isOpen)}>
-        <span className={classes.icon}>{isOpen ? '▼' : '▶'}</span>
-        <span>Orchestration</span>
+        <div className={classes.headerLeft}>
+          <span className={classes.icon}>{isOpen ? '▼' : '▶'}</span>
+          <span>Orchestration</span>
+        </div>
+        {onReset && (
+          <button
+            className={classes.resetButton}
+            onClick={handleResetClick}
+            title="Reset orchestration to defaults"
+          >
+            Reset
+          </button>
+        )}
       </div>
 
       {isOpen && (
