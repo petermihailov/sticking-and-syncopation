@@ -21,7 +21,7 @@ describe('16th-paradiddle-double-accent', () => {
     standardTestInputs.forEach((testInput, index) => {
       it(testInput.name, () => {
         const result = convert(testInput.input as Accent[])
-        expect(result.join('')).toBe(expectations[index])
+        expect(result.bar1.join('')).toBe(expectations[index])
       })
     })
   })

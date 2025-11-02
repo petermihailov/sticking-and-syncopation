@@ -22,8 +22,17 @@ const config = createConverter({
 
       // Alternate hands on accents
       if (isAccent && result.length >= 2) {
-        const lastChar = result[result.length - 1]
-        const oppositeHand = getOppositeHand(lastChar)
+        // Find last actual hand stroke (ignore 'k' which is kick drum)
+        let lastHand = result[result.length - 1]
+        if (lastHand === 'k') {
+          for (let i = result.length - 2; i >= 0; i--) {
+            if (result[i] !== 'k') {
+              lastHand = result[i]
+              break
+            }
+          }
+        }
+        const oppositeHand = getOppositeHand(lastHand)
         const filtered = preferStartingWith(oppositeHand)(patterns)
         if (filtered.length > 0) return filtered
       }

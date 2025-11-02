@@ -1,7 +1,7 @@
 import type { ConvertResult } from '../../types.ts'
 
 export function generateNotation(convertResult: ConvertResult): string {
-  const barString = convertResult.stickings.join('').replace(/\s/g, '')
+  const barString = convertResult.bars[0].join('').replace(/\s/g, '')
   const hasKick = barString.includes('k')
 
   const notes = barString.split('').map(char => {

@@ -34,8 +34,16 @@ export function evaluatePatternQuality(
     return PATTERN_SCORES.INVALID
   }
 
-  if (['rr', 'll'].some(transition => testSequence.includes(transition))) {
-    return PATTERN_SCORES.CREATES_DOUBLE
+  // Check if the NEW pattern creates a double at the transition point
+  // We need to check the junction between result and pattern
+  if (result.length > 0) {
+    const lastChar = result[result.length - 1]
+    const firstCharOfPattern = pattern[0]
+    const junction = lastChar + firstCharOfPattern
+
+    if (junction === 'rr' || junction === 'll') {
+      return PATTERN_SCORES.CREATES_DOUBLE
+    }
   }
 
   return PATTERN_SCORES.VALID

@@ -54,9 +54,14 @@ export type ConverterConfig = {
   selectConfig?: SelectPatternConfig
 }
 
+export type ConvertResultBars = {
+  bar1: Sticking[]
+  bar2?: Sticking[]
+}
+
 export type ConverterExports = {
   converterName: string
   pattern: string
   replaces: ConverterReplaces
-  convert: (accentMap8: Accent[]) => Sticking[]
+  convert: (accentMap8: Accent[]) => ConvertResultBars
 }

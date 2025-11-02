@@ -4,16 +4,16 @@ import type { Accent } from '../../types.ts'
 import { standardTestInputs } from '../shared/test-cases.ts'
 
 const expectations = [
-  'rrlrrlrrlrrl', // Все нули
+  'rrllrrllrrll', // Все нули
   'RlRLrLRlRLrL', // Все единицы
   'RllRllRllRll', // Чередование с 1
   'rrLrrLrrLrrL', // Чередование с 0
   'RlRllrLrLrrl', // Парные единицы
   'rrlRlRllrLrL', // Парные нули
-  'Rllrrlrrlrrl', // Паттерн [1,0,0,0,0,0,0,0]
+  'Rllrrllrrllr', // Паттерн [1,0,0,0,0,0,0,0]
   'RllrrlRllRll', // Паттерн [1,0,0,0,1,0,1,0]
   'RllrrLRllrrL', // Паттерн [1,0,0,1,1,0,0,1]
-  'rrLrrlrrlrrl', // Паттерн [0,1,0,0,0,0,0,0]
+  'rrLrrllrrllr', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
 describe('8th-inverted-doubles-in-triplets', () => {
@@ -21,7 +21,7 @@ describe('8th-inverted-doubles-in-triplets', () => {
     standardTestInputs.forEach((testInput, index) => {
       it(testInput.name, () => {
         const result = convert(testInput.input as Accent[])
-        expect(result.join('')).toBe(expectations[index])
+        expect(result.bar1.join('')).toBe(expectations[index])
       })
     })
   })

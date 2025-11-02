@@ -18,8 +18,7 @@ import { OrchestrationPanel } from '../OrchestrationPanel/OrchestrationPanel'
 interface ABCNotationProps {
   seeNotation: string
   playNotation?: string
-  stickings?: Sticking[]
-  isMirrored?: boolean
+  bars?: Sticking[][]
   width?: number
   height?: number
 }
@@ -28,8 +27,7 @@ export function ABCNotation({
   seeNotation,
   playNotation,
   width = 420,
-  stickings,
-  isMirrored = false,
+  bars = [],
 }: ABCNotationProps) {
   const notationRef = useRef<HTMLDivElement>(null)
   const [, setSelectedNotes] = useState<Set<string>>(new Set())
@@ -145,21 +143,23 @@ export function ABCNotation({
     }
   }, [])
 
-  // Update player bars when stickings change OR when player is ready
+  // Update player bars when bars change OR when player is ready
   useEffect(() => {
     // Wait until player is initialized (isLoading === false)
     if (isLoading || !playerRef.current) {
       return
     }
 
-    if (stickings && stickings.length > 0) {
-      const playerBars = stickingsToBars([stickings], state.instrumentMapping)
+    if (bars.length > 0 && bars[0].length > 0) {
+      // Filter out any empty bars before converting (defensive check)
+      const validBars = bars.filter(bar => bar && bar.length > 0)
+      const playerBars = stickingsToBars(validBars, state.instrumentMapping)
       playerRef.current.setBars(playerBars)
     } else {
       //
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stickings?.join(','), isLoading, playerVersion, state.instrumentMapping])
+  }, [bars.map(b => b.join(',')).join('|'), isLoading, playerVersion, state.instrumentMapping])
 
   // Sync metronome state with Player
   useEffect(() => {
@@ -203,12 +203,12 @@ export function ABCNotation({
       // Prevent page scroll when space is used for playback control
       event.preventDefault()
 
-      // Toggle playback if player is ready and has stickings
+      // Toggle playback if player is ready and has bars
       if (
         !isLoading &&
         drumKit &&
-        stickings &&
-        stickings.length > 0 &&
+        bars.length > 0 &&
+        bars[0].length > 0 &&
         playerRef.current
       ) {
         if (isPlaying) {
@@ -228,7 +228,7 @@ export function ABCNotation({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isLoading, drumKit, stickings, isPlaying])
+  }, [isLoading, drumKit, bars, isPlaying])
 
   const handlePlay = () => {
     if (playerRef.current && !isPlaying) {
@@ -289,8 +289,8 @@ export function ABCNotation({
       <SVGFilters />
       <div ref={notationRef} className={classes.notation} />
       {/*<Labels />*/}
-      {stickings?.length && (
-        <Stickings stickings={stickings} isMirrored={isMirrored} />
+      {bars.length > 0 && bars[0].length > 0 && (
+        <Stickings bars={bars} />
       )}
 
       {/* Player Controls */}
@@ -300,11 +300,11 @@ export function ABCNotation({
         <div className={classes.controls}>
           <PlayerControls
             isPlaying={isPlaying}
-            isDisabled={!drumKit || !stickings || stickings.length === 0}
+            isDisabled={!drumKit || bars.length === 0 || bars[0].length === 0}
             currentBeat={currentBeat.rhythmIndex + 1}
             onPlay={handlePlay}
             onStop={handleStop}
-            hasPattern={!!(stickings && stickings.length > 0)}
+            hasPattern={bars.length > 0 && bars[0].length > 0}
           />
 
           <TempoControl tempo={state.tempo} onChange={handleTempoChange} />

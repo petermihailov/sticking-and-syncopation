@@ -17,12 +17,13 @@ export function processAccents(
   options?: ProcessAccentsOptions
 ): Sticking[] {
   const result: Sticking[] = []
+  const accentCount = accentMap8.length
 
-  for (let i = 0; i < ACCENTS_COUNT; i++) {
+  for (let i = 0; i < accentCount; i++) {
     const accentLevel = String(accentMap8[i]) as '0' | '1'
     const availablePatterns = replaces[accentLevel] as StickingPattern[]
     const isAccent = accentMap8[i] === 1
-    const nextIsAccent = (i === ACCENTS_COUNT - 1 && accentMap8[0] === 1) || accentMap8[i + 1] === 1
+    const nextIsAccent = (i === accentCount - 1 && accentMap8[0] === 1) || accentMap8[i + 1] === 1
 
     let targetPatterns = availablePatterns
 
@@ -83,8 +84,9 @@ export function processPairs(
   options?: ProcessPairsOptions
 ): Sticking[] {
   const result: Sticking[] = []
+  const pairCount = Math.floor(accentMap8.length / 2)
 
-  for (let i = 0; i < PAIRS_COUNT; i++) {
+  for (let i = 0; i < pairCount; i++) {
     const pair = `${accentMap8[i * 2] || 0}${accentMap8[i * 2 + 1] || 0}`
     const availablePatterns = replaces[pair as keyof typeof replaces] as StickingPattern[]
 

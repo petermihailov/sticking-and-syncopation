@@ -13,6 +13,5 @@ export type Accent = 0 | 1
  * Result of converting accent pattern to sticking pattern
  */
 export interface ConvertResult {
-  stickings: Sticking[]
-  isMirrored: boolean
+  bars: Sticking[][]
 }

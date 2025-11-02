@@ -21,7 +21,7 @@ describe('convertHandToHand', () => {
     standardTestInputs.forEach((testInput, index) => {
       it(testInput.name, () => {
         const result = convert(testInput.input as Accent[])
-        const resultString = result.join('')
+        const resultString = result.bar1.join('')
         expect(resultString).toBe(expectations[index])
       })
     })

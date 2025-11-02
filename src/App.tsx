@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { Accent, ConvertResult } from './types.ts'
 import { converters } from './converters/registry'
-import { shouldCreateMirroredBar } from './converters/shared/mirror-checker'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { ABCNotation } from './components/ABCNotation'
@@ -18,10 +17,11 @@ function AppContent() {
     )
 
     const converter = converters[state.rudiment]
-    const bar = converter.convert(accentArray)
-    const isMirrored = shouldCreateMirroredBar(bar)
+    const result = converter.convert(accentArray)
 
-    return { stickings: bar, isMirrored }
+    return {
+      bars: result.bar2 ? [result.bar1, result.bar2] : [result.bar1],
+    }
   }, [state.accents, state.rudiment])
 
   // Keyboard shortcut: R for reset to defaults
@@ -50,8 +50,7 @@ function AppContent() {
       <ABCNotation
         seeNotation={generateAccentNotation(state.accents)}
         playNotation={converters[state.rudiment].generateNotation(convertResult)}
-        stickings={convertResult.stickings}
-        isMirrored={convertResult.isMirrored}
+        bars={convertResult.bars}
       />
     </>
   )

@@ -4,16 +4,16 @@ import type { Accent } from '../../types.ts'
 import { standardTestInputs } from '../shared/test-cases.ts'
 
 const expectations = [
-  'rllrrlrlrlrlrlrl', // Все нули
+  'rllrrllrrllrrllr', // Все нули
   'RlRlRlRlRlRlRlRl', // Все единицы
-  'RllRLrrLRlrLRlrL', // Чередование с 1
-  'rLRllRLrrLRlrLRl', // Чередование с 0
-  'RlRllrrLRlRlrlrL', // Парные единицы
-  'rllRLrLrrlrLRlRl', // Парные нули
-  'RllrrlrlrlrlrlrL', // Паттерн [1,0,0,0,0,0,0,0]
-  'RllrrlrLRlrLRlrL', // Паттерн [1,0,0,0,1,0,1,0]
-  'RllrrLRlRlrlrLRl', // Паттерн [1,0,0,1,1,0,0,1]
-  'rLRllrrlrlrlrlrl', // Паттерн [0,1,0,0,0,0,0,0]
+  'RllRLrrLRllRLrrL', // Чередование с 1
+  'rLRllRLrrLRllRLr', // Чередование с 0
+  'RlRllrrLRlRllrrL', // Парные единицы
+  'rllRLrLrrllRLrLr', // Парные нули
+  'RllrrllrrllrrllR', // Паттерн [1,0,0,0,0,0,0,0]
+  'RllrrllRLrrLRllR', // Паттерн [1,0,0,0,1,0,1,0]
+  'RllrrLRlRllrrLRl', // Паттерн [1,0,0,1,1,0,0,1]
+  'rLRllrrllrrllrrl', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
 describe('16th-invert-paradiddle-double-accent', () => {
@@ -21,7 +21,7 @@ describe('16th-invert-paradiddle-double-accent', () => {
     standardTestInputs.forEach((testInput, index) => {
       it(testInput.name, () => {
         const result = convert(testInput.input as Accent[])
-        expect(result.join('')).toBe(expectations[index])
+        expect(result.bar1.join('')).toBe(expectations[index])
       })
     })
   })

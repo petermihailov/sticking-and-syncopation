@@ -4,7 +4,7 @@ export function generateHandToHandNotation(
   convertResult: ConvertResult
 ): string {
   // Извлекаем символы палочек из результата (12 символов для триолей)
-  const stickings = convertResult.stickings || ['r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l']
+  const stickings = convertResult.bars[0] || ['r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l']
 
   // Создаем ноты с акцентами для триолей
   const notes = stickings.map((sticking: Sticking) => {

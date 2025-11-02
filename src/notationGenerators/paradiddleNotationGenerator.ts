@@ -4,7 +4,7 @@ export function generateParadiddleNotation(
   convertResult: ConvertResult
 ): string {
   // Извлекаем символы палочек из результата
-  const barString = convertResult.stickings.join('').replace(/\s/g, '') // Убираем пробелы
+  const barString = convertResult.bars[0].join('').replace(/\s/g, '') // Убираем пробелы
   const hasKick = barString.includes('k')
 
   // Создаем ноты с акцентами, ghost notes и sticking аннотациями

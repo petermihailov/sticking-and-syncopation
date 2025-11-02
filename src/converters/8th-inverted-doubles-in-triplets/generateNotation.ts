@@ -1,7 +1,7 @@
 import type { ConvertResult, Sticking } from '../../types.ts'
 
 export function generateNotation(convertResult: ConvertResult): string {
-  const stickings = convertResult.stickings || ['r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l']
+  const stickings = convertResult.bars[0] || ['r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l', 'r', 'l']
 
   const notes = stickings.map((sticking: Sticking) => {
     const isAccent = sticking === 'R' || sticking === 'L'

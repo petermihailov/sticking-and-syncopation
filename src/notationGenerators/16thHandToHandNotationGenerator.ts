@@ -4,7 +4,7 @@ export function generate16thHandToHandNotation(
   convertResult: ConvertResult
 ): string {
   // Извлекаем символы палочек из результата (24 символа для 16th триолей)
-  const stickings = convertResult.stickings || []
+  const stickings = convertResult.bars[0] || []
 
   // Создаем ноты с акцентами для триолей
   const notes = stickings.map((sticking: Sticking) => {

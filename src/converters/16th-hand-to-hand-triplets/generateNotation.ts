@@ -1,7 +1,7 @@
 import type { ConvertResult, Sticking } from '../../types.ts'
 
 export function generateNotation(convertResult: ConvertResult): string {
-  const stickings = convertResult.stickings || []
+  const stickings = convertResult.bars[0] || []
 
   const notes = stickings.map((sticking: Sticking) => {
     if (sticking === ' ') {
