@@ -24,11 +24,11 @@ export function Lessons() {
     })
   }
 
-  const getExerciseKey = (lessonId: number, exerciseId: number) => {
+  const getExerciseKey = (lessonId: number, exerciseId: string) => {
     return `${lessonId}-${exerciseId}`
   }
 
-  const setExerciseRef = (lessonId: number, exerciseId: number) => {
+  const setExerciseRef = (lessonId: number, exerciseId: string) => {
     return (el: HTMLButtonElement | null) => {
       const key = getExerciseKey(lessonId, exerciseId)
       if (el) {
@@ -42,7 +42,7 @@ export function Lessons() {
   const handleKeyDown = (
     e: React.KeyboardEvent,
     lessonId: number,
-    exerciseId: number
+    exerciseId: string
   ) => {
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       return
@@ -60,9 +60,6 @@ export function Lessons() {
     const container = e.currentTarget.parentElement
     if (!container) return
 
-    const buttons = Array.from(exerciseRefs.current.values()).filter(btn =>
-      container.contains(btn)
-    )
     const containerWidth = container.clientWidth
     const buttonWidth = (e.currentTarget as HTMLButtonElement).offsetWidth
     const gap = 8 // 0.5rem = 8px
