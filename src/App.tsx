@@ -6,6 +6,7 @@ import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { ABCNotation } from './components/ABCNotation'
 import { AudioPlayer } from './components/AudioPlayer'
+import { AppLayout } from './components/Layout/AppLayout'
 import { generateAccentNotation } from './notationGenerators'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
 import {
@@ -64,7 +65,20 @@ function AppContent() {
   }
 
   return (
-    <>
+    <AppLayout sidebar={<Lessons />}>
+      <AudioPlayer
+        bars={convertResult.bars}
+        instrumentMapping={state.instrumentMapping}
+        tempo={state.tempo}
+        metronome={state.metronome}
+        metronomeVolume={state.metronomeVolume}
+        onBeatChange={setCurrentBeat}
+        onTempoChange={actions.setTempo}
+        onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
+        onMetronomeVolumeChange={actions.setMetronomeVolume}
+        onMappingChange={handleMappingChange}
+        onOrchestrationReset={handleOrchestrationReset}
+      />
       <RudimentSelector
         selectedRudiment={state.rudiment}
         onRudimentChange={actions.setRudiment}
@@ -81,21 +95,7 @@ function AppContent() {
         bars={convertResult.bars}
         currentBeat={currentBeat}
       />
-      <AudioPlayer
-        bars={convertResult.bars}
-        instrumentMapping={state.instrumentMapping}
-        tempo={state.tempo}
-        metronome={state.metronome}
-        metronomeVolume={state.metronomeVolume}
-        onBeatChange={setCurrentBeat}
-        onTempoChange={actions.setTempo}
-        onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
-        onMetronomeVolumeChange={actions.setMetronomeVolume}
-        onMappingChange={handleMappingChange}
-        onOrchestrationReset={handleOrchestrationReset}
-      />
-      <Lessons />
-    </>
+    </AppLayout>
   )
 }
 

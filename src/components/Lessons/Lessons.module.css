@@ -1,8 +1,8 @@
 .lessons {
-  margin-bottom: 1.5rem;
   background: #fff;
   border: 1px solid #0003;
   border-radius: 4px;
+  height: fit-content;
 }
 
 .title {
@@ -58,16 +58,10 @@
 
 .exercises {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.5rem;
   padding: 1rem;
   background: #fafafa;
-}
-
-@media (max-width: 640px) {
-  .exercises {
-    grid-template-columns: 1fr;
-  }
 }
 
 .exercise {
