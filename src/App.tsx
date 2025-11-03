@@ -6,6 +6,7 @@ import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { ABCNotation } from './components/ABCNotation'
 import { AudioPlayer } from './components/AudioPlayer'
+import { OrchestrationSection } from './components/OrchestrationSection'
 import { AppLayout } from './components/Layout/AppLayout'
 import { generateAccentNotation } from './notationGenerators'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
@@ -20,6 +21,9 @@ function AppContent() {
     barIndex: 0,
     rhythmIndex: 0,
   })
+  const [instrumentCounters, setInstrumentCounters] = useState<
+    Map<string, number>
+  >(new Map())
 
   // Convert accents to rudiment pattern
   const convertResult: ConvertResult = useMemo(() => {
@@ -66,6 +70,10 @@ function AppContent() {
 
   return (
     <AppLayout sidebar={<Lessons />}>
+      <RudimentSelector
+        selectedRudiment={state.rudiment}
+        onRudimentChange={actions.setRudiment}
+      />
       <AudioPlayer
         bars={convertResult.bars}
         instrumentMapping={state.instrumentMapping}
@@ -73,15 +81,10 @@ function AppContent() {
         metronome={state.metronome}
         metronomeVolume={state.metronomeVolume}
         onBeatChange={setCurrentBeat}
+        onInstrumentCountersChange={setInstrumentCounters}
         onTempoChange={actions.setTempo}
         onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
         onMetronomeVolumeChange={actions.setMetronomeVolume}
-        onMappingChange={handleMappingChange}
-        onOrchestrationReset={handleOrchestrationReset}
-      />
-      <RudimentSelector
-        selectedRudiment={state.rudiment}
-        onRudimentChange={actions.setRudiment}
       />
       <AccentPattern
         checkedItems={state.accents}
@@ -94,6 +97,12 @@ function AppContent() {
         )}
         bars={convertResult.bars}
         currentBeat={currentBeat}
+      />
+      <OrchestrationSection
+        mapping={state.instrumentMapping}
+        instrumentCounters={instrumentCounters}
+        onChange={handleMappingChange}
+        onReset={handleOrchestrationReset}
       />
     </AppLayout>
   )

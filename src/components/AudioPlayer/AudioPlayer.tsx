@@ -5,10 +5,7 @@ import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
 import type { DrumKit, StickingMapping } from '../../types/instrument'
 import type { Sticking } from '../../types'
-import { PlayerControls } from '../PlayerControls/PlayerControls'
-import { TempoControl } from '../TempoControl/TempoControl'
-import { MetronomeControls } from '../MetronomeControls/MetronomeControls'
-import { OrchestrationPanel } from '../OrchestrationPanel/OrchestrationPanel'
+import { PlayerSection } from '../PlayerSection/PlayerSection'
 
 interface AudioPlayerProps {
   bars: Sticking[][]
@@ -17,11 +14,10 @@ interface AudioPlayerProps {
   metronome: boolean
   metronomeVolume: number
   onBeatChange?: (beat: { barIndex: number; rhythmIndex: number }) => void
+  onInstrumentCountersChange?: (counters: Map<string, number>) => void
   onTempoChange: (tempo: number) => void
   onMetronomeToggle: () => void
   onMetronomeVolumeChange: (volume: number) => void
-  onMappingChange: (key: keyof StickingMapping, value: unknown) => void
-  onOrchestrationReset: () => void
 }
 
 export function AudioPlayer({
@@ -31,11 +27,10 @@ export function AudioPlayer({
   metronome,
   metronomeVolume,
   onBeatChange,
+  onInstrumentCountersChange,
   onTempoChange,
   onMetronomeToggle,
   onMetronomeVolumeChange,
-  onMappingChange,
-  onOrchestrationReset,
 }: AudioPlayerProps) {
   const playerRef = useRef<Player | null>(null)
   const [drumKit, setDrumKit] = useState<DrumKit | null>(null)
@@ -49,6 +44,11 @@ export function AudioPlayer({
   const [instrumentCounters, setInstrumentCounters] = useState<
     Map<string, number>
   >(new Map())
+
+  // Notify parent about instrument counters changes
+  useEffect(() => {
+    onInstrumentCountersChange?.(instrumentCounters)
+  }, [instrumentCounters, onInstrumentCountersChange])
 
   // Initialize Player and load DrumKit
   useEffect(() => {
@@ -217,31 +217,19 @@ export function AudioPlayer({
   }
 
   return (
-    <div className={classes.controls}>
-      <PlayerControls
-        isPlaying={isPlaying}
-        isDisabled={!drumKit || bars.length === 0 || bars[0].length === 0}
-        currentBeat={currentBeat.rhythmIndex + 1}
-        onPlay={handlePlay}
-        onStop={handleStop}
-        hasPattern={bars.length > 0 && bars[0].length > 0}
-      />
-
-      <TempoControl tempo={tempo} onChange={onTempoChange} />
-
-      <MetronomeControls
-        enabled={metronome}
-        volume={metronomeVolume}
-        onToggle={onMetronomeToggle}
-        onVolumeChange={onMetronomeVolumeChange}
-      />
-
-      <OrchestrationPanel
-        mapping={instrumentMapping}
-        onChange={onMappingChange}
-        onReset={onOrchestrationReset}
-        instrumentCounters={instrumentCounters}
-      />
-    </div>
+    <PlayerSection
+      isPlaying={isPlaying}
+      isDisabled={!drumKit || bars.length === 0 || bars[0].length === 0}
+      currentBeat={currentBeat.rhythmIndex + 1}
+      tempo={tempo}
+      metronome={metronome}
+      metronomeVolume={metronomeVolume}
+      hasPattern={bars.length > 0 && bars[0].length > 0}
+      onPlay={handlePlay}
+      onStop={handleStop}
+      onTempoChange={onTempoChange}
+      onMetronomeToggle={onMetronomeToggle}
+      onMetronomeVolumeChange={onMetronomeVolumeChange}
+    />
   )
 }

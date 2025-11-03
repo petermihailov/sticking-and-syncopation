@@ -14,12 +14,14 @@ export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
     switch (event.key) {
       case 'ArrowLeft':
         event.preventDefault()
-        const prevIndex = currentIndex > 0 ? currentIndex - 1 : checkedItems.length - 1
+        const prevIndex =
+          currentIndex > 0 ? currentIndex - 1 : checkedItems.length - 1
         checkboxRefs.current[prevIndex]?.focus()
         break
       case 'ArrowRight':
         event.preventDefault()
-        const nextIndex = currentIndex < checkedItems.length - 1 ? currentIndex + 1 : 0
+        const nextIndex =
+          currentIndex < checkedItems.length - 1 ? currentIndex + 1 : 0
         checkboxRefs.current[nextIndex]?.focus()
         break
       case ' ':
@@ -30,7 +32,7 @@ export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
   }
 
   return (
-    <>
+    <div>
       <div className={classes.checkboxLabels}>
         {['1', '&', '2', '&', '3', '&', '4', '&'].map((label, index) => (
           <div key={index} className={classes.checkboxLabel}>
@@ -42,15 +44,17 @@ export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
         {checkedItems.map((isChecked, index) => (
           <input
             key={index}
-            ref={el => { checkboxRefs.current[index] = el }}
+            ref={el => {
+              checkboxRefs.current[index] = el
+            }}
             type="checkbox"
             checked={isChecked}
             onChange={() => onToggle(index)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
+            onKeyDown={e => handleKeyDown(e, index)}
             tabIndex={index === 0 ? 0 : -1}
           />
         ))}
       </div>
-    </>
+    </div>
   )
 }
