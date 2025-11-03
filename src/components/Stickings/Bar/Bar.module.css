@@ -1,20 +1,21 @@
 .labels {
-    display: flex;
-    width: 83%;
-    margin-left: auto;
-    margin-right: 8%;
-    aspect-ratio: 20 / 1;
-    font-size: min(1rem, 3vw);
+  display: flex;
+  width: 83%;
+  margin-left: auto;
+  margin-right: 8%;
+  aspect-ratio: 20 / 1;
+  font-size: min(1rem, 3vw);
 }
 
 .label {
-    position: relative;
-    flex: 1;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    line-height: 0;
-    text-transform: uppercase;
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  line-height: 0;
+  text-transform: uppercase;
+  transition: transform 150ms ease-out;
 }
 
 /*.labels:not(:last-child) .label {*/
@@ -22,44 +23,77 @@
 /*}*/
 
 .label:first-child {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 .label.r {
-    background-color: #f002;
+  background-color: #f002;
 }
 
 .label.r.a {
-    background-color: #f003;
+  background-color: #f003;
 }
 
 .label.l {
-    background-color: #00f2;
+  background-color: #00f2;
 }
 
 .label.l.a {
-    background-color: #00f3;
+  background-color: #00f3;
 }
 
 .label.k {
-    background-color: #0df4;
-    border-bottom: 1px dashed #0df4;
+  background-color: #0df4;
+  border-bottom: 1px dashed #0df4;
 }
 
 .label.a {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .label.a::before {
-    content: '>';
-    position: absolute;
-    font-weight: 600;
-    top: -5%;
-    color: #000;
+  content: '';
+  position: absolute;
+  bottom: -35%;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: scale(0);
+  border-radius: 50%;
+  transition: transform 0.3s ease-out;
+}
+
+.label.a::after {
+  content: '>';
+  position: absolute;
+  font-weight: 600;
+  top: -5%;
+  color: #000;
 }
 
 .label.pause {
-    background-color: #8882;
-    opacity: 0.5;
-    color: #666;
+  background-color: #8882;
+  opacity: 0.5;
+  color: #666;
+}
+
+.label.current {
+  transform: scale(1.5);
+  transition: none;
+}
+
+.label.current.a {
+  background-color: #0000;
+}
+
+.label.current.a::before {
+  transform: scale(1);
+  transition: none;
+}
+
+.label.current.a.r::before {
+  background-color: #f003;
+}
+
+.label.current.a.l::before {
+  background-color: #00f4;
 }

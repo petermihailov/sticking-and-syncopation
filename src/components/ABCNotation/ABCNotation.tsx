@@ -19,10 +19,11 @@ export function ABCNotation({
   playNotation,
   width = 420,
   bars = [],
-  currentBeat: _currentBeat,
+  currentBeat,
 }: ABCNotationProps) {
   const notationRef = useRef<HTMLDivElement>(null)
   const [, setSelectedNotes] = useState<Set<string>>(new Set())
+  const visualObjRef = useRef<any>(null)
 
   useEffect(() => {
     if (notationRef.current && seeNotation) {
@@ -46,7 +47,7 @@ export function ABCNotation({
       }
 
       // Рендерим ABC нотацию
-      abcjs.renderAbc(notationRef.current, combinedNotation, {
+      const visualObj = abcjs.renderAbc(notationRef.current, combinedNotation, {
         responsive: 'resize',
         staffwidth: width,
         oneSvgPerLine: true,
@@ -62,6 +63,8 @@ export function ABCNotation({
           console.log('Clicked note')
         },
       })
+
+      visualObjRef.current = visualObj
     }
   }, [seeNotation, playNotation, width])
 
@@ -70,13 +73,13 @@ export function ABCNotation({
     setSelectedNotes(new Set())
   }, [seeNotation, playNotation])
 
-  // TODO: Implement beat highlighting using currentBeat prop
-
   return (
     <div className={classes.container}>
       <SVGFilters />
       <div ref={notationRef} className={classes.notation} />
-      {bars.length > 0 && bars[0].length > 0 && <Stickings bars={bars} />}
+      {bars.length > 0 && bars[0].length > 0 && (
+        <Stickings bars={bars} currentBeat={currentBeat} />
+      )}
     </div>
   )
 }

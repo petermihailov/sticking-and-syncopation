@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import classes from './AudioPlayer.module.css'
-import { createPlayer, type Player } from '../../lib/player'
+import { createPlayer } from '../../lib/player'
 import { createDrumKit, resumeAudioContext } from '../../utils/audio'
 import { stickingsToBars } from '../../utils/groove'
 import type { DrumKit, StickingMapping } from '../../types/instrument'
 import type { Sticking } from '../../types'
-import { PlayerSection } from '../PlayerSection/PlayerSection'
+import { PlayerSection } from '../PlayerSection'
+import { usePlayerControl } from '../../context/PlayerControlContext'
 
 interface AudioPlayerProps {
   bars: Sticking[][]
@@ -32,14 +33,17 @@ export function AudioPlayer({
   onMetronomeToggle,
   onMetronomeVolumeChange,
 }: AudioPlayerProps) {
-  const playerRef = useRef<Player | null>(null)
+  const {
+    playerRef: sharedPlayerRef,
+    isPlaying,
+    setIsPlaying,
+    currentBeat,
+    setCurrentBeat,
+    stop: stopPlayer,
+  } = usePlayerControl()
+
   const [drumKit, setDrumKit] = useState<DrumKit | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [currentBeat, setCurrentBeat] = useState({
-    barIndex: 0,
-    rhythmIndex: 0,
-  })
   const [playerVersion, setPlayerVersion] = useState(0)
   const [instrumentCounters, setInstrumentCounters] = useState<
     Map<string, number>
@@ -86,7 +90,7 @@ export function AudioPlayer({
           })
         })
 
-        playerRef.current = player
+        sharedPlayerRef.current = player
         setPlayerVersion(prev => prev + 1)
         setIsLoading(false)
       } catch (error) {
@@ -99,53 +103,58 @@ export function AudioPlayer({
 
     // Cleanup
     return () => {
-      if (playerRef.current && isPlaying) {
-        playerRef.current.stop()
+      if (sharedPlayerRef.current && isPlaying) {
+        sharedPlayerRef.current.stop()
       }
     }
   }, [])
 
   // Update player bars when bars change OR when player is ready
   useEffect(() => {
-    if (isLoading || !playerRef.current) {
+    if (isLoading || !sharedPlayerRef.current) {
       return
     }
 
     if (bars.length > 0 && bars[0].length > 0) {
       const validBars = bars.filter(bar => bar && bar.length > 0)
       const playerBars = stickingsToBars(validBars, instrumentMapping)
-      playerRef.current.setBars(playerBars)
+      sharedPlayerRef.current.setBars(playerBars)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bars.map(b => b.join(',')).join('|'), isLoading, playerVersion, instrumentMapping])
+  }, [
+    bars.map(b => b.join(',')).join('|'),
+    isLoading,
+    playerVersion,
+    instrumentMapping,
+  ])
 
   // Sync metronome state with Player
   useEffect(() => {
-    if (!playerRef.current) return
+    if (!sharedPlayerRef.current) return
 
     if (metronome) {
-      playerRef.current.playMetronome()
+      sharedPlayerRef.current.playMetronome()
     } else {
-      playerRef.current.stopMetronome()
+      sharedPlayerRef.current.stopMetronome()
     }
   }, [metronome])
 
   // Sync metronome volume with Player
   useEffect(() => {
-    if (!playerRef.current) return
-    playerRef.current.setMetronomeVolume(metronomeVolume)
+    if (!sharedPlayerRef.current) return
+    sharedPlayerRef.current.setMetronomeVolume(metronomeVolume)
   }, [metronomeVolume])
 
   // Sync instrument mapping with Player
   useEffect(() => {
-    if (!playerRef.current) return
-    playerRef.current.setInstrumentMapping(instrumentMapping)
+    if (!sharedPlayerRef.current) return
+    sharedPlayerRef.current.setInstrumentMapping(instrumentMapping)
   }, [instrumentMapping])
 
   // Sync tempo with Player
   useEffect(() => {
-    if (!playerRef.current) return
-    playerRef.current.setTempo(tempo)
+    if (!sharedPlayerRef.current) return
+    sharedPlayerRef.current.setTempo(tempo)
   }, [tempo])
 
   // Keyboard shortcut: Space for play/pause
@@ -172,16 +181,15 @@ export function AudioPlayer({
         drumKit &&
         bars.length > 0 &&
         bars[0].length > 0 &&
-        playerRef.current
+        sharedPlayerRef.current
       ) {
         if (isPlaying) {
-          playerRef.current.stop()
-          setIsPlaying(false)
-          setCurrentBeat({ barIndex: 0, rhythmIndex: 0 })
+          stopPlayer()
+          setInstrumentCounters(new Map())
           onBeatChange?.({ barIndex: 0, rhythmIndex: 0 })
         } else {
           resumeAudioContext()
-          playerRef.current.play()
+          sharedPlayerRef.current.play()
           setIsPlaying(true)
         }
       }
@@ -192,23 +200,21 @@ export function AudioPlayer({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isLoading, drumKit, bars, isPlaying, onBeatChange])
+  }, [isLoading, drumKit, bars, isPlaying, onBeatChange, stopPlayer])
 
-  const handlePlay = () => {
-    if (playerRef.current && !isPlaying) {
-      resumeAudioContext()
-      playerRef.current.play()
-      setIsPlaying(true)
-    }
-  }
-
-  const handleStop = () => {
-    if (playerRef.current && isPlaying) {
-      playerRef.current.stop()
-      setIsPlaying(false)
-      setCurrentBeat({ barIndex: 0, rhythmIndex: 0 })
+  const handleToggle = () => {
+    if (isPlaying) {
+      // Stop - use context method to trigger callbacks
+      stopPlayer()
       setInstrumentCounters(new Map())
       onBeatChange?.({ barIndex: 0, rhythmIndex: 0 })
+    } else {
+      // Play
+      if (sharedPlayerRef.current) {
+        resumeAudioContext()
+        sharedPlayerRef.current.play()
+        setIsPlaying(true)
+      }
     }
   }
 
@@ -225,8 +231,7 @@ export function AudioPlayer({
       metronome={metronome}
       metronomeVolume={metronomeVolume}
       hasPattern={bars.length > 0 && bars[0].length > 0}
-      onPlay={handlePlay}
-      onStop={handleStop}
+      onToggle={handleToggle}
       onTempoChange={onTempoChange}
       onMetronomeToggle={onMetronomeToggle}
       onMetronomeVolumeChange={onMetronomeVolumeChange}

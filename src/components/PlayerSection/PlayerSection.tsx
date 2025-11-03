@@ -11,8 +11,7 @@ interface PlayerSectionProps {
   metronome: boolean
   metronomeVolume: number
   hasPattern: boolean
-  onPlay: () => void
-  onStop: () => void
+  onToggle: () => void
   onTempoChange: (tempo: number) => void
   onMetronomeToggle: () => void
   onMetronomeVolumeChange: (volume: number) => void
@@ -26,8 +25,7 @@ export function PlayerSection({
   metronome,
   metronomeVolume,
   hasPattern,
-  onPlay,
-  onStop,
+  onToggle,
   onTempoChange,
   onMetronomeToggle,
   onMetronomeVolumeChange,
@@ -38,8 +36,7 @@ export function PlayerSection({
         isPlaying={isPlaying}
         isDisabled={isDisabled}
         currentBeat={currentBeat}
-        onPlay={onPlay}
-        onStop={onStop}
+        onToggle={onToggle}
         hasPattern={hasPattern}
       />
 

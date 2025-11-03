@@ -6,12 +6,14 @@ interface StickingBarProps {
   labels: Sticking[]
   isSecondBar?: boolean
   className?: string
+  currentIndex?: number
 }
 
 export function Bar({
   labels,
   isSecondBar = false,
   className,
+  currentIndex,
 }: StickingBarProps) {
   return (
     <div
@@ -27,6 +29,7 @@ export function Bar({
             [classes.k]: label.toLowerCase() === 'k',
             [classes.a]: label === 'R' || label === 'L',
             [classes.pause]: label === ' ',
+            [classes.current]: index === currentIndex,
           })}
           key={index}
         >

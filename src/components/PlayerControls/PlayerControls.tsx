@@ -6,8 +6,7 @@ interface PlayerControlsProps {
   isPlaying: boolean
   isDisabled: boolean
   currentBeat: number
-  onPlay: () => void
-  onStop: () => void
+  onToggle: () => void
   hasPattern: boolean
 }
 
@@ -15,25 +14,17 @@ export function PlayerControls({
   isPlaying,
   isDisabled,
   currentBeat,
-  onPlay,
-  onStop,
+  onToggle,
   hasPattern,
 }: PlayerControlsProps) {
   return (
     <div className={classes.container}>
       <button
-        onClick={onPlay}
-        disabled={isPlaying || isDisabled}
+        onClick={onToggle}
+        disabled={isDisabled}
         className={classes.button}
       >
-        ▶ Play
-      </button>
-      <button
-        onClick={onStop}
-        disabled={!isPlaying}
-        className={classes.button}
-      >
-        ⏹ Stop
+        {isPlaying ? '⏹ Stop' : '▶ Play'}
       </button>
       <FavoritesButton />
       <ShareButton />

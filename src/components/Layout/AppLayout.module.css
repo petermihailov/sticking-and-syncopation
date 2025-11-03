@@ -49,7 +49,10 @@
   }
 
   .sidebar {
+    position: sticky;
+    top: 16px;
     min-width: 250px;
+    max-height: calc(100vh - 32px);
   }
 
   .toggleButton {

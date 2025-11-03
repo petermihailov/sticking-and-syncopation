@@ -10,6 +10,7 @@ import { OrchestrationSection } from './components/OrchestrationSection'
 import { AppLayout } from './components/Layout/AppLayout'
 import { generateAccentNotation } from './notationGenerators'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
+import { PlayerControlProvider } from './context/PlayerControlContext'
 import {
   DEFAULT_STICKING_MAPPING,
   type StickingMapping,
@@ -86,10 +87,6 @@ function AppContent() {
         onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
         onMetronomeVolumeChange={actions.setMetronomeVolume}
       />
-      <AccentPattern
-        checkedItems={state.accents}
-        onToggle={actions.toggleAccent}
-      />
       <ABCNotation
         seeNotation={generateAccentNotation(state.accents)}
         playNotation={converters[state.rudiment].generateNotation(
@@ -104,6 +101,10 @@ function AppContent() {
         onChange={handleMappingChange}
         onReset={handleOrchestrationReset}
       />
+      <AccentPattern
+        checkedItems={state.accents}
+        onToggle={actions.toggleAccent}
+      />
     </AppLayout>
   )
 }
@@ -111,7 +112,9 @@ function AppContent() {
 function App() {
   return (
     <AppStateProvider>
-      <AppContent />
+      <PlayerControlProvider>
+        <AppContent />
+      </PlayerControlProvider>
     </AppStateProvider>
   )
 }

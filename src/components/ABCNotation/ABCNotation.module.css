@@ -81,6 +81,20 @@
     stroke-width: 1.5;
 }
 
+/* Highlight current note */
+.notation :global(.abcjs-note.current-note) path {
+    fill: #ffcc00 !important;
+    filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.8));
+}
+
+.notation :global(.abcjs-note.current-note) circle {
+    fill: #ffcc00 !important;
+}
+
+.notation :global(.abcjs-note.current-note) ellipse {
+    fill: #ffcc00 !important;
+}
+
 @keyframes squigglevision {
     0% {
         filter: url('#sketch-0');
