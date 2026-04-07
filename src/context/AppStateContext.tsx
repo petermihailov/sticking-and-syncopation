@@ -9,7 +9,6 @@ import {
 import type { RudimentType } from '../converters/registry'
 import type { StickingMapping } from '../types/sticking'
 import type { AppState } from '../types/appState'
-import type { UserExercise } from '../types/userLessons'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
@@ -18,10 +17,6 @@ import { useStatePersistence } from '../hooks/useStatePersistence'
 
 interface AppStateContextValue {
   state: AppState
-  /** id загруженного пользовательского упражнения, либо null */
-  loadedExerciseId: string | null
-  /** Загруженное упражнение отличается от текущего state */
-  isDirty: boolean
   actions: {
     setAccents: (accents: boolean[]) => void
     toggleAccent: (index: number) => void
@@ -32,8 +27,6 @@ interface AppStateContextValue {
     setInstrumentMapping: (mapping: StickingMapping) => void
     resetAccents: () => void
     resetToDefaults: () => void
-    loadUserExercise: (exercise: UserExercise) => void
-    clearLoadedExercise: () => void
   }
   shareUrl: string
 }
@@ -74,33 +67,12 @@ function loadInitialState(): AppState {
   }
 }
 
-function arraysEqual<T>(a: T[], b: T[]): boolean {
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false
-  return true
-}
-
-function mappingsEqual(a: StickingMapping, b: StickingMapping): boolean {
-  return (
-    arraysEqual(a.uppercaseR, b.uppercaseR) &&
-    arraysEqual(a.uppercaseL, b.uppercaseL) &&
-    a.uppercaseRKick === b.uppercaseRKick &&
-    a.uppercaseLKick === b.uppercaseLKick &&
-    arraysEqual(a.lowercaseR, b.lowercaseR) &&
-    arraysEqual(a.lowercaseL, b.lowercaseL) &&
-    arraysEqual(a.kick, b.kick)
-  )
-}
-
 interface AppStateProviderProps {
   children: ReactNode
 }
 
 export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
   const [state, setState] = useState<AppState>(loadInitialState)
-  const [loadedExercise, setLoadedExercise] = useState<UserExercise | null>(
-    null
-  )
 
   useStatePersistence(state)
 
@@ -144,31 +116,6 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     setState(DEFAULT_APP_STATE)
   }
 
-  const loadUserExercise = (exercise: UserExercise) => {
-    setState(prev => ({
-      ...prev,
-      accents: exercise.accents,
-      rudiment: exercise.rudiment,
-      tempo: exercise.tempo,
-      instrumentMapping: exercise.instrumentMapping,
-    }))
-    setLoadedExercise(exercise)
-  }
-
-  const clearLoadedExercise = () => {
-    setLoadedExercise(null)
-  }
-
-  const isDirty = useMemo(() => {
-    if (!loadedExercise) return false
-    return (
-      loadedExercise.tempo !== state.tempo ||
-      loadedExercise.rudiment !== state.rudiment ||
-      !arraysEqual(loadedExercise.accents, state.accents) ||
-      !mappingsEqual(loadedExercise.instrumentMapping, state.instrumentMapping)
-    )
-  }, [loadedExercise, state])
-
   const shareUrl = useMemo(() => {
     const queryString = encodeStateToUrl(state)
     const baseUrl = window.location.origin + window.location.pathname
@@ -177,8 +124,6 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
 
   const contextValue: AppStateContextValue = {
     state,
-    loadedExerciseId: loadedExercise?.id ?? null,
-    isDirty,
     actions: {
       setAccents,
       toggleAccent,
@@ -189,8 +134,6 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       setInstrumentMapping,
       resetAccents,
       resetToDefaults,
-      loadUserExercise,
-      clearLoadedExercise,
     },
     shareUrl,
   }

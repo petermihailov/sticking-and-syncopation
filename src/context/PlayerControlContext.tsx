@@ -12,6 +12,7 @@ import { createPlayer } from '../lib/player'
 import type { Player, PlayerState } from '../lib/player/Player'
 import { createDrumKit, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
+import { isTextInputElement, isRangeInput } from '../utils/domFocus'
 import type { DrumKit } from '../types/kit'
 import { useAppState } from './AppStateContext'
 import { useNotation } from './NotationContext'
@@ -148,10 +149,22 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
       if (event.key !== ' ') return
 
       const activeElement = document.activeElement
-      const interactiveTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']
-      if (activeElement && interactiveTags.includes(activeElement.tagName)) {
+
+      // В текстовых полях пробел — это ввод символа.
+      if (isTextInputElement(activeElement)) return
+
+      // На слайдерах (темп и т.п.) снимаем фокус и переключаем плеер,
+      // чтобы пробел срабатывал сразу после изменения значения.
+      if (isRangeInput(activeElement)) {
+        ;(activeElement as HTMLElement).blur()
+        event.preventDefault()
+        toggle()
         return
       }
+
+      // Кнопки/ссылки: пробел активирует их штатно — не перехватываем.
+      const tag = activeElement?.tagName
+      if (tag === 'BUTTON' || tag === 'A' || tag === 'SELECT') return
 
       event.preventDefault()
       toggle()

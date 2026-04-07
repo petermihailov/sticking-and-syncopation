@@ -1,5 +1,4 @@
 import { Lessons } from './components/Lessons'
-import { UserLessons } from './components/UserLessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { VexFlowNotation } from './components/VexFlowNotation'
@@ -43,12 +42,7 @@ function AppContent() {
 
   return (
     <AppLayout
-      sidebar={
-        <>
-          <Lessons />
-          <UserLessons />
-        </>
-      }
+      sidebar={<Lessons />}
     >
       <RudimentSelector
         selectedRudiment={state.rudiment}
