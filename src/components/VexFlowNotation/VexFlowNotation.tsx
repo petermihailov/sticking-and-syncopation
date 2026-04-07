@@ -7,17 +7,23 @@ import classes from './VexFlowNotation.module.css'
 interface VexFlowNotationProps {
   seeNotation: NotationData
   playNotation?: NotationData
+  currentRhythmIndex?: number
+  isPlaying?: boolean
   children?: ReactNode
 }
 
 export function VexFlowNotation({
   seeNotation,
   playNotation,
+  currentRhythmIndex,
+  isPlaying,
   children,
 }: VexFlowNotationProps) {
   const { seeRef, playRef } = useVexFlowRenderer({
     seeNotation,
     playNotation,
+    currentRhythmIndex,
+    isPlaying,
   })
 
   return (

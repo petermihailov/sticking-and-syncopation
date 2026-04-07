@@ -6,7 +6,6 @@ import classes from './PlayerSection.module.css'
 interface PlayerSectionProps {
   isPlaying: boolean
   isDisabled: boolean
-  currentBeat: number
   tempo: number
   metronome: boolean
   metronomeVolume: number
@@ -20,7 +19,6 @@ interface PlayerSectionProps {
 export function PlayerSection({
   isPlaying,
   isDisabled,
-  currentBeat,
   tempo,
   metronome,
   metronomeVolume,
@@ -35,7 +33,6 @@ export function PlayerSection({
       <PlayerControls
         isPlaying={isPlaying}
         isDisabled={isDisabled}
-        currentBeat={currentBeat}
         onToggle={onToggle}
         hasPattern={hasPattern}
       />

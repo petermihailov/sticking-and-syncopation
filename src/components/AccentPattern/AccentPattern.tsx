@@ -5,9 +5,14 @@ import classes from './AccentPattern.module.css'
 interface AccentPatternProps {
   checkedItems: boolean[]
   onToggle: (index: number) => void
+  className?: string
 }
 
-export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
+export function AccentPattern({
+  checkedItems,
+  onToggle,
+  className,
+}: AccentPatternProps) {
   const checkboxRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const handleKeyDown = (event: React.KeyboardEvent, currentIndex: number) => {
@@ -32,7 +37,7 @@ export function AccentPattern({ checkedItems, onToggle }: AccentPatternProps) {
   }
 
   return (
-    <div>
+    <div className={className}>
       <div className={classes.checkboxLabels}>
         {['1', '&', '2', '&', '3', '&', '4', '&'].map((label, index) => (
           <div key={index} className={classes.checkboxLabel}>

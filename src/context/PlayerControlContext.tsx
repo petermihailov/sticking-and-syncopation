@@ -8,8 +8,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react'
-import { createPlayer } from '../lib/player'
-import type { Player, PlayerState } from '../lib/player/Player'
+import { Player, type PlayerState } from '../lib/player'
 import { createDrumKit, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
 import { isTextInputElement, isRangeInput } from '../utils/domFocus'
@@ -72,7 +71,7 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
   // Создаём плеер один раз, асинхронно подгружаем кит.
   // applyState ниже сам передаст кит в плеер, как только он будет готов.
   useEffect(() => {
-    const player = createPlayer()
+    const player = new Player()
     player.setOnBeat(beat => {
       setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
       setInstrumentCounters(player.getInstrumentCounters())

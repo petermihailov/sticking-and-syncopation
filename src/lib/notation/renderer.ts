@@ -20,12 +20,14 @@ interface BuiltVoices {
   vfVoices: Voice[]
   tuplets: Tuplet[]
   beams: Beam[]
+  indexedNotes: Array<{ note: StaveNote; index: number }>
 }
 
 function buildVoices(notation: NotationData): BuiltVoices {
   const vfVoices: Voice[] = []
   const allTuplets: Tuplet[] = []
   const allBeamGroups: StaveNote[][] = []
+  const allIndexedNotes: Array<{ note: StaveNote; index: number }> = []
 
   for (const voiceData of notation.voices) {
     const duration = voiceData.duration ?? notation.baseDuration
@@ -39,6 +41,7 @@ function buildVoices(notation: NotationData): BuiltVoices {
 
     allTuplets.push(...result.tuplets)
     allBeamGroups.push(...result.beamGroups)
+    allIndexedNotes.push(...result.indexedNotes)
   }
 
   const beams: Beam[] = []
@@ -50,7 +53,7 @@ function buildVoices(notation: NotationData): BuiltVoices {
     }
   }
 
-  return { vfVoices, tuplets: allTuplets, beams }
+  return { vfVoices, tuplets: allTuplets, beams, indexedNotes: allIndexedNotes }
 }
 
 // Создаёт стан только ради измерения noteStartX/noteEndX оверхеда
@@ -98,7 +101,7 @@ export function renderNotation(
     repeat: notation.repeat,
   })
 
-  const { vfVoices, tuplets, beams } = buildVoices(notation)
+  const { vfVoices, tuplets, beams, indexedNotes } = buildVoices(notation)
 
   new Formatter().joinVoices(vfVoices).formatToStave(vfVoices, stave)
 
@@ -117,6 +120,13 @@ export function renderNotation(
 
   for (const beam of beams) {
     beam.setContext(context).draw()
+  }
+
+  // Проставляем data-note-index на SVG-группах уже отрисованных нот —
+  // по этому атрибуту компонент подсветит текущую ноту во время воспроизведения.
+  for (const { note, index } of indexedNotes) {
+    const el = note.getSVGElement?.() as SVGElement | undefined
+    el?.setAttribute('data-note-index', String(index))
   }
 }
 

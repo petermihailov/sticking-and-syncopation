@@ -1,15 +1,26 @@
 import { useEffect, useRef } from 'react'
 import { Renderer } from 'vexflow'
 import type { NotationData } from '../../types/notation'
-import { renderNotation, getStaveHeight, measureNotationWidth } from '../../lib/notation'
+import {
+  renderNotation,
+  getStaveHeight,
+  measureNotationWidth,
+} from '../../lib/notation'
+import classes from './VexFlowNotation.module.css'
 
 interface UseVexFlowRendererOptions {
   seeNotation: NotationData
   playNotation?: NotationData
+  // Подсвечиваемая нота в play-стане. rhythmIndex соответствует индексу в
+  // исходных стикингах и, следовательно, data-note-index в SVG.
+  currentRhythmIndex?: number
+  isPlaying?: boolean
 }
 
 const STAVE_X = 10
 const STAVE_Y_PADDING = 30
+// Множитель к минимальной ширине стана, чтобы ноты не лепились друг к другу
+const WIDTH_SCALE = 1.5
 
 function renderToContainer(
   container: HTMLDivElement,
@@ -32,24 +43,40 @@ function renderToContainer(
 export function useVexFlowRenderer({
   seeNotation,
   playNotation,
+  currentRhythmIndex,
+  isPlaying,
 }: UseVexFlowRendererOptions) {
   const seeRef = useRef<HTMLDivElement>(null)
   const playRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Считаем ширину для обоих станов и выравниваем по максимуму,
-    // чтобы see- и play-стан были одинаковой ширины
-    const seeWidth = measureNotationWidth(seeNotation)
-    const playWidth = playNotation ? measureNotationWidth(playNotation) : 0
-    const sharedWidth = Math.max(seeWidth, playWidth)
-
+    // Каждый стан рендерится по своей ширине (минимальная × WIDTH_SCALE)
     if (seeRef.current) {
-      renderToContainer(seeRef.current, seeNotation, sharedWidth)
+      const w = Math.ceil(measureNotationWidth(seeNotation) * WIDTH_SCALE)
+      renderToContainer(seeRef.current, seeNotation, w)
     }
     if (playRef.current && playNotation) {
-      renderToContainer(playRef.current, playNotation, sharedWidth)
+      const w = Math.ceil(measureNotationWidth(playNotation) * WIDTH_SCALE)
+      renderToContainer(playRef.current, playNotation, w)
     }
   }, [seeNotation, playNotation])
+
+  // Подсветка текущей ноты только в play-стане. Снимает класс со старой
+  // ноты и вешает на новую без повторного рендера всей нотации.
+  useEffect(() => {
+    const container = playRef.current
+    if (!container) return
+
+    const prev = container.querySelectorAll(`.${classes.currentNote}`)
+    prev.forEach(el => el.classList.remove(classes.currentNote))
+
+    if (!isPlaying || currentRhythmIndex === undefined) return
+
+    const target = container.querySelector(
+      `[data-note-index="${currentRhythmIndex}"]`
+    )
+    target?.classList.add(classes.currentNote)
+  }, [currentRhythmIndex, isPlaying, playNotation])
 
   return { seeRef, playRef }
 }

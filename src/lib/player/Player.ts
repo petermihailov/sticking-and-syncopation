@@ -10,8 +10,9 @@ import {
   stateToCounters,
   type ResolverState,
 } from './StickingResolver'
-import type { AudioEngine } from './services/AudioEngine'
-import type { BufferManager } from './services/BufferManager'
+import { AudioEngine } from './services/AudioEngine'
+import { BufferManager } from './services/BufferManager'
+import { getAudioContext } from '../../utils/audio'
 import { getTimeOffset } from './timing'
 import { scheduleMetronomeBar } from './metronome'
 
@@ -39,7 +40,7 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
 }
 
 /**
- * Player — оркеструет воспроизведение, координируя сервисы.
+ * Player — оркеструет воспроизведение, координируя внутренние сервисы.
  * Состояние применяется только через applyState (reducer-стиль).
  */
 export class Player {
@@ -50,10 +51,8 @@ export class Player {
   private nextBeatAt: number = 0
   private timeoutId: number | undefined
 
-  constructor(
-    private readonly audioEngine: AudioEngine,
-    private readonly buffers: BufferManager
-  ) {}
+  private readonly audioEngine: AudioEngine = new AudioEngine(getAudioContext())
+  private readonly buffers: BufferManager = new BufferManager()
 
   // === Public API ===
 

@@ -2,11 +2,19 @@ import { StaveNote, Tuplet, Beam, Articulation } from 'vexflow'
 import type { Voice as VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
+export interface IndexedNote {
+  readonly note: StaveNote
+  readonly index: number
+}
+
 export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
   const stemDir = voiceData.stem === 'up' ? 1 : -1
   const notes: StaveNote[] = []
   const beamGroups: StaveNote[][] = []
   const tuplets: Tuplet[] = []
+  // Маппинг noteIndex (из NoteEvent) → StaveNote — для подсветки во время
+  // воспроизведения. Включает и паузы: подсветка их может пропускать.
+  const indexedNotes: IndexedNote[] = []
 
   for (const group of voiceData.groups) {
     const groupNotes: StaveNote[] = []
@@ -22,6 +30,7 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
         })
         groupNotes.push(rest)
         notes.push(rest)
+        indexedNotes.push({ note: rest, index: event.index })
         continue
       }
 
@@ -40,6 +49,7 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
       groupNotes.push(note)
       notes.push(note)
       groupBeamable.push(note)
+      indexedNotes.push({ note, index: event.index })
 
     }
 
@@ -48,6 +58,7 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
         new Tuplet(groupNotes, {
           numNotes: group.tuplet.actual,
           notesOccupied: group.tuplet.normal,
+          ratioed: false,
         })
       )
     }
@@ -57,5 +68,5 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
     }
   }
 
-  return { notes, tuplets, beamGroups }
+  return { notes, tuplets, beamGroups, indexedNotes }
 }

@@ -17,10 +17,11 @@ import {
   DEFAULT_STICKING_MAPPING,
   type StickingMapping,
 } from './types/sticking'
+import classes from './App.module.css'
 
 function AppContent() {
   const { state, actions } = useAppState()
-  const { currentBeat, instrumentCounters } = usePlayerControl()
+  const { currentBeat, instrumentCounters, isPlaying } = usePlayerControl()
 
   const { convertResult, seeNotation, playNotation } = useNotation()
 
@@ -41,28 +42,34 @@ function AppContent() {
     convertResult.bars.length > 0 && convertResult.bars[0].length > 0
 
   return (
-    <AppLayout
-      sidebar={<Lessons />}
-    >
+    <AppLayout sidebar={<Lessons />}>
       <RudimentSelector
         selectedRudiment={state.rudiment}
         onRudimentChange={actions.setRudiment}
       />
       <AudioPlayer />
-      <VexFlowNotation seeNotation={seeNotation} playNotation={playNotation}>
-        {hasStickings && (
-          <Stickings bars={convertResult.bars} currentBeat={currentBeat} />
-        )}
-      </VexFlowNotation>
+      <div className={classes.notesContainer}>
+        <AccentPattern
+          className={classes.checkboxes}
+          checkedItems={state.accents}
+          onToggle={actions.toggleAccent}
+        />
+        <VexFlowNotation
+          seeNotation={seeNotation}
+          playNotation={playNotation}
+          currentRhythmIndex={currentBeat.rhythmIndex}
+          isPlaying={isPlaying}
+        >
+          {hasStickings && (
+            <Stickings bars={convertResult.bars} currentBeat={currentBeat} />
+          )}
+        </VexFlowNotation>
+      </div>
       <OrchestrationSection
         mapping={state.instrumentMapping}
         instrumentCounters={instrumentCounters}
         onChange={handleMappingChange}
         onReset={handleOrchestrationReset}
-      />
-      <AccentPattern
-        checkedItems={state.accents}
-        onToggle={actions.toggleAccent}
       />
     </AppLayout>
   )

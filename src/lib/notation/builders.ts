@@ -1,5 +1,5 @@
-import type { Sticking } from '../types'
-import type { NotationData, NoteEvent, NoteGroup, Voice } from '../types/notation'
+import type { Sticking } from '../../types'
+import type { NotationData, NoteEvent, NoteGroup, Voice } from '../../types/notation'
 import { collapseAccentPairs } from './accentCollapse'
 
 function stickingToNoteEvent(sticking: Sticking, index: number): NoteEvent {
@@ -11,17 +11,6 @@ function stickingToNoteEvent(sticking: Sticking, index: number): NoteEvent {
   }
   const accent = sticking === 'R' || sticking === 'L'
   return { type: 'snare', accent, index }
-}
-
-function hasKickInStickings(stickings: readonly Sticking[]): boolean {
-  return stickings.some(s => s === 'k')
-}
-
-function buildKickVoice(beatCount: number): Voice {
-  const groups: NoteGroup[] = Array.from({ length: beatCount }, (_, i) => ({
-    notes: [{ type: 'kick' as const, accent: false, index: i }],
-  }))
-  return { groups, stem: 'down', duration: '4' }
 }
 
 function groupNotes(
@@ -44,14 +33,10 @@ export function buildSixteenthNotation(
   const events = stickings.map((s, i) => stickingToNoteEvent(s, i))
   const snareVoice: Voice = { groups: groupNotes(events, 4), stem: 'up' }
 
-  const voices: Voice[] = hasKickInStickings(stickings)
-    ? [snareVoice]
-    : [snareVoice, buildKickVoice(4)]
-
   return {
     timeSignature: { top: 4, bottom: 4 },
     baseDuration: '16',
-    voices,
+    voices: [snareVoice],
     repeat: true,
   }
 }
@@ -69,7 +54,7 @@ export function buildTripletNotation(
   return {
     timeSignature: { top: 4, bottom: 4 },
     baseDuration: '8',
-    voices: [snareVoice, buildKickVoice(4)],
+    voices: [snareVoice],
     repeat: true,
   }
 }
@@ -87,7 +72,7 @@ export function buildSixteenthTripletNotation(
   return {
     timeSignature: { top: 4, bottom: 4 },
     baseDuration: '16',
-    voices: [snareVoice, buildKickVoice(4)],
+    voices: [snareVoice],
     repeat: true,
   }
 }

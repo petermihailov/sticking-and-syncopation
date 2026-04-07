@@ -7,7 +7,6 @@ export function AudioPlayer() {
   const { state, actions } = useAppState()
   const {
     isPlaying,
-    currentBeat,
     drumKit,
     isLoading,
     hasPattern,
@@ -22,7 +21,6 @@ export function AudioPlayer() {
     <PlayerSection
       isPlaying={isPlaying}
       isDisabled={!drumKit || !hasPattern}
-      currentBeat={currentBeat.rhythmIndex + 1}
       tempo={state.tempo}
       metronome={state.metronome}
       metronomeVolume={state.metronomeVolume}
