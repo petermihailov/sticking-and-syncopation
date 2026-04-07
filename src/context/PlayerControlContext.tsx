@@ -13,7 +13,7 @@ import { createDrumKit, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
 import type { DrumKit } from '../types/instrument'
 import { useAppState } from './AppStateContext'
-import { useRudimentNotation } from '../hooks/useRudimentNotation'
+import { useNotation } from './NotationContext'
 
 interface Beat {
   barIndex: number
@@ -49,7 +49,7 @@ interface PlayerControlProviderProps {
 export function PlayerControlProvider({ children }: PlayerControlProviderProps) {
   const { state } = useAppState()
   const { tempo, metronome, metronomeVolume, instrumentMapping } = state
-  const { convertResult } = useRudimentNotation(state.rudiment, state.accents)
+  const { convertResult, meter } = useNotation()
   const bars = convertResult.bars
 
   const playerRef = useRef<Player | null>(null)
@@ -76,7 +76,7 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
       try {
         setIsLoading(true)
         const kit = await createDrumKit(
-          '/sticking-and-syncopation/sounds/',
+          `${import.meta.env.BASE_URL}sounds/`,
           'wav'
         )
         if (cancelled) return
@@ -122,9 +122,9 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
   useEffect(() => {
     if (!isReady || !playerRef.current || !hasPattern) return
     const validBars = bars.filter(bar => bar && bar.length > 0)
-    const playerBars = stickingsToBars(validBars, instrumentMapping)
+    const playerBars = stickingsToBars(validBars, instrumentMapping, meter)
     playerRef.current.setBars(playerBars)
-  }, [bars, instrumentMapping, isReady, hasPattern])
+  }, [bars, instrumentMapping, meter, isReady, hasPattern])
 
   // Темп
   useEffect(() => {

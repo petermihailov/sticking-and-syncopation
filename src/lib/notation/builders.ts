@@ -56,7 +56,7 @@ export function buildSixteenthNotation(
   }
 }
 
-/** 8th-note triplet patterns: 3/4, groups of 3 with triplet */
+/** Восьмые триоли: 4/4, 4 группы по 3 (триоль 3:2) */
 export function buildTripletNotation(
   stickings: readonly Sticking[]
 ): NotationData {
@@ -67,14 +67,14 @@ export function buildTripletNotation(
   }
 
   return {
-    timeSignature: { top: 3, bottom: 4 },
+    timeSignature: { top: 4, bottom: 4 },
     baseDuration: '8',
-    voices: [snareVoice, buildKickVoice(3)],
+    voices: [snareVoice, buildKickVoice(4)],
     repeat: true,
   }
 }
 
-/** 16th-note triplet patterns: 3/4, groups of 6 with sextuplet */
+/** Шестнадцатые триоли: 4/4, 4 группы по 6 (секстоль 6:4) */
 export function buildSixteenthTripletNotation(
   stickings: readonly Sticking[]
 ): NotationData {
@@ -85,9 +85,9 @@ export function buildSixteenthTripletNotation(
   }
 
   return {
-    timeSignature: { top: 3, bottom: 4 },
+    timeSignature: { top: 4, bottom: 4 },
     baseDuration: '16',
-    voices: [snareVoice, buildKickVoice(3)],
+    voices: [snareVoice, buildKickVoice(4)],
     repeat: true,
   }
 }

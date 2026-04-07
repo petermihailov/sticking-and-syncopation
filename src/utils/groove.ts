@@ -1,6 +1,8 @@
 import type { Bar, Instrument, Group, Hand, StickingMapping } from '../types/instrument';
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument';
-import type { Sticking } from '../types';
+import type { Sticking, Meter } from '../types';
+
+const DEFAULT_METER: Meter = { beatsPerBar: 4, noteValue: 4, notesPerBeat: 4 };
 
 /**
  * Get instruments to play at a specific rhythm index in a bar
@@ -44,7 +46,11 @@ export function getInstrumentsByIndex(
  * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Bar object ready for Player with hand information for pitch shifting
  */
-export function stickingToBar(stickings: Sticking[], mapping: StickingMapping = DEFAULT_STICKING_MAPPING): Bar {
+export function stickingToBar(
+  stickings: Sticking[],
+  mapping: StickingMapping = DEFAULT_STICKING_MAPPING,
+  meter: Meter = DEFAULT_METER
+): Bar {
   const rhythm: Instrument[][] = [];
   const stickingSymbols: Sticking[] = [];
   const hands: Hand[] = [];
@@ -96,21 +102,13 @@ export function stickingToBar(stickings: Sticking[], mapping: StickingMapping = 
     hands.push(hand);
   });
 
-  // Calculate timeDivision based on pattern length
-  // This allows different rudiments to play at correct speeds:
-  // - 12 notes = 8th triplets (3 notes per beat)
-  // - 16 notes = 16th notes (4 notes per beat)
-  // - 24 notes = 16th triplets (6 notes per beat)
-  const noteCount = stickings.length;
-  const timeDivision = noteCount / 4; // 4 beats in 4/4 time
-
   return {
     rhythm,
     stickings: stickingSymbols,
     hands,
-    beatsPerBar: 4, // 4/4 time
-    noteValue: 4, // Quarter notes
-    timeDivision, // Dynamically calculated based on note count
+    beatsPerBar: meter.beatsPerBar,
+    noteValue: meter.noteValue,
+    timeDivision: meter.notesPerBeat,
   };
 }
 
@@ -120,8 +118,12 @@ export function stickingToBar(stickings: Sticking[], mapping: StickingMapping = 
  * @param mapping - Optional instrument mapping (uses default if not provided)
  * @returns Array of Bar objects
  */
-export function stickingsToBars(stickingPatterns: Sticking[][], mapping?: StickingMapping): Bar[] {
-  return stickingPatterns.map((pattern) => stickingToBar(pattern, mapping));
+export function stickingsToBars(
+  stickingPatterns: Sticking[][],
+  mapping?: StickingMapping,
+  meter?: Meter
+): Bar[] {
+  return stickingPatterns.map((pattern) => stickingToBar(pattern, mapping, meter));
 }
 
 /**

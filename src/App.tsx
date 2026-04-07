@@ -11,7 +11,7 @@ import {
   PlayerControlProvider,
   usePlayerControl,
 } from './context/PlayerControlContext'
-import { useRudimentNotation } from './hooks/useRudimentNotation'
+import { NotationProvider, useNotation } from './context/NotationContext'
 import { useGlobalShortcuts } from './hooks/useGlobalShortcuts'
 import {
   DEFAULT_STICKING_MAPPING,
@@ -22,10 +22,7 @@ function AppContent() {
   const { state, actions } = useAppState()
   const { currentBeat, instrumentCounters } = usePlayerControl()
 
-  const { convertResult, seeNotation, playNotation } = useRudimentNotation(
-    state.rudiment,
-    state.accents
-  )
+  const { convertResult, seeNotation, playNotation } = useNotation()
 
   useGlobalShortcuts({ onReset: actions.resetToDefaults })
 
@@ -72,9 +69,11 @@ function AppContent() {
 function App() {
   return (
     <AppStateProvider>
-      <PlayerControlProvider>
-        <AppContent />
-      </PlayerControlProvider>
+      <NotationProvider>
+        <PlayerControlProvider>
+          <AppContent />
+        </PlayerControlProvider>
+      </NotationProvider>
     </AppStateProvider>
   )
 }

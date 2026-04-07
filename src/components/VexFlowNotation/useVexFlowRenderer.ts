@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { Renderer } from 'vexflow'
 import type { NotationData } from '../../types/notation'
-import { renderNotation, getStaveHeight } from '../../lib/notation'
+import { renderNotation, getStaveHeight, measureNotationWidth } from '../../lib/notation'
 
 interface UseVexFlowRendererOptions {
   seeNotation: NotationData
   playNotation?: NotationData
-  width: number
 }
 
 const STAVE_X = 10
@@ -15,16 +14,16 @@ const STAVE_Y_PADDING = 30
 function renderToContainer(
   container: HTMLDivElement,
   notation: NotationData,
-  width: number
+  staveWidth: number
 ) {
   container.innerHTML = ''
 
-  const staveWidth = width - STAVE_X * 2
+  const totalWidth = staveWidth + STAVE_X * 2
   const staveHeight = getStaveHeight()
   const svgHeight = staveHeight + STAVE_Y_PADDING
 
   const renderer = new Renderer(container, Renderer.Backends.SVG)
-  renderer.resize(width, svgHeight)
+  renderer.resize(totalWidth, svgHeight)
   const context = renderer.getContext()
 
   renderNotation(context, notation, STAVE_X, STAVE_Y_PADDING, staveWidth)
@@ -33,22 +32,24 @@ function renderToContainer(
 export function useVexFlowRenderer({
   seeNotation,
   playNotation,
-  width,
 }: UseVexFlowRendererOptions) {
   const seeRef = useRef<HTMLDivElement>(null)
   const playRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (seeRef.current) {
-      renderToContainer(seeRef.current, seeNotation, width)
-    }
-  }, [seeNotation, width])
+    // Считаем ширину для обоих станов и выравниваем по максимуму,
+    // чтобы see- и play-стан были одинаковой ширины
+    const seeWidth = measureNotationWidth(seeNotation)
+    const playWidth = playNotation ? measureNotationWidth(playNotation) : 0
+    const sharedWidth = Math.max(seeWidth, playWidth)
 
-  useEffect(() => {
-    if (playRef.current && playNotation) {
-      renderToContainer(playRef.current, playNotation, width)
+    if (seeRef.current) {
+      renderToContainer(seeRef.current, seeNotation, sharedWidth)
     }
-  }, [playNotation, width])
+    if (playRef.current && playNotation) {
+      renderToContainer(playRef.current, playNotation, sharedWidth)
+    }
+  }, [seeNotation, playNotation])
 
   return { seeRef, playRef }
 }

@@ -1,13 +1,19 @@
 import { useMemo } from 'react'
-import type { Accent, ConvertResult } from '../types'
+import type { Accent, ConvertResult, Meter } from '../types'
 import type { NotationData } from '../types/notation'
-import { converters, generateNotation, type RudimentType } from '../converters/registry'
+import {
+  converters,
+  generateNotation,
+  getRudimentMeter,
+  type RudimentType,
+} from '../converters/registry'
 import { buildAccentNotation } from '../lib/notation/builders'
 
 interface RudimentNotation {
   convertResult: ConvertResult
   seeNotation: NotationData
   playNotation: NotationData
+  meter: Meter
 }
 
 export function useRudimentNotation(
@@ -29,5 +35,7 @@ export function useRudimentNotation(
     [rudiment, convertResult]
   )
 
-  return { convertResult, seeNotation, playNotation }
+  const meter = useMemo(() => getRudimentMeter(rudiment), [rudiment])
+
+  return { convertResult, seeNotation, playNotation, meter }
 }

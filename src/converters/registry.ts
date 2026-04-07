@@ -1,4 +1,4 @@
-import type { ConvertResult } from '../types'
+import type { ConvertResult, Meter } from '../types'
 import type { NotationData } from '../types/notation'
 import {
   buildSixteenthNotation,
@@ -38,6 +38,13 @@ const NOTATION_BUILDERS: Record<
   sixteenth: buildSixteenthNotation,
   triplet: buildTripletNotation,
   sixteenthTriplet: buildSixteenthTripletNotation,
+}
+
+/** Размер для каждого вида нотации. Все рудименты — в 4/4. */
+const METER_BY_KIND: Record<NotationKind, Meter> = {
+  sixteenth: { beatsPerBar: 4, noteValue: 4, notesPerBeat: 4 },
+  triplet: { beatsPerBar: 4, noteValue: 4, notesPerBeat: 3 },
+  sixteenthTriplet: { beatsPerBar: 4, noteValue: 4, notesPerBeat: 6 },
 }
 
 const RUDIMENTS = [
@@ -112,6 +119,10 @@ export function generateNotation(
   convertResult: ConvertResult
 ): NotationData {
   return NOTATION_BUILDERS[notationKindById[type]](convertResult.bars[0])
+}
+
+export function getRudimentMeter(type: RudimentType): Meter {
+  return METER_BY_KIND[notationKindById[type]]
 }
 
 export interface RudimentOption {

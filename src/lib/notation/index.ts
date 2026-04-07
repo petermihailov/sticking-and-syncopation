@@ -1,1 +1,1 @@
-export { renderNotation, getStaveHeight } from './renderer'
+export { renderNotation, getStaveHeight, measureNotationWidth } from './renderer'
