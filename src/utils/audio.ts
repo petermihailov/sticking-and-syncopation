@@ -1,4 +1,5 @@
-import type { DrumKit, Instrument } from '../types/instrument';
+import type { Instrument } from '../types/instrument';
+import type { DrumKit } from '../types/kit';
 
 // Singleton AudioContext instance
 let audioContext: AudioContext | null = null;

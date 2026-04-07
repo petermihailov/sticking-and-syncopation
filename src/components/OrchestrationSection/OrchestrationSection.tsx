@@ -1,4 +1,4 @@
-import type { StickingMapping } from '../../types/instrument'
+import type { StickingMapping } from '../../types/sticking'
 import { OrchestrationPanel } from '../OrchestrationPanel/OrchestrationPanel'
 import classes from './OrchestrationSection.module.css'
 

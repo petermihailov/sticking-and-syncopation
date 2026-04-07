@@ -10,8 +10,9 @@ import {
   encodeStateToUrl,
   decodeStateFromUrl,
 } from './urlState'
-import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
-import type { Instrument, StickingMapping } from '../types/instrument'
+import { DEFAULT_STICKING_MAPPING } from '../types/sticking'
+import type { StickingMapping } from '../types/sticking'
+import type { Instrument } from '../types/instrument'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import type { AppState } from '../types/appState'
 

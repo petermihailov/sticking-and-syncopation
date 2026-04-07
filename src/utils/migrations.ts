@@ -1,4 +1,5 @@
-import type { StickingMapping, Instrument } from '../types/instrument'
+import type { Instrument } from '../types/instrument'
+import type { StickingMapping } from '../types/sticking'
 import { DEFAULT_APP_STATE } from '../types/appState'
 
 /**

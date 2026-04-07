@@ -5,13 +5,14 @@ import {
   useRef,
   useEffect,
   useCallback,
+  useMemo,
   type ReactNode,
 } from 'react'
 import { createPlayer } from '../lib/player'
-import type { Player } from '../lib/player/Player'
+import type { Player, PlayerState } from '../lib/player/Player'
 import { createDrumKit, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
-import type { DrumKit } from '../types/instrument'
+import type { DrumKit } from '../types/kit'
 import { useAppState } from './AppStateContext'
 import { useNotation } from './NotationContext'
 
@@ -61,98 +62,59 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
   })
   const [drumKit, setDrumKit] = useState<DrumKit | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isReady, setIsReady] = useState(false)
   const [instrumentCounters, setInstrumentCounters] = useState<
     Map<string, number>
   >(new Map())
 
   const hasPattern = bars.length > 0 && bars[0].length > 0
 
-  // Инициализация плеера и загрузка кита (один раз)
+  // Создаём плеер один раз, асинхронно подгружаем кит.
+  // applyState ниже сам передаст кит в плеер, как только он будет готов.
   useEffect(() => {
+    const player = createPlayer()
+    player.setOnBeat(beat => {
+      setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
+      setInstrumentCounters(player.getInstrumentCounters())
+    })
+    playerRef.current = player
+
     let cancelled = false
-
-    const init = async () => {
-      try {
-        setIsLoading(true)
-        const kit = await createDrumKit(
-          `${import.meta.env.BASE_URL}sounds/`,
-          'wav'
-        )
+    setIsLoading(true)
+    createDrumKit(`${import.meta.env.BASE_URL}sounds/`, 'wav')
+      .then(kit => {
         if (cancelled) return
-
         setDrumKit(kit)
-
-        const player = createPlayer()
-        player.setKit(kit)
-        player.setTempo(tempo)
-        player.setInstrumentMapping(instrumentMapping)
-        if (metronome) player.playMetronome()
-        player.setMetronomeVolume(metronomeVolume)
-
-        player.setOnBeat(beat => {
-          setCurrentBeat({
-            barIndex: beat.barIndex,
-            rhythmIndex: beat.rhythmIndex,
-          })
-          setInstrumentCounters(player.getInstrumentCounters())
-        })
-
-        playerRef.current = player
-        setIsReady(true)
         setIsLoading(false)
-      } catch (error) {
-        console.error('Failed to initialize player:', error)
+      })
+      .catch(error => {
+        console.error('Failed to load drum kit:', error)
         if (!cancelled) setIsLoading(false)
-      }
-    }
-
-    init()
+      })
 
     return () => {
       cancelled = true
-      if (playerRef.current && isPlaying) {
-        playerRef.current.stop()
-      }
+      player.stop()
+      playerRef.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Синхронизация bars
-  useEffect(() => {
-    if (!isReady || !playerRef.current || !hasPattern) return
+  // Единая синхронизация состояния плеера. Player сам диффает поля.
+  const playerState = useMemo<PlayerState>(() => {
     const validBars = bars.filter(bar => bar && bar.length > 0)
-    const playerBars = stickingsToBars(validBars, instrumentMapping, meter)
-    playerRef.current.setBars(playerBars)
-  }, [bars, instrumentMapping, meter, isReady, hasPattern])
-
-  // Темп
-  useEffect(() => {
-    if (!isReady || !playerRef.current) return
-    playerRef.current.setTempo(tempo)
-  }, [tempo, isReady])
-
-  // Метроном on/off
-  useEffect(() => {
-    if (!isReady || !playerRef.current) return
-    if (metronome) {
-      playerRef.current.playMetronome()
-    } else {
-      playerRef.current.stopMetronome()
+    return {
+      bars: stickingsToBars(validBars, instrumentMapping, meter),
+      tempo,
+      metronomeEnabled: metronome,
+      metronomeVolume,
+      mapping: instrumentMapping,
+      mutedGroups: [],
+      kit: drumKit ?? undefined,
     }
-  }, [metronome, isReady])
+  }, [bars, tempo, metronome, metronomeVolume, instrumentMapping, meter, drumKit])
 
-  // Громкость метронома
   useEffect(() => {
-    if (!isReady || !playerRef.current) return
-    playerRef.current.setMetronomeVolume(metronomeVolume)
-  }, [metronomeVolume, isReady])
-
-  // Маппинг инструментов
-  useEffect(() => {
-    if (!isReady || !playerRef.current) return
-    playerRef.current.setInstrumentMapping(instrumentMapping)
-  }, [instrumentMapping, isReady])
+    playerRef.current?.applyState(playerState)
+  }, [playerState])
 
   const play = useCallback(() => {
     if (playerRef.current && !isPlaying) {

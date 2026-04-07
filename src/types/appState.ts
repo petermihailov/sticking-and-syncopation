@@ -1,6 +1,6 @@
 import type { RudimentType } from '../converters/registry'
-import type { StickingMapping } from './instrument'
-import { DEFAULT_STICKING_MAPPING } from './instrument'
+import type { StickingMapping } from './sticking'
+import { DEFAULT_STICKING_MAPPING } from './sticking'
 
 /**
  * Application state that can be shared via URL and persisted in localStorage

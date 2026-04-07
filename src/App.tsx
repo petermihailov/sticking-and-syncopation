@@ -16,7 +16,7 @@ import { useGlobalShortcuts } from './hooks/useGlobalShortcuts'
 import {
   DEFAULT_STICKING_MAPPING,
   type StickingMapping,
-} from './types/instrument'
+} from './types/sticking'
 
 function AppContent() {
   const { state, actions } = useAppState()

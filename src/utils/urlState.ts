@@ -1,7 +1,8 @@
 import type { RudimentType } from '../converters/registry'
-import type { Instrument, StickingMapping } from '../types/instrument'
+import type { Instrument } from '../types/instrument'
+import type { StickingMapping } from '../types/sticking'
 import type { AppState } from '../types/appState'
-import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
+import { DEFAULT_STICKING_MAPPING } from '../types/sticking'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { converters } from '../converters/registry'
 

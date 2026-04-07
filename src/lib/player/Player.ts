@@ -1,27 +1,50 @@
-import type {
-  Beat,
-  Instrument,
-  Bar,
-  DrumKit,
-  Group,
-  StickingMapping,
-} from '../../types/instrument'
-import { getInstrumentsByIndex } from '../../utils/groove'
+import type { Beat, Group } from '../../types/instrument'
+import type { Bar } from '../../types/bar'
+import type { DrumKit } from '../../types/kit'
+import type { InstrumentVoice, StickingMapping } from '../../types/sticking'
+import { DEFAULT_STICKING_MAPPING } from '../../types/sticking'
+import { getVoicesByIndex } from '../../utils/groove'
+import {
+  EMPTY_RESOLVER_STATE,
+  resolveStroke,
+  stateToCounters,
+  type ResolverState,
+} from './StickingResolver'
 import type { AudioEngine } from './services/AudioEngine'
-import type { Scheduler } from './services/Scheduler'
-import type { InstrumentResolver } from './services/InstrumentResolver'
 import type { BufferManager } from './services/BufferManager'
+import { getTimeOffset } from './timing'
+import { scheduleMetronomeBar } from './metronome'
+
+/**
+ * Сериализуемое состояние плеера. PlayerControlContext собирает его
+ * из реактивного состояния и однократным вызовом applyState отправляет в Player.
+ */
+export interface PlayerState {
+  bars: Bar[]
+  tempo: number
+  metronomeEnabled: boolean
+  metronomeVolume: number
+  mapping: StickingMapping
+  mutedGroups: Group[]
+  kit?: DrumKit
+}
+
+const DEFAULT_PLAYER_STATE: PlayerState = {
+  bars: [],
+  tempo: 80,
+  metronomeEnabled: false,
+  metronomeVolume: 1.0,
+  mapping: DEFAULT_STICKING_MAPPING,
+  mutedGroups: [],
+}
 
 /**
  * Player — оркеструет воспроизведение, координируя сервисы.
- * Держит собственное состояние (темп, метроном, такты, заглушенные группы).
+ * Состояние применяется только через applyState (reducer-стиль).
  */
 export class Player {
-  private tempo: number = 80
-  private metronomeEnabled: boolean = false
-  private metronomeVolume: number = 1.0
-  private bars: Bar[] = []
-  private mutedGroups: Group[] = []
+  private state: PlayerState = DEFAULT_PLAYER_STATE
+  private resolverState: ResolverState = EMPTY_RESOLVER_STATE
   private onBeat: (beat: Beat) => void = () => undefined
 
   private nextBeatAt: number = 0
@@ -29,210 +52,144 @@ export class Player {
 
   constructor(
     private readonly audioEngine: AudioEngine,
-    private readonly scheduler: Scheduler,
-    private readonly resolver: InstrumentResolver,
     private readonly buffers: BufferManager
   ) {}
 
   // === Public API ===
 
-  setKit(kit: DrumKit): void {
-    this.audioEngine.setKit(kit)
-  }
+  applyState(next: PlayerState): void {
+    const prev = this.state
 
-  setBars(bars: Bar[]): void {
-    this.bars = bars
-  }
-
-  setTempo(bpm: number): void {
-    this.tempo = bpm
-  }
-
-  playMetronome(): void {
-    this.metronomeEnabled = true
-  }
-
-  stopMetronome(): void {
-    this.metronomeEnabled = false
-  }
-
-  setMetronomeVolume(volume: number): void {
-    this.metronomeVolume = volume
-  }
-
-  setInstrumentMapping(mapping: StickingMapping): void {
-    this.resolver.setMapping(mapping)
-  }
-
-  getInstrumentCounters(): Map<string, number> {
-    return this.resolver.getCounters()
-  }
-
-  mute(group: Group): void {
-    if (!this.mutedGroups.includes(group)) {
-      this.mutedGroups.push(group)
+    if (next.kit && next.kit !== prev.kit) {
+      this.audioEngine.setKit(next.kit)
     }
-  }
 
-  unmute(group: Group): void {
-    this.mutedGroups = this.mutedGroups.filter(g => g !== group)
-  }
+    // Если маппинг изменился — сбрасываем счётчики ротации, иначе индексация
+    // поедет относительно нового списка инструментов.
+    if (next.mapping !== prev.mapping) {
+      this.resolverState = EMPTY_RESOLVER_STATE
+    }
 
-  isMuted(group: Group): boolean {
-    return this.mutedGroups.includes(group)
+    this.state = next
   }
 
   setOnBeat(onBeat: (beat: Beat) => void): void {
     this.onBeat = onBeat
   }
 
+  getInstrumentCounters(): Map<string, number> {
+    return stateToCounters(this.resolverState)
+  }
+
   play(): void {
-    if (!this.bars || this.bars.length === 0) {
-      console.warn('Cannot play: no bars set. Use setBars() first.')
+    const { bars } = this.state
+    if (!bars || bars.length === 0) {
+      console.warn('Cannot play: no bars set.')
       return
     }
 
-    const bar = this.bars[0]
-    if (!bar) {
-      console.warn('Cannot play: first bar is invalid')
-      return
-    }
-
-    const instruments = this.resolveInstruments(bar, 0)
-    const hand = bar.hands?.[0] ?? null
-
+    this.resolverState = EMPTY_RESOLVER_STATE
     this.nextBeatAt = this.audioEngine.getCurrentTime()
-
-    this.scheduleMetronome(bar)
-    this.playNotesAtNextBeatTime(instruments, this.nextBeatAt, hand)
-    this.schedule(0, 0, instruments)
+    this.tickAt(0, 0)
   }
 
   stop(): void {
     if (this.timeoutId !== undefined) {
-      this.scheduler.clear(this.timeoutId)
+      window.clearTimeout(this.timeoutId)
+      this.timeoutId = undefined
     }
+    // Глушим всё уже запланированное в Web Audio (метроном, хвосты).
+    this.audioEngine.silence()
     this.buffers.clearAll()
-    this.resolver.resetCounters()
+    this.resolverState = EMPTY_RESOLVER_STATE
 
-    this.onBeat({
-      barIndex: 0,
-      rhythmIndex: 0,
-      instruments: [],
-    })
+    this.onBeat({ barIndex: 0, rhythmIndex: 0, instruments: [] })
   }
 
   // === Private Methods ===
 
-  private resolveInstruments(bar: Bar, rhythmIndex: number): Instrument[] {
-    if (bar.stickings && bar.stickings[rhythmIndex]) {
-      return this.resolver.resolve(bar.stickings[rhythmIndex])
-    }
-    return getInstrumentsByIndex(bar, rhythmIndex, this.mutedGroups)
-  }
-
-  private playNotesAtNextBeatTime(
-    instruments: Instrument[],
-    time: number,
-    hand: 'r' | 'l' | null = null
-  ): void {
-    instruments.forEach(instrument => {
-      let gain = 1.0
-      if (instrument.startsWith('fxMetronome')) {
-        gain = this.metronomeVolume
-      }
-
-      const source = this.audioEngine.playInstrument(instrument, time, {
-        gain,
-        hand,
-      })
-
-      if (!source) return
-
-      if (instrument.startsWith('fxMetronome')) {
-        this.buffers.addMetronomeBuffer(source)
-      }
-
-      if (instrument.startsWith('hh')) {
-        if (instrument.startsWith('hhOpen')) {
-          this.buffers.addHiHatBuffer(source)
-        } else {
-          this.buffers.stopHiHatBuffers(time)
-        }
-      }
-    })
-  }
-
-  private schedule(
-    barIndex: number,
-    rhythmIndex: number,
-    instruments: Instrument[]
-  ): void {
-    if (!this.bars || this.bars.length === 0) {
-      console.warn('No bars available, stopping playback')
+  /**
+   * Сыграть один шаг (бар, субдивизия) в this.nextBeatAt и запланировать следующий.
+   */
+  private tickAt(barIndex: number, rhythmIndex: number): void {
+    const { bars } = this.state
+    if (!bars || bars.length === 0) {
       this.stop()
       return
     }
 
-    const safeBarIndex = barIndex % this.bars.length
-    const currentBar = this.bars[safeBarIndex]
-
+    const safeBarIndex = barIndex % bars.length
+    const currentBar = bars[safeBarIndex]
     if (!currentBar || !currentBar.rhythm || currentBar.rhythm.length === 0) {
-      console.warn(`Invalid bar at index ${safeBarIndex}, stopping playback`)
       this.stop()
       return
     }
 
     const safeRhythmIndex = rhythmIndex % currentBar.rhythm.length
 
+    // Метроном планируем на старте каждого такта.
+    if (safeRhythmIndex === 0 && this.state.metronomeEnabled) {
+      scheduleMetronomeBar(
+        this.audioEngine,
+        currentBar,
+        this.state.tempo,
+        this.nextBeatAt,
+        this.state.metronomeVolume
+      )
+    }
+
+    const voices = this.resolveVoices(currentBar, safeRhythmIndex)
+    this.playVoicesAt(voices, this.nextBeatAt)
+
     this.onBeat({
       barIndex: safeBarIndex,
       rhythmIndex: safeRhythmIndex,
-      instruments,
+      instruments: voices.map(v => v.instrument),
     })
 
-    this.nextBeatAt += this.scheduler.getTimeOffset(this.tempo, currentBar)
+    // Сдвигаем горизонт на следующий шаг.
+    this.nextBeatAt += getTimeOffset(this.state.tempo, currentBar)
 
     const nextRhythmIndex = (safeRhythmIndex + 1) % currentBar.rhythm.length
     const nextBarIndex =
       safeRhythmIndex === currentBar.rhythm.length - 1
-        ? (safeBarIndex + 1) % this.bars.length
+        ? (safeBarIndex + 1) % bars.length
         : safeBarIndex
-    const nextBar = this.bars[nextBarIndex]
-
-    if (!nextBar) {
-      console.warn(
-        `Next bar at index ${nextBarIndex} not found, stopping playback`
-      )
-      this.stop()
-      return
-    }
-
-    if (nextRhythmIndex === 0) {
-      this.scheduleMetronome(nextBar)
-    }
-
-    const nextInstruments = this.resolveInstruments(nextBar, nextRhythmIndex)
-    const nextHand = nextBar.hands?.[nextRhythmIndex] ?? null
-
-    this.playNotesAtNextBeatTime(nextInstruments, this.nextBeatAt, nextHand)
 
     const delay = (this.nextBeatAt - this.audioEngine.getCurrentTime()) * 1000
-    this.timeoutId = this.scheduler.schedule(
-      () => this.schedule(nextBarIndex, nextRhythmIndex, nextInstruments),
-      delay
+    this.timeoutId = window.setTimeout(
+      () => this.tickAt(nextBarIndex, nextRhythmIndex),
+      Math.max(0, delay)
     )
   }
 
-  private scheduleMetronome(bar: Bar): void {
-    if (!this.metronomeEnabled) return
-
-    const timeOffset = this.scheduler.getTimeOffset(this.tempo, bar)
-    const timeStep = (timeOffset * bar.rhythm.length) / bar.beatsPerBar
-
-    for (let i = 0; i < bar.beatsPerBar; i++) {
-      const instrument = i === 0 ? 'fxMetronomeAccent' : 'fxMetronomeRegular'
-      this.playNotesAtNextBeatTime([instrument], this.nextBeatAt + timeStep * i)
+  /**
+   * Получить voices для субдивизии: либо через резолвер (если в такте есть
+   * исходные символы стикинга), либо напрямую из bar.rhythm.
+   */
+  private resolveVoices(bar: Bar, rhythmIndex: number): InstrumentVoice[] {
+    const stroke = bar.stickings?.[rhythmIndex]
+    if (stroke) {
+      const result = resolveStroke(stroke, this.state.mapping, this.resolverState)
+      this.resolverState = result.nextState
+      return result.voices
     }
+    return getVoicesByIndex(bar, rhythmIndex, this.state.mutedGroups)
+  }
+
+  private playVoicesAt(voices: InstrumentVoice[], time: number): void {
+    voices.forEach(voice => {
+      const source = this.audioEngine.playVoice(voice, time)
+      if (!source) return
+
+      // Hi-hat: открытый трек копим, чтобы оборвать при закрытом ударе.
+      if (voice.instrument.startsWith('hh')) {
+        if (voice.instrument.startsWith('hhOpen')) {
+          this.buffers.addHiHatBuffer(source)
+        } else {
+          this.buffers.stopHiHatBuffers(time)
+        }
+      }
+    })
   }
 }

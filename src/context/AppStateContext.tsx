@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { RudimentType } from '../converters/registry'
-import type { StickingMapping } from '../types/instrument'
+import type { StickingMapping } from '../types/sticking'
 import type { AppState, FavoritePreset } from '../types/appState'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'

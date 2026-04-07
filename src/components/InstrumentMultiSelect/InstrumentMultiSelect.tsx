@@ -1,5 +1,5 @@
 import type { Instrument } from '../../types/instrument'
-import { INSTRUMENT_GROUPS } from '../../types/instrument'
+import { INSTRUMENT_GROUPS } from '../../types/kit'
 import classes from './InstrumentMultiSelect.module.css'
 
 interface InstrumentMultiSelectProps {

@@ -1,36 +1,45 @@
-import type { Instrument, DrumKit, Hand } from '../../../types/instrument'
-
-export interface PlayOptions {
-  gain?: number
-  pitch?: number
-  hand?: Hand
-}
+import type { Instrument } from '../../../types/instrument'
+import type { DrumKit } from '../../../types/kit'
+import type { InstrumentVoice } from '../../../types/sticking'
 
 /**
- * Audio engine service - handles Web Audio API interactions
+ * Audio engine — только Web Audio. Никаких политик громкости/питча:
+ * gain и rate приходят в voice от резолвера.
+ *
+ * Все источники подключаются к masterGain. silence() мгновенно глушит
+ * всё, что уже запланировано в Web Audio (метроном, хвосты), и создаёт
+ * новый masterGain для следующего сеанса. Это избавляет от необходимости
+ * вручную отслеживать активные source-ноды.
  */
 export class AudioEngine {
   private readonly audioCtx: AudioContext
   private kit: DrumKit = {}
+  private masterGain: GainNode
 
   constructor(audioCtx: AudioContext) {
     this.audioCtx = audioCtx
+    this.masterGain = this.createMaster()
   }
 
-  /**
-   * Set the drum kit (audio buffers)
-   */
   setKit(kit: DrumKit): void {
     this.kit = kit
   }
 
   /**
-   * Play a single instrument at a specific time
+   * Сыграть voice (инструмент + опциональные gain/rate) в заданное время.
+   */
+  playVoice(voice: InstrumentVoice, time: number): AudioBufferSourceNode | null {
+    return this.playInstrument(voice.instrument, time, voice.gain, voice.rate)
+  }
+
+  /**
+   * Низкоуровневая версия для метронома и других системных звуков.
    */
   playInstrument(
     instrument: Instrument,
     time: number,
-    options: PlayOptions = {}
+    gain?: number,
+    rate?: number
   ): AudioBufferSourceNode | null {
     const buffer = this.kit[instrument]
     if (!buffer) {
@@ -38,57 +47,41 @@ export class AudioEngine {
       return null
     }
 
-    // Create audio source
     const source = this.audioCtx.createBufferSource()
     source.buffer = buffer
 
-    // Create gain node for volume control
     const gainNode = this.audioCtx.createGain()
+    gainNode.gain.value = gain ?? 1.0
+    if (rate !== undefined) source.playbackRate.value = rate
 
-    // Apply gain from options or use default
-    if (options.gain !== undefined) {
-      gainNode.gain.value = options.gain
-    } else {
-      // Default volumes per instrument
-      gainNode.gain.value = this.getDefaultGain(instrument)
-    }
-
-    // Apply pitch shift from options
-    if (options.pitch !== undefined) {
-      source.playbackRate.value = options.pitch
-    } else if (options.hand) {
-      // Apply hand-based pitch shift
-      if (options.hand === 'r') {
-        source.playbackRate.value = 1.02 // Right hand: slightly higher
-      } else if (options.hand === 'l') {
-        source.playbackRate.value = 0.98 // Left hand: slightly lower
-      }
-    }
-
-    // Connect: source → gainNode → destination
     source.connect(gainNode)
-    gainNode.connect(this.audioCtx.destination)
+    gainNode.connect(this.masterGain)
     source.start(time)
 
     return source
   }
 
   /**
-   * Get current audio context time
+   * Заглушить всё запланированное и пересоздать masterGain.
+   * Используется при stop, чтобы метроном/хвосты не доигрывали после остановки.
    */
+  silence(): void {
+    try {
+      this.masterGain.disconnect()
+    } catch {
+      // ignore
+    }
+    this.masterGain = this.createMaster()
+  }
+
   getCurrentTime(): number {
     return this.audioCtx.currentTime
   }
 
-  /**
-   * Get default gain for an instrument
-   */
-  private getDefaultGain(instrument: Instrument): number {
-    if (instrument === 'snSnareGhost') {
-      return 0.6 // Ghost notes quieter
-    } else if (instrument === 'cySplashRegular') {
-      return 0.5 // Splash cymbal slightly quieter
-    }
-    return 1.0 // Normal volume
+  private createMaster(): GainNode {
+    const node = this.audioCtx.createGain()
+    node.gain.value = 1.0
+    node.connect(this.audioCtx.destination)
+    return node
   }
 }

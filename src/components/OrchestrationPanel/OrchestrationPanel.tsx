@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { Instrument, StickingMapping } from '../../types/instrument'
+import type { Instrument } from '../../types/instrument'
+import type { StickingMapping } from '../../types/sticking'
 import { InstrumentGroup } from '../InstrumentGroup/InstrumentGroup'
 import classes from './OrchestrationPanel.module.css'
 
