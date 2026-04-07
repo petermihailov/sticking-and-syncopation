@@ -1,52 +1,18 @@
-import { useEffect } from 'react'
 import classes from './AudioPlayer.module.css'
-import type { StickingMapping } from '../../types/instrument'
-import type { Sticking } from '../../types'
 import { PlayerSection } from '../PlayerSection'
 import { usePlayerControl } from '../../context/PlayerControlContext'
-import { usePlayer } from '../../hooks/usePlayer'
+import { useAppState } from '../../context/AppStateContext'
 
-interface AudioPlayerProps {
-  bars: Sticking[][]
-  instrumentMapping: StickingMapping
-  tempo: number
-  metronome: boolean
-  metronomeVolume: number
-  onBeatChange?: (beat: { barIndex: number; rhythmIndex: number }) => void
-  onInstrumentCountersChange?: (counters: Map<string, number>) => void
-  onTempoChange: (tempo: number) => void
-  onMetronomeToggle: () => void
-  onMetronomeVolumeChange: (volume: number) => void
-}
-
-export function AudioPlayer({
-  bars,
-  instrumentMapping,
-  tempo,
-  metronome,
-  metronomeVolume,
-  onBeatChange,
-  onInstrumentCountersChange,
-  onTempoChange,
-  onMetronomeToggle,
-  onMetronomeVolumeChange,
-}: AudioPlayerProps) {
-  const { isPlaying, currentBeat } = usePlayerControl()
-
-  const { isLoading, drumKit, instrumentCounters, hasPattern, toggle } =
-    usePlayer({
-      bars,
-      instrumentMapping,
-      tempo,
-      metronome,
-      metronomeVolume,
-      onBeatChange,
-    })
-
-  // Прокидываем счётчики в родителя
-  useEffect(() => {
-    onInstrumentCountersChange?.(instrumentCounters)
-  }, [instrumentCounters, onInstrumentCountersChange])
+export function AudioPlayer() {
+  const { state, actions } = useAppState()
+  const {
+    isPlaying,
+    currentBeat,
+    drumKit,
+    isLoading,
+    hasPattern,
+    toggle,
+  } = usePlayerControl()
 
   if (isLoading) {
     return <div className={classes.loading}>Loading sounds...</div>
@@ -57,14 +23,14 @@ export function AudioPlayer({
       isPlaying={isPlaying}
       isDisabled={!drumKit || !hasPattern}
       currentBeat={currentBeat.rhythmIndex + 1}
-      tempo={tempo}
-      metronome={metronome}
-      metronomeVolume={metronomeVolume}
+      tempo={state.tempo}
+      metronome={state.metronome}
+      metronomeVolume={state.metronomeVolume}
       hasPattern={hasPattern}
       onToggle={toggle}
-      onTempoChange={onTempoChange}
-      onMetronomeToggle={onMetronomeToggle}
-      onMetronomeVolumeChange={onMetronomeVolumeChange}
+      onTempoChange={actions.setTempo}
+      onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
+      onMetronomeVolumeChange={actions.setMetronomeVolume}
     />
   )
 }

@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { useAppState } from '../../context/AppStateContext'
 import { AccentPatternDisplay } from '../AccentPatternDisplay'
-import { PracticeTimer } from './PracticeTimer'
 import { lessons, type Exercise } from './lessonData'
 import classes from './Lessons.module.css'
 
@@ -102,7 +101,6 @@ export function Lessons() {
   return (
     <div className={classes.lessons}>
       <h2 className={classes.title}>Lessons</h2>
-      <PracticeTimer />
       {lessons.map(lesson => (
         <div key={lesson.id} className={classes.lesson}>
           <button

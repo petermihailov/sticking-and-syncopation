@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Lessons } from './components/Lessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
@@ -8,7 +7,10 @@ import { AudioPlayer } from './components/AudioPlayer'
 import { OrchestrationSection } from './components/OrchestrationSection'
 import { AppLayout } from './components/Layout/AppLayout'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
-import { PlayerControlProvider } from './context/PlayerControlContext'
+import {
+  PlayerControlProvider,
+  usePlayerControl,
+} from './context/PlayerControlContext'
 import { useRudimentNotation } from './hooks/useRudimentNotation'
 import { useGlobalShortcuts } from './hooks/useGlobalShortcuts'
 import {
@@ -18,13 +20,7 @@ import {
 
 function AppContent() {
   const { state, actions } = useAppState()
-  const [currentBeat, setCurrentBeat] = useState({
-    barIndex: 0,
-    rhythmIndex: 0,
-  })
-  const [instrumentCounters, setInstrumentCounters] = useState<
-    Map<string, number>
-  >(new Map())
+  const { currentBeat, instrumentCounters } = usePlayerControl()
 
   const { convertResult, seeNotation, playNotation } = useRudimentNotation(
     state.rudiment,
@@ -53,18 +49,7 @@ function AppContent() {
         selectedRudiment={state.rudiment}
         onRudimentChange={actions.setRudiment}
       />
-      <AudioPlayer
-        bars={convertResult.bars}
-        instrumentMapping={state.instrumentMapping}
-        tempo={state.tempo}
-        metronome={state.metronome}
-        metronomeVolume={state.metronomeVolume}
-        onBeatChange={setCurrentBeat}
-        onInstrumentCountersChange={setInstrumentCounters}
-        onTempoChange={actions.setTempo}
-        onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
-        onMetronomeVolumeChange={actions.setMetronomeVolume}
-      />
+      <AudioPlayer />
       <VexFlowNotation seeNotation={seeNotation} playNotation={playNotation}>
         {hasStickings && (
           <Stickings bars={convertResult.bars} currentBeat={currentBeat} />
