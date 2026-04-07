@@ -76,15 +76,4 @@ export const lessons: Lesson[] = [
       { accents: [1, 1, 1, 0, 0, 1, 1, 0] },
     ],
   },
-  {
-    title: 'Lesson X',
-    exercises: [
-      { accents: [1, 1, 0, 0, 1, 1, 0, 0] },
-      { accents: [0, 0, 1, 1, 0, 0, 1, 1] },
-      { accents: [0, 1, 0, 1, 0, 1, 1, 1] },
-      { accents: [0, 1, 0, 1, 1, 0, 1, 1] },
-      { accents: [1, 1, 0, 1, 0, 1, 1, 0] },
-      { accents: [1, 0, 1, 1, 1, 1, 0, 0] },
-    ],
-  },
 ]

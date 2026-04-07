@@ -1,0 +1,146 @@
+.section {
+  background: #fff;
+  border: 1px solid #0003;
+  border-radius: 4px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border-bottom: 1px solid #0003;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+  color: #555;
+  border-radius: 3px;
+}
+
+.iconBtn:hover {
+  background: #0001;
+}
+
+.empty {
+  padding: 0.75rem 1rem;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.list {
+  border-bottom: 1px solid #0003;
+}
+
+.list:last-child {
+  border-bottom: none;
+}
+
+.listHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: start;
+}
+
+.listHeader:hover {
+  background: #f9f9f9;
+}
+
+.listTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.arrow {
+  color: #666;
+  font-size: 0.7rem;
+}
+
+.exercises {
+  padding: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: #fafafa;
+}
+
+.exercise {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: start;
+}
+
+.exercise:hover {
+  border-color: #007acc;
+  background: #f0f8ff;
+}
+
+.exercise.active {
+  background: #007acc;
+  color: #fff;
+  border-color: #007acc;
+}
+
+.exerciseName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dirtyDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff9900;
+  flex-shrink: 0;
+}
+
+.meta {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.exerciseRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}

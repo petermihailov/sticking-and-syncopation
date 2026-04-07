@@ -21,26 +21,6 @@ export interface AppState {
 }
 
 /**
- * Favorite preset - subset of AppState that can be saved and loaded
- */
-export interface FavoritePreset {
-  /** Unique identifier for the preset */
-  id: string
-  /** User-defined name for the preset */
-  name: string
-  /** Timestamp when preset was created */
-  createdAt: number
-  /** Accent pattern */
-  accents: boolean[]
-  /** Selected rudiment type */
-  rudiment: RudimentType
-  /** Playback tempo in BPM */
-  tempo: number
-  /** Instrument mapping for stickings */
-  instrumentMapping: StickingMapping
-}
-
-/**
  * Default application state
  */
 export const DEFAULT_APP_STATE: AppState = {

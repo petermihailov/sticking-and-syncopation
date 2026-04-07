@@ -1,4 +1,5 @@
 import { Lessons } from './components/Lessons'
+import { UserLessons } from './components/UserLessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { VexFlowNotation } from './components/VexFlowNotation'
@@ -41,7 +42,14 @@ function AppContent() {
     convertResult.bars.length > 0 && convertResult.bars[0].length > 0
 
   return (
-    <AppLayout sidebar={<Lessons />}>
+    <AppLayout
+      sidebar={
+        <>
+          <Lessons />
+          <UserLessons />
+        </>
+      }
+    >
       <RudimentSelector
         selectedRudiment={state.rudiment}
         onRudimentChange={actions.setRudiment}
