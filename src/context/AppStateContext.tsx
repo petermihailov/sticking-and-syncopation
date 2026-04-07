@@ -2,42 +2,18 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   useMemo,
   type FC,
   type ReactNode,
 } from 'react'
 import type { RudimentType } from '../converters/registry'
-import type { StickingMapping, Instrument } from '../types/instrument'
+import type { StickingMapping } from '../types/instrument'
 import type { AppState, FavoritePreset } from '../types/appState'
 import { DEFAULT_APP_STATE } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
-
-/**
- * Migrate old StickingMapping format (single instruments) to new format (arrays)
- * @param mapping - Potentially old format mapping
- * @returns Migrated mapping with arrays
- */
-function migrateStickingMapping(mapping: any): StickingMapping {
-  if (!mapping) return DEFAULT_APP_STATE.instrumentMapping
-
-  // Check if already migrated (uppercaseR is an array)
-  if (Array.isArray(mapping.uppercaseR)) {
-    return mapping as StickingMapping
-  }
-
-  // Migrate: convert single instruments to arrays
-  return {
-    uppercaseR: [mapping.uppercaseR] as Instrument[],
-    uppercaseL: [mapping.uppercaseL] as Instrument[],
-    uppercaseRKick: mapping.uppercaseRKick ?? false,
-    uppercaseLKick: mapping.uppercaseLKick ?? false,
-    lowercaseR: [mapping.lowercaseR] as Instrument[],
-    lowercaseL: [mapping.lowercaseL] as Instrument[],
-    kick: [mapping.kick] as Instrument[],
-  }
-}
+import { migrateStickingMapping } from '../utils/migrations'
+import { useStatePersistence } from '../hooks/useStatePersistence'
 
 interface AppStateContextValue {
   state: AppState
@@ -60,69 +36,47 @@ const AppStateContext = createContext<AppStateContextValue | undefined>(
   undefined
 )
 
+function loadInitialState(): AppState {
+  const searchParams = new URLSearchParams(window.location.search)
+  const urlState = decodeStateFromUrl(searchParams)
+
+  const savedAccents = LocalStorageManager.getItem<boolean[]>('accents')
+  const savedRudiment =
+    LocalStorageManager.getItem<RudimentType>('selectedRudiment')
+  const savedTempo = LocalStorageManager.getItem<number>('tempo')
+  const savedMetronome = LocalStorageManager.getItem<boolean>('metronome')
+  const savedMetronomeVolume =
+    LocalStorageManager.getItem<number>('metronomeVolume')
+  const savedMapping = LocalStorageManager.getItem<unknown>('instrumentMapping')
+
+  const migratedMapping = savedMapping
+    ? migrateStickingMapping(savedMapping)
+    : DEFAULT_APP_STATE.instrumentMapping
+
+  const finalMapping = urlState.instrumentMapping
+    ? migrateStickingMapping(urlState.instrumentMapping)
+    : migratedMapping
+
+  return {
+    accents: urlState.accents ?? savedAccents ?? DEFAULT_APP_STATE.accents,
+    rudiment: urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
+    tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
+    metronome: savedMetronome ?? DEFAULT_APP_STATE.metronome,
+    metronomeVolume:
+      savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
+    instrumentMapping: finalMapping,
+  }
+}
+
 interface AppStateProviderProps {
   children: ReactNode
 }
 
 export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
-  const [state, setState] = useState<AppState>(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const urlState = decodeStateFromUrl(searchParams)
+  const [state, setState] = useState<AppState>(loadInitialState)
 
-    const savedAccents = LocalStorageManager.getItem<boolean[]>('accents')
-    const savedRudiment =
-      LocalStorageManager.getItem<RudimentType>('selectedRudiment')
-    const savedTempo = LocalStorageManager.getItem<number>('tempo')
-    const savedMetronome = LocalStorageManager.getItem<boolean>('metronome')
-    const savedMetronomeVolume =
-      LocalStorageManager.getItem<number>('metronomeVolume')
-    const savedMapping = LocalStorageManager.getItem<any>('instrumentMapping')
+  useStatePersistence(state)
 
-    const migratedMapping = savedMapping
-      ? migrateStickingMapping(savedMapping)
-      : DEFAULT_APP_STATE.instrumentMapping
-
-    const finalMapping = urlState.instrumentMapping
-      ? migrateStickingMapping(urlState.instrumentMapping)
-      : migratedMapping
-
-    return {
-      accents: urlState.accents ?? savedAccents ?? DEFAULT_APP_STATE.accents,
-      rudiment:
-        urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
-      tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
-      metronome: savedMetronome ?? DEFAULT_APP_STATE.metronome,
-      metronomeVolume:
-        savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
-      instrumentMapping: finalMapping,
-    }
-  })
-
-  useEffect(() => {
-    LocalStorageManager.setItem('accents', state.accents)
-  }, [state.accents])
-
-  useEffect(() => {
-    LocalStorageManager.setItem('selectedRudiment', state.rudiment)
-  }, [state.rudiment])
-
-  useEffect(() => {
-    LocalStorageManager.setItem('tempo', state.tempo)
-  }, [state.tempo])
-
-  useEffect(() => {
-    LocalStorageManager.setItem('metronome', state.metronome)
-  }, [state.metronome])
-
-  useEffect(() => {
-    LocalStorageManager.setItem('metronomeVolume', state.metronomeVolume)
-  }, [state.metronomeVolume])
-
-  useEffect(() => {
-    LocalStorageManager.setItem('instrumentMapping', state.instrumentMapping)
-  }, [state.instrumentMapping])
-
-  // Actions
   const setAccents = (accents: boolean[]) => {
     setState(prev => ({ ...prev, accents }))
   }
@@ -173,20 +127,10 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     }))
   }
 
-  // Compute shareable URL
   const shareUrl = useMemo(() => {
     const queryString = encodeStateToUrl(state)
     const baseUrl = window.location.origin + window.location.pathname
     return `${baseUrl}?${queryString}`
-  }, [state])
-
-  // Sync URL with state changes (update address bar in real-time)
-  useEffect(() => {
-    const queryString = encodeStateToUrl(state)
-    const newUrl = `${window.location.pathname}?${queryString}`
-
-    // Update URL without reloading page
-    window.history.replaceState(null, '', newUrl)
   }, [state])
 
   const contextValue: AppStateContextValue = {

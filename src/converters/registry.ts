@@ -4,7 +4,7 @@ import {
   buildSixteenthNotation,
   buildTripletNotation,
   buildSixteenthTripletNotation,
-} from '../notationGenerators/builders'
+} from '../lib/notation/builders'
 import type { Sticking } from '../types'
 import * as paradiddleSingle from './16th-paradiddle-single-accent/index'
 import * as paradiddleDouble from './16th-paradiddle-double-accent/index'

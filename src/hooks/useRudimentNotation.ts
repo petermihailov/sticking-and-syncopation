@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { Accent, ConvertResult } from '../types'
 import type { NotationData } from '../types/notation'
 import { converters, generateNotation, type RudimentType } from '../converters/registry'
-import { buildAccentNotation } from '../notationGenerators/builders'
+import { buildAccentNotation } from '../lib/notation/builders'
 
 interface RudimentNotation {
   convertResult: ConvertResult
