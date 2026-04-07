@@ -1,4 +1,4 @@
-import type { RudimentType } from '../converters/registry.ts'
+import type { RudimentType } from '../converters/registry'
 import type { StickingMapping } from './instrument'
 import { DEFAULT_STICKING_MAPPING } from './instrument'
 

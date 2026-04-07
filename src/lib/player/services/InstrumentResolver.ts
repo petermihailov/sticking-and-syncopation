@@ -1,11 +1,10 @@
 import type { Instrument, StickingMapping } from '../../../types/instrument'
 import { DEFAULT_STICKING_MAPPING } from '../../../types/instrument'
-import type { IInstrumentResolver } from '../di/types'
 
 /**
  * Instrument resolver service - resolves sticking symbols to instruments with rotation
  */
-export class InstrumentResolver implements IInstrumentResolver {
+export class InstrumentResolver {
   private mapping: StickingMapping = DEFAULT_STICKING_MAPPING
   private counters = new Map<string, number>()
 

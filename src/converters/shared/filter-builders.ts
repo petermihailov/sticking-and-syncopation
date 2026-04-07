@@ -1,4 +1,4 @@
-import type { StickingPattern } from '../../types.ts'
+import type { StickingPattern } from '../../types'
 
 /** Filter patterns that contain only lowercase characters */
 export function requireAllLowercase(patterns: StickingPattern[]): StickingPattern[] {

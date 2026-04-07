@@ -7,7 +7,7 @@ import {
   type FC,
   type ReactNode,
 } from 'react'
-import type { RudimentType } from '../converters/registry.ts'
+import type { RudimentType } from '../converters/registry'
 import type { StickingMapping, Instrument } from '../types/instrument'
 import type { AppState, FavoritePreset } from '../types/appState'
 import { DEFAULT_APP_STATE } from '../types/appState'

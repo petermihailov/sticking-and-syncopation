@@ -1,8 +1,8 @@
-import { replaces } from './replaces.ts'
-import { createConverter } from '../shared/config-converter.ts'
-import type { StickingPattern } from '../../types.ts'
-import type { FilterContext } from '../shared/config-types.ts'
-import { getOppositeHand, preferChar, preferStartingWith } from '../shared/filter-builders.ts'
+import { replaces } from './replaces'
+import { createConverter } from '../shared/config-converter'
+import type { StickingPattern } from '../../types'
+import type { FilterContext } from '../shared/config-types'
+import { getOppositeHand, preferChar, preferStartingWith } from '../shared/filter-builders'
 
 const config = createConverter({
   converterName: '16th inverted paradiddle kick',
@@ -44,4 +44,3 @@ const config = createConverter({
 
 export const { converterName, pattern, convert } = config
 export { replaces }
-export { generateNotation } from './generateNotation.ts'

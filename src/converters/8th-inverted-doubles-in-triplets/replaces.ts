@@ -1,4 +1,4 @@
-import type { StickingPattern } from '../../types.ts'
+import type { StickingPattern } from '../../types'
 
 export const replaces = {
   '00': ['rrl', 'rll', 'llr', 'lrr'] as StickingPattern[],

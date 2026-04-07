@@ -1,10 +1,9 @@
 import type { Bar } from '../../../types/instrument'
-import type { IScheduler } from '../di/types'
 
 /**
  * Scheduler service - handles timing and scheduling
  */
-export class Scheduler implements IScheduler {
+export class Scheduler {
   /**
    * Schedule a callback to run after a delay
    */

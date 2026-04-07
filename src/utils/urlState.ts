@@ -1,9 +1,9 @@
-import type { RudimentType } from '../converters/registry.ts'
+import type { RudimentType } from '../converters/registry'
 import type { Instrument, StickingMapping } from '../types/instrument'
 import type { AppState } from '../types/appState'
 import { DEFAULT_STICKING_MAPPING } from '../types/instrument'
 import { DEFAULT_APP_STATE } from '../types/appState'
-import { converters } from '../converters/registry.ts'
+import { converters } from '../converters/registry'
 
 /**
  * Instrument to 2-character code mapping

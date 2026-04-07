@@ -1,4 +1,4 @@
-import type { Sticking } from '../../types.ts'
+import type { Sticking } from '../../types'
 import { Bar } from './Bar'
 import classes from './Stickings.module.css'
 

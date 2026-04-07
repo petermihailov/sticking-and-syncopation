@@ -1,5 +1,5 @@
-import { replaces } from './replaces.ts'
-import { createConverter } from '../shared/config-converter.ts'
+import { replaces } from './replaces'
+import { createConverter } from '../shared/config-converter'
 
 const config = createConverter({
   converterName: '16th hand-to-hand triplets',
@@ -17,4 +17,3 @@ const config = createConverter({
 
 export const { converterName, pattern, convert } = config
 export { replaces }
-export { generateNotation } from './generateNotation.ts'

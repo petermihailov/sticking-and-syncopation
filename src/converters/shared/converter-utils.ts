@@ -1,6 +1,6 @@
-import type { Accent, Sticking, StickingPattern } from '../../types.ts'
-import type { ConverterReplaces, PatternFilter } from './types.ts'
-import { findBestPattern } from './pattern-selector.ts'
+import type { Accent, Sticking, StickingPattern } from '../../types'
+import type { ConverterReplaces, PatternFilter } from './types'
+import { findBestPattern } from './pattern-selector'
 
 type ProcessAccentsOptions = {
   /** Function to filter available patterns based on context */

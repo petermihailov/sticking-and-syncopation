@@ -1,10 +1,15 @@
-import type { Instrument, DrumKit } from '../../../types/instrument'
-import type { IAudioEngine, PlayOptions } from '../di/types'
+import type { Instrument, DrumKit, Hand } from '../../../types/instrument'
+
+export interface PlayOptions {
+  gain?: number
+  pitch?: number
+  hand?: Hand
+}
 
 /**
  * Audio engine service - handles Web Audio API interactions
  */
-export class AudioEngine implements IAudioEngine {
+export class AudioEngine {
   private readonly audioCtx: AudioContext
   private kit: DrumKit = {}
 

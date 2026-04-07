@@ -1,16 +1,16 @@
-import type { Accent, Sticking, StickingPattern } from '../../types.ts'
+import type { Accent, Sticking, StickingPattern } from '../../types'
 import type {
   ConverterConfig,
   ConverterExports,
   FilterContext,
   PatternFilter,
-} from './config-types.ts'
+} from './config-types'
 import {
   processAccents,
   processAccentsSimple,
   processPairs,
-} from './converter-utils.ts'
-import { findBestPattern } from './pattern-selector.ts'
+} from './converter-utils'
+import { findBestPattern } from './pattern-selector'
 import {
   requireAllLowercase,
   requireSomeUppercase,
@@ -19,7 +19,7 @@ import {
   preferChar,
   preferStartingWith,
   getOppositeHand,
-} from './filter-builders.ts'
+} from './filter-builders'
 
 function createFilterFromConfig(
   config: ConverterConfig['filterConfig']
@@ -87,7 +87,8 @@ function createFilterFromConfig(
     }
   }
 
-  return undefined
+  const _exhaustive: never = config
+  return _exhaustive
 }
 
 function createSelectFromConfig(
@@ -122,7 +123,8 @@ function createSelectFromConfig(
     }
   }
 
-  return undefined
+  const _exhaustive: never = config
+  return _exhaustive
 }
 
 export function createConverter(config: ConverterConfig): ConverterExports {
@@ -155,21 +157,16 @@ export function createConverter(config: ConverterConfig): ConverterExports {
   }
 
   const convert = (accentMap8: Accent[]) => {
-    // Generate 2 bars at once to ensure proper hand transitions
+    // Генерируем сразу два такта, чтобы корректно учесть переходы рук между ними.
+    // Длина выхода пропорциональна длине входа, поэтому barLength = половина результата.
     const doubledAccents: Accent[] = [...accentMap8, ...accentMap8]
     const doubleBars = generateBar(doubledAccents)
 
-    // Calculate bar length based on single bar generation
-    const singleBar = generateBar(accentMap8)
-    const barLength = singleBar.length
-
-    // Split into two bars
+    const barLength = doubleBars.length / 2
     const bar1 = doubleBars.slice(0, barLength)
-    const bar2 = doubleBars.slice(barLength, barLength * 2)
+    const bar2 = doubleBars.slice(barLength)
 
-    // Compare bars - if identical, only return bar1
-    const barsAreIdentical = bar1.length === bar2.length &&
-      bar1.every((s, i) => s === bar2[i])
+    const barsAreIdentical = bar1.every((s, i) => s === bar2[i])
 
     return {
       bar1,

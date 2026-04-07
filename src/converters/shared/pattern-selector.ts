@@ -1,5 +1,5 @@
-import type { Sticking, StickingPattern } from '../../types.ts'
-import { evaluatePatternQuality } from './quality-evaluator.ts'
+import type { Sticking, StickingPattern } from '../../types'
+import { evaluatePatternQuality } from './quality-evaluator'
 
 type FindBestPatternArgs = {
   result: Sticking[]

@@ -1,0 +1,1 @@
+export { VexFlowNotation } from './VexFlowNotation'

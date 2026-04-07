@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { Accent, ConvertResult } from './types.ts'
-import { converters } from './converters/registry'
+import { useState } from 'react'
 import { Lessons } from './components/Lessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
-import { ABCNotation } from './components/ABCNotation'
+import { VexFlowNotation } from './components/VexFlowNotation'
+import { Stickings } from './components/Stickings'
 import { AudioPlayer } from './components/AudioPlayer'
 import { OrchestrationSection } from './components/OrchestrationSection'
 import { AppLayout } from './components/Layout/AppLayout'
-import { generateAccentNotation } from './notationGenerators'
 import { AppStateProvider, useAppState } from './context/AppStateContext'
 import { PlayerControlProvider } from './context/PlayerControlContext'
+import { useRudimentNotation } from './hooks/useRudimentNotation'
+import { useGlobalShortcuts } from './hooks/useGlobalShortcuts'
 import {
   DEFAULT_STICKING_MAPPING,
   type StickingMapping,
@@ -26,37 +26,12 @@ function AppContent() {
     Map<string, number>
   >(new Map())
 
-  // Convert accents to rudiment pattern
-  const convertResult: ConvertResult = useMemo(() => {
-    const accentArray: Accent[] = state.accents.map(checked =>
-      checked ? 1 : 0
-    )
+  const { convertResult, seeNotation, playNotation } = useRudimentNotation(
+    state.rudiment,
+    state.accents
+  )
 
-    const converter = converters[state.rudiment]
-    const result = converter.convert(accentArray)
-
-    return {
-      bars: result.bar2 ? [result.bar1, result.bar2] : [result.bar1],
-    }
-  }, [state.accents, state.rudiment])
-
-  // Keyboard shortcuts: R for reset to defaults, Escape to blur active element
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'KeyR') {
-        event.preventDefault()
-        actions.resetToDefaults()
-      } else if (event.code === 'Escape') {
-        // Blur any active element
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur()
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [actions])
+  useGlobalShortcuts({ onReset: actions.resetToDefaults })
 
   const handleMappingChange = (key: keyof StickingMapping, value: unknown) => {
     actions.setInstrumentMapping({
@@ -68,6 +43,9 @@ function AppContent() {
   const handleOrchestrationReset = () => {
     actions.setInstrumentMapping(DEFAULT_STICKING_MAPPING)
   }
+
+  const hasStickings =
+    convertResult.bars.length > 0 && convertResult.bars[0].length > 0
 
   return (
     <AppLayout sidebar={<Lessons />}>
@@ -87,14 +65,11 @@ function AppContent() {
         onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
         onMetronomeVolumeChange={actions.setMetronomeVolume}
       />
-      <ABCNotation
-        seeNotation={generateAccentNotation(state.accents)}
-        playNotation={converters[state.rudiment].generateNotation(
-          convertResult
+      <VexFlowNotation seeNotation={seeNotation} playNotation={playNotation}>
+        {hasStickings && (
+          <Stickings bars={convertResult.bars} currentBeat={currentBeat} />
         )}
-        bars={convertResult.bars}
-        currentBeat={currentBeat}
-      />
+      </VexFlowNotation>
       <OrchestrationSection
         mapping={state.instrumentMapping}
         instrumentCounters={instrumentCounters}

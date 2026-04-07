@@ -1,4 +1,4 @@
-import type { Sticking } from '../../types.ts'
+import type { Sticking } from '../../types'
 
 export function isAccented(char: Sticking): boolean {
   return char === char.toUpperCase()

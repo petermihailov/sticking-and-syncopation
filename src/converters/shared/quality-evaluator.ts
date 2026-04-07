@@ -1,4 +1,4 @@
-import type { Sticking } from '../../types.ts'
+import type { Sticking } from '../../types'
 
 // Константы для оценки паттернов
 export const PATTERN_SCORES = {

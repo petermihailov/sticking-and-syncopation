@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { convert } from './index.ts'
-import type { Accent } from '../../types.ts'
-import { standardTestInputs } from '../shared/test-cases.ts'
+import { convert } from './index'
+import type { Accent } from '../../types'
+import { standardTestInputs } from '../shared/test-cases'
 
 const expectations = [
   'rrllrrllrrllrrll', // Все нули

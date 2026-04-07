@@ -1,4 +1,4 @@
-import type { Accent, Sticking, StickingPattern } from '../../types.ts'
+import type { Accent, Sticking, StickingPattern } from '../../types'
 
 /** Mapping of accent patterns to sticking patterns */
 export type ConverterReplaces = Record<string, StickingPattern[]>

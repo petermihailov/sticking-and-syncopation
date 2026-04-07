@@ -1,0 +1,28 @@
+.container {
+    padding: min(2rem, 4vw);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    filter: url(#roughpaper);
+}
+
+.notation {
+    overflow-x: auto;
+    overflow-y: hidden;
+    color: #00184d;
+}
+
+.notation svg {
+    max-width: 100%;
+    height: auto;
+}
+
+

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import classes from './Bar.module.css'
-import type { Sticking } from '../../../types.ts'
+import type { Sticking } from '../../../types'
 
 interface StickingBarProps {
   labels: Sticking[]

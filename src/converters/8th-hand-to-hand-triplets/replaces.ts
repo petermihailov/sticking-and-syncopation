@@ -1,4 +1,4 @@
-import type { Sticking3 } from '../../types.ts'
+import type { Sticking3 } from '../../types'
 
 export const replaces = {
   '00': ['rlr', 'lrl'] as Sticking3[],

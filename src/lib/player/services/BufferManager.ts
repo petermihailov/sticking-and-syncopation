@@ -1,9 +1,7 @@
-import type { IBufferManager } from '../di/types'
-
 /**
  * Buffer manager service - manages active audio buffers (hi-hat, metronome)
  */
-export class BufferManager implements IBufferManager {
+export class BufferManager {
   private hiHatBuffers: AudioBufferSourceNode[] = []
   private metronomeBuffers: AudioBufferSourceNode[] = []
 
