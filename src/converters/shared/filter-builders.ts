@@ -1,23 +1,37 @@
 import type { StickingPattern } from '../../types'
 
 /** Filter patterns that contain only lowercase characters */
-export function requireAllLowercase(patterns: StickingPattern[]): StickingPattern[] {
+export function requireAllLowercase(
+  patterns: StickingPattern[]
+): StickingPattern[] {
   return patterns.filter(p => p.split('').every(c => c === c.toLowerCase()))
 }
 
 /** Filter patterns that contain at least one uppercase character */
-export function requireSomeUppercase(patterns: StickingPattern[]): StickingPattern[] {
-  return patterns.filter(p => p.split('').some(c => c !== c.toLowerCase() && c === c.toUpperCase()))
+export function requireSomeUppercase(
+  patterns: StickingPattern[]
+): StickingPattern[] {
+  return patterns.filter(p =>
+    p.split('').some(c => c !== c.toLowerCase() && c === c.toUpperCase())
+  )
 }
 
 /** Filter patterns that contain only uppercase characters */
-export function requireAllUppercase(patterns: StickingPattern[]): StickingPattern[] {
-  return patterns.filter(p => p.split('').every(c => c !== c.toLowerCase() && c === c.toUpperCase()))
+export function requireAllUppercase(
+  patterns: StickingPattern[]
+): StickingPattern[] {
+  return patterns.filter(p =>
+    p.split('').every(c => c !== c.toLowerCase() && c === c.toUpperCase())
+  )
 }
 
 /** Filter patterns that contain at least one lowercase character */
-export function requireSomeLowercase(patterns: StickingPattern[]): StickingPattern[] {
-  return patterns.filter(p => p.split('').some(c => c !== c.toUpperCase() && c === c.toLowerCase()))
+export function requireSomeLowercase(
+  patterns: StickingPattern[]
+): StickingPattern[] {
+  return patterns.filter(p =>
+    p.split('').some(c => c !== c.toUpperCase() && c === c.toLowerCase())
+  )
 }
 
 /** Filter patterns that contain a specific character */
@@ -35,7 +49,9 @@ export function preferStartingWith(char: string) {
 }
 
 /** Get the opposite hand */
-export function getOppositeHand(hand: 'R' | 'L' | 'r' | 'l' | 'k' | ' '): 'l' | 'r' {
+export function getOppositeHand(
+  hand: 'R' | 'L' | 'r' | 'l' | 'k' | ' '
+): 'l' | 'r' {
   const lower = hand.toLowerCase()
   if (lower === 'r' || lower === 'k' || lower === ' ') return 'l'
   return 'r'

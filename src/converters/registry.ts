@@ -19,7 +19,9 @@ import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/
 type ConverterModule = {
   converterName: string
   pattern: string
-  convert: (accentMap8: import('../types').Accent[]) => import('./shared/config-types').ConvertResultBars
+  convert: (
+    accentMap8: import('../types').Accent[]
+  ) => import('./shared/config-types').ConvertResultBars
 }
 
 type NotationKind = 'sixteenth' | 'triplet' | 'sixteenthTriplet'

@@ -29,7 +29,9 @@ export function InstrumentGroup({
   fullWidth = false,
 }: InstrumentGroupProps) {
   return (
-    <div className={`${classes.container} ${fullWidth ? classes.fullWidth : ''}`}>
+    <div
+      className={`${classes.container} ${fullWidth ? classes.fullWidth : ''}`}
+    >
       <div className={classes.header}>
         <span className={classes.label}>{label}</span>
         <span className={classes.description}>({description})</span>

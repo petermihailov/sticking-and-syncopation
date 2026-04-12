@@ -1,8 +1,8 @@
-import type { Instrument } from '../types/instrument';
-import type { DrumKit } from '../types/kit';
+import type { Instrument } from '../types/instrument'
+import type { DrumKit } from '../types/kit'
 
 // Singleton AudioContext instance
-let audioContext: AudioContext | null = null;
+let audioContext: AudioContext | null = null
 
 /**
  * Get or create the singleton AudioContext instance
@@ -10,9 +10,11 @@ let audioContext: AudioContext | null = null;
  */
 export function getAudioContext(): AudioContext {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioContext = new (window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext)()
   }
-  return audioContext;
+  return audioContext
 }
 
 /**
@@ -21,21 +23,21 @@ export function getAudioContext(): AudioContext {
  * @returns Promise<AudioBuffer>
  */
 export async function loadSound(url: string): Promise<AudioBuffer> {
-  const ctx = getAudioContext();
+  const ctx = getAudioContext()
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url)
     if (!response.ok) {
-      throw new Error(`Failed to fetch sound: ${url} (${response.status})`);
+      throw new Error(`Failed to fetch sound: ${url} (${response.status})`)
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    const arrayBuffer = await response.arrayBuffer()
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
 
-    return audioBuffer;
+    return audioBuffer
   } catch (error) {
-    console.error(`Error loading sound ${url}:`, error);
-    throw error;
+    console.error(`Error loading sound ${url}:`, error)
+    throw error
   }
 }
 
@@ -79,28 +81,28 @@ export async function createDrumKit(
     // Metronome
     'fxMetronomeAccent',
     'fxMetronomeRegular',
-  ];
+  ]
 
-  const kit: DrumKit = {};
+  const kit: DrumKit = {}
 
   // Load all sounds in parallel
-  const loadPromises = instruments.map(async (instrument) => {
-    const url = `${basePath}${instrument}.${extension}`;
+  const loadPromises = instruments.map(async instrument => {
+    const url = `${basePath}${instrument}.${extension}`
     try {
-      const buffer = await loadSound(url);
-      kit[instrument] = buffer;
+      const buffer = await loadSound(url)
+      kit[instrument] = buffer
     } catch (error) {
-      console.warn(`Failed to load ${instrument}.${extension}:`, error);
+      console.warn(`Failed to load ${instrument}.${extension}:`, error)
       // Don't throw, just skip this instrument
     }
-  });
+  })
 
-  await Promise.all(loadPromises);
+  await Promise.all(loadPromises)
 
-  const loadedCount = Object.keys(kit).length;
-  console.log(`DrumKit loaded: ${loadedCount}/${instruments.length} sounds`);
+  const loadedCount = Object.keys(kit).length
+  console.log(`DrumKit loaded: ${loadedCount}/${instruments.length} sounds`)
 
-  return kit;
+  return kit
 }
 
 /**
@@ -108,8 +110,8 @@ export async function createDrumKit(
  * Call this in response to user interaction (click, touch, etc.)
  */
 export function resumeAudioContext(): void {
-  const ctx = getAudioContext();
+  const ctx = getAudioContext()
   if (ctx.state === 'suspended') {
-    ctx.resume();
+    ctx.resume()
   }
 }

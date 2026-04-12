@@ -169,7 +169,11 @@ export class Player {
   private resolveVoices(bar: Bar, rhythmIndex: number): InstrumentVoice[] {
     const stroke = bar.stickings?.[rhythmIndex]
     if (stroke) {
-      const result = resolveStroke(stroke, this.state.mapping, this.resolverState)
+      const result = resolveStroke(
+        stroke,
+        this.state.mapping,
+        this.resolverState
+      )
       this.resolverState = result.nextState
       return result.voices
     }

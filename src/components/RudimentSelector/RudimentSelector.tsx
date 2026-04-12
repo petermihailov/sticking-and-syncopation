@@ -57,13 +57,15 @@ export function RudimentSelector({
       // When dropdown is closed, arrow keys change rudiment directly
       if (event.key === 'ArrowDown') {
         event.preventDefault()
-        const nextIndex = selectedIndex < rudimentOptions.length - 1 ? selectedIndex + 1 : 0
+        const nextIndex =
+          selectedIndex < rudimentOptions.length - 1 ? selectedIndex + 1 : 0
         onRudimentChange(rudimentOptions[nextIndex].value as RudimentType)
         return
       }
       if (event.key === 'ArrowUp') {
         event.preventDefault()
-        const prevIndex = selectedIndex > 0 ? selectedIndex - 1 : rudimentOptions.length - 1
+        const prevIndex =
+          selectedIndex > 0 ? selectedIndex - 1 : rudimentOptions.length - 1
         onRudimentChange(rudimentOptions[prevIndex].value as RudimentType)
         return
       }

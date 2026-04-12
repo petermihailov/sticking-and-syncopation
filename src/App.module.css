@@ -1,11 +1,11 @@
 /* App.module.css */
 
 .notesContainer {
-    position: relative;
+  position: relative;
 }
 
 .checkboxes {
-    position: absolute;
-    right: 1rem;
-    z-index: 1;
+  position: absolute;
+  right: 1rem;
+  z-index: 1;
 }

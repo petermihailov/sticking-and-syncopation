@@ -6,12 +6,12 @@ import { Stickings } from './components/Stickings'
 import { AudioPlayer } from './components/AudioPlayer'
 import { OrchestrationSection } from './components/OrchestrationSection'
 import { AppLayout } from './components/Layout/AppLayout'
-import { AppStateProvider, useAppState } from './context/AppStateContext'
-import {
-  PlayerControlProvider,
-  usePlayerControl,
-} from './context/PlayerControlContext'
-import { NotationProvider, useNotation } from './context/NotationContext'
+import { AppStateProvider } from './context/AppStateContext'
+import { PlayerControlProvider } from './context/PlayerControlContext'
+import { NotationProvider } from './context/NotationContext'
+import { useAppState } from './context/useAppState'
+import { usePlayerControl } from './context/usePlayerControl'
+import { useNotation } from './context/useNotation'
 import { useGlobalShortcuts } from './hooks/useGlobalShortcuts'
 import {
   DEFAULT_STICKING_MAPPING,

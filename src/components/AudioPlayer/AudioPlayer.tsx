@@ -1,17 +1,12 @@
 import classes from './AudioPlayer.module.css'
 import { PlayerSection } from '../PlayerSection'
-import { usePlayerControl } from '../../context/PlayerControlContext'
-import { useAppState } from '../../context/AppStateContext'
+import { usePlayerControl } from '../../context/usePlayerControl'
+import { useAppState } from '../../context/useAppState'
 
 export function AudioPlayer() {
   const { state, actions } = useAppState()
-  const {
-    isPlaying,
-    drumKit,
-    isLoading,
-    hasPattern,
-    toggle,
-  } = usePlayerControl()
+  const { isPlaying, drumKit, isLoading, hasPattern, toggle } =
+    usePlayerControl()
 
   if (isLoading) {
     return <div className={classes.loading}>Loading sounds...</div>

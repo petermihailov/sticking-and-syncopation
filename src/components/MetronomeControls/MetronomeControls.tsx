@@ -30,7 +30,10 @@ export function MetronomeControls({
 
       {/* Metronome volume */}
       <div className={classes.volumeContainer}>
-        <label htmlFor="metronome-volume-slider" className={classes.volumeLabel}>
+        <label
+          htmlFor="metronome-volume-slider"
+          className={classes.volumeLabel}
+        >
           Metronome: {Math.round(volume * 100)}%
         </label>
         <input

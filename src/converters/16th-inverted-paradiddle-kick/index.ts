@@ -2,7 +2,11 @@ import { replaces } from './replaces'
 import { createConverter } from '../shared/config-converter'
 import type { StickingPattern } from '../../types'
 import type { FilterContext } from '../shared/config-types'
-import { getOppositeHand, preferChar, preferStartingWith } from '../shared/filter-builders'
+import {
+  getOppositeHand,
+  preferChar,
+  preferStartingWith,
+} from '../shared/filter-builders'
 
 const config = createConverter({
   converterName: '16th inverted paradiddle kick',

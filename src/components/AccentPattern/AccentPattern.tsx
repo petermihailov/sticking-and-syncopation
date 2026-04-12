@@ -17,18 +17,20 @@ export function AccentPattern({
 
   const handleKeyDown = (event: React.KeyboardEvent, currentIndex: number) => {
     switch (event.key) {
-      case 'ArrowLeft':
+      case 'ArrowLeft': {
         event.preventDefault()
         const prevIndex =
           currentIndex > 0 ? currentIndex - 1 : checkedItems.length - 1
         checkboxRefs.current[prevIndex]?.focus()
         break
-      case 'ArrowRight':
+      }
+      case 'ArrowRight': {
         event.preventDefault()
         const nextIndex =
           currentIndex < checkedItems.length - 1 ? currentIndex + 1 : 0
         checkboxRefs.current[nextIndex]?.focus()
         break
+      }
       case ' ':
         event.preventDefault()
         onToggle(currentIndex)

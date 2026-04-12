@@ -12,7 +12,11 @@ interface ToastProps {
  * Toast notification component
  * Displays a temporary message at the bottom-right of the screen
  */
-export const Toast: FC<ToastProps> = ({ message, duration = 2000, onClose }) => {
+export const Toast: FC<ToastProps> = ({
+  message,
+  duration = 2000,
+  onClose,
+}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose()
@@ -22,9 +26,7 @@ export const Toast: FC<ToastProps> = ({ message, duration = 2000, onClose }) => 
   }, [duration, onClose])
 
   return createPortal(
-    <div className={classes.toast}>
-      {message}
-    </div>,
+    <div className={classes.toast}>{message}</div>,
     document.body
   )
 }

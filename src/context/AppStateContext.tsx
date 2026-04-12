@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useMemo,
-  type FC,
-  type ReactNode,
-} from 'react'
+import { useState, useMemo, type FC, type ReactNode } from 'react'
 import type { RudimentType } from '../converters/registry'
 import type { StickingMapping } from '../types/sticking'
 import type { AppState } from '../types/appState'
@@ -14,26 +7,7 @@ import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
 import { migrateStickingMapping } from '../utils/migrations'
 import { useStatePersistence } from '../hooks/useStatePersistence'
-
-interface AppStateContextValue {
-  state: AppState
-  actions: {
-    setAccents: (accents: boolean[]) => void
-    toggleAccent: (index: number) => void
-    setRudiment: (rudiment: RudimentType) => void
-    setTempo: (tempo: number) => void
-    setMetronome: (enabled: boolean) => void
-    setMetronomeVolume: (volume: number) => void
-    setInstrumentMapping: (mapping: StickingMapping) => void
-    resetAccents: () => void
-    resetToDefaults: () => void
-  }
-  shareUrl: string
-}
-
-const AppStateContext = createContext<AppStateContextValue | undefined>(
-  undefined
-)
+import { AppStateContext } from './useAppState'
 
 function loadInitialState(): AppState {
   const searchParams = new URLSearchParams(window.location.search)
@@ -61,8 +35,7 @@ function loadInitialState(): AppState {
     rudiment: urlState.rudiment ?? savedRudiment ?? DEFAULT_APP_STATE.rudiment,
     tempo: urlState.tempo ?? savedTempo ?? DEFAULT_APP_STATE.tempo,
     metronome: savedMetronome ?? DEFAULT_APP_STATE.metronome,
-    metronomeVolume:
-      savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
+    metronomeVolume: savedMetronomeVolume ?? DEFAULT_APP_STATE.metronomeVolume,
     instrumentMapping: finalMapping,
   }
 }
@@ -122,7 +95,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     return `${baseUrl}?${queryString}`
   }, [state])
 
-  const contextValue: AppStateContextValue = {
+  const contextValue = {
     state,
     actions: {
       setAccents,
@@ -143,15 +116,4 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       {children}
     </AppStateContext.Provider>
   )
-}
-
-/**
- * Hook to access app state and actions
- */
-export const useAppState = (): AppStateContextValue => {
-  const context = useContext(AppStateContext)
-  if (!context) {
-    throw new Error('useAppState must be used within AppStateProvider')
-  }
-  return context
 }

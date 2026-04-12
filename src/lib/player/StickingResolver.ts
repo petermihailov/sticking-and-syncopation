@@ -14,7 +14,10 @@ export interface ResolveResult {
 
 // Применить политику воспроизведения к имени инструмента.
 // Политика — единственное место, где живут pitch-сдвиги и ghost-громкость.
-function applyStrokePolicy(stroke: string, instrument: Instrument): InstrumentVoice {
+function applyStrokePolicy(
+  stroke: string,
+  instrument: Instrument
+): InstrumentVoice {
   const voice: InstrumentVoice = { instrument }
 
   // Ghost-снейр играем тише.

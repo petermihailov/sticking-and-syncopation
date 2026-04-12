@@ -1,5 +1,5 @@
 import { useState, type FC, type CSSProperties } from 'react'
-import { useAppState } from '../../context/AppStateContext'
+import { useAppState } from '../../context/useAppState'
 import { Toast } from '../Toast'
 
 interface ShareButtonProps {

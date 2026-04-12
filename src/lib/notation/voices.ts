@@ -53,7 +53,6 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
       notes.push(note)
       groupBeamable.push(note)
       indexedNotes.push({ note, index: event.index })
-
     }
 
     if (group.tuplet) {

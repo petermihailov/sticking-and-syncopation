@@ -42,7 +42,10 @@ export type SelectPatternConfig =
   | { type: 'byLastPattern'; mapping: Record<string, number> }
   | {
       type: 'custom'
-      selectFn: (patterns: StickingPattern[], result: Sticking[]) => StickingPattern
+      selectFn: (
+        patterns: StickingPattern[],
+        result: Sticking[]
+      ) => StickingPattern
     }
 
 export type ConverterConfig = {

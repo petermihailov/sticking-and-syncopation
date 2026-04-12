@@ -9,14 +9,14 @@ const config = createConverter({
   selectConfig: {
     type: 'byLastPattern',
     mapping: {
-      'rl': 0,
-      'Rl': 0,
-      'rL': 0,
-      'RL': 0,
-      'lr': 1,
-      'Lr': 1,
-      'lR': 1,
-      'LR': 1,
+      rl: 0,
+      Rl: 0,
+      rL: 0,
+      RL: 0,
+      lr: 1,
+      Lr: 1,
+      lR: 1,
+      LR: 1,
     },
   },
 })

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useAppState } from '../../context/AppStateContext'
+import { useAppState } from '../../context/useAppState'
 import { AccentPatternDisplay } from '../AccentPatternDisplay'
 import { lessons, type Exercise } from './lessonData'
 import classes from './Lessons.module.css'
@@ -131,7 +131,7 @@ export function Lessons() {
                       isActive ? classes.active : ''
                     }`}
                     onClick={() => handleExerciseClick(exercise)}
-                    onKeyDown={(e) =>
+                    onKeyDown={e =>
                       handleKeyDown(e, lessonIndex, exerciseIndex)
                     }
                     aria-label={`Exercise ${number}`}

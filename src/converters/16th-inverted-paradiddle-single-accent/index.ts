@@ -8,9 +8,7 @@ const config = createConverter({
   mode: 'accents',
   filterConfig: {
     type: 'caseAware',
-    rules: [
-      { when: 'nextIsAccent', prefer: 'someUppercase' },
-    ],
+    rules: [{ when: 'nextIsAccent', prefer: 'someUppercase' }],
   },
 })
 

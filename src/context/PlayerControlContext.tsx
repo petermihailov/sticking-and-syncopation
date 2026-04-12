@@ -1,6 +1,4 @@
 import {
-  createContext,
-  useContext,
   useState,
   useRef,
   useEffect,
@@ -13,41 +11,22 @@ import { createDrumKit, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
 import { isTextInputElement, isRangeInput } from '../utils/domFocus'
 import type { DrumKit } from '../types/kit'
-import { useAppState } from './AppStateContext'
-import { useNotation } from './NotationContext'
+import { useAppState } from './useAppState'
+import { useNotation } from './useNotation'
+import { PlayerControlContext } from './usePlayerControl'
 
 interface Beat {
   barIndex: number
   rhythmIndex: number
 }
 
-interface PlayerControlContextValue {
-  isPlaying: boolean
-  currentBeat: Beat
-  instrumentCounters: Map<string, number>
-  drumKit: DrumKit | null
-  isLoading: boolean
-  hasPattern: boolean
-  toggle: () => void
-}
-
-const PlayerControlContext = createContext<PlayerControlContextValue | null>(
-  null
-)
-
-export function usePlayerControl() {
-  const context = useContext(PlayerControlContext)
-  if (!context) {
-    throw new Error('usePlayerControl must be used within PlayerControlProvider')
-  }
-  return context
-}
-
 interface PlayerControlProviderProps {
   children: ReactNode
 }
 
-export function PlayerControlProvider({ children }: PlayerControlProviderProps) {
+export function PlayerControlProvider({
+  children,
+}: PlayerControlProviderProps) {
   const { state } = useAppState()
   const { tempo, metronome, metronomeVolume, instrumentMapping } = state
   const { convertResult, meter } = useNotation()
@@ -110,7 +89,15 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
       mutedGroups: [],
       kit: drumKit ?? undefined,
     }
-  }, [bars, tempo, metronome, metronomeVolume, instrumentMapping, meter, drumKit])
+  }, [
+    bars,
+    tempo,
+    metronome,
+    metronomeVolume,
+    instrumentMapping,
+    meter,
+    drumKit,
+  ])
 
   useEffect(() => {
     playerRef.current?.applyState(playerState)
@@ -173,7 +160,7 @@ export function PlayerControlProvider({ children }: PlayerControlProviderProps) 
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [toggle])
 
-  const value: PlayerControlContextValue = {
+  const value = {
     isPlaying,
     currentBeat,
     instrumentCounters,

@@ -30,7 +30,5 @@ export function isTextInputElement(el: Element | null): boolean {
 
 /** true, если элемент — `<input type="range">`. */
 export function isRangeInput(el: Element | null): boolean {
-  return (
-    el instanceof HTMLInputElement && el.type.toLowerCase() === 'range'
-  )
+  return el instanceof HTMLInputElement && el.type.toLowerCase() === 'range'
 }

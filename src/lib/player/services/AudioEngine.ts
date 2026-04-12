@@ -28,7 +28,10 @@ export class AudioEngine {
   /**
    * Сыграть voice (инструмент + опциональные gain/rate) в заданное время.
    */
-  playVoice(voice: InstrumentVoice, time: number): AudioBufferSourceNode | null {
+  playVoice(
+    voice: InstrumentVoice,
+    time: number
+  ): AudioBufferSourceNode | null {
     return this.playInstrument(voice.instrument, time, voice.gain, voice.rate)
   }
 

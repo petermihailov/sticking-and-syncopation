@@ -22,7 +22,8 @@ export function processAccents(
     const accentLevel = String(accentMap8[i]) as '0' | '1'
     const availablePatterns = replaces[accentLevel] as StickingPattern[]
     const isAccent = accentMap8[i] === 1
-    const nextIsAccent = (i === accentCount - 1 && accentMap8[0] === 1) || accentMap8[i + 1] === 1
+    const nextIsAccent =
+      (i === accentCount - 1 && accentMap8[0] === 1) || accentMap8[i + 1] === 1
 
     let targetPatterns = availablePatterns
 
@@ -57,8 +58,13 @@ export function processAccentsSimple(
   const result: Sticking[] = []
 
   for (const accent of accentMap8) {
-    const availablePatterns = replaces[String(accent) as '0' | '1'] as StickingPattern[]
-    const chosenPattern = findBestPattern({ patterns: availablePatterns, result })
+    const availablePatterns = replaces[
+      String(accent) as '0' | '1'
+    ] as StickingPattern[]
+    const chosenPattern = findBestPattern({
+      patterns: availablePatterns,
+      result,
+    })
 
     result.push(...(chosenPattern.split('') as Sticking[]))
   }
@@ -87,7 +93,9 @@ export function processPairs(
 
   for (let i = 0; i < pairCount; i++) {
     const pair = `${accentMap8[i * 2] || 0}${accentMap8[i * 2 + 1] || 0}`
-    const availablePatterns = replaces[pair as keyof typeof replaces] as StickingPattern[]
+    const availablePatterns = replaces[
+      pair as keyof typeof replaces
+    ] as StickingPattern[]
 
     const chosenPattern = options?.selectPattern
       ? options.selectPattern(availablePatterns, result)
