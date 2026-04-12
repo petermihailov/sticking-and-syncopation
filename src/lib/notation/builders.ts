@@ -1,16 +1,22 @@
 import type { Sticking } from '../../types'
-import type { NotationData, NoteEvent, NoteGroup, Voice } from '../../types/notation'
+import type {
+  NotationData,
+  NoteEvent,
+  NoteGroup,
+  Voice,
+} from '../../types/notation'
 import { collapseAccentPairs } from './accentCollapse'
 
 function stickingToNoteEvent(sticking: Sticking, index: number): NoteEvent {
   if (sticking === 'k') {
-    return { type: 'kick', accent: false, index }
+    return { type: 'kick', accent: false, ghost: false, index }
   }
   if (sticking === ' ') {
-    return { type: 'rest', accent: false, index }
+    return { type: 'rest', accent: false, ghost: false, index }
   }
   const accent = sticking === 'R' || sticking === 'L'
-  return { type: 'snare', accent, index }
+  // Все не-акцентные ноты на малом в play-нотации — ghost.
+  return { type: 'snare', accent, ghost: !accent, index }
 }
 
 function groupNotes(
@@ -82,6 +88,7 @@ export function buildAccentNotation(checkedItems: boolean[]): NotationData {
   const events: NoteEvent[] = checkedItems.map((checked, i) => ({
     type: checked ? 'snare' : 'rest',
     accent: false,
+    ghost: false,
     index: i,
   }))
 

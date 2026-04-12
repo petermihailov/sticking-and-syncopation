@@ -1,4 +1,4 @@
-import { StaveNote, Tuplet, Beam, Articulation } from 'vexflow'
+import { StaveNote, Tuplet, Beam, Articulation, Parenthesis } from 'vexflow'
 import type { Voice as VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
@@ -44,6 +44,9 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
 
       if (event.accent) {
         note.addModifier(new Articulation('a>'))
+      }
+      if (event.ghost) {
+        Parenthesis.buildAndAttach([note])
       }
 
       groupNotes.push(note)
