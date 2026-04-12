@@ -21,10 +21,10 @@ export function useRudimentNotation(
   accents: boolean[]
 ): RudimentNotation {
   const convertResult = useMemo<ConvertResult>(() => {
-    const accentArray: Accent[] = accents.map(checked => (checked ? 1 : 0))
-    const result = converters[rudiment].convert(accentArray)
+    const accentArray = accents.map((checked): Accent => (checked ? 1 : 0))
+    const { bar1, bar2 } = converters[rudiment].convert(accentArray)
     return {
-      bars: result.bar2 ? [result.bar1, result.bar2] : [result.bar1],
+      bars: bar2 ? [bar1, bar2] : [bar1],
     }
   }, [accents, rudiment])
 

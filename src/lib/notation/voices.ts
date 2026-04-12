@@ -1,4 +1,4 @@
-import { StaveNote, Tuplet, Beam, Articulation, Parenthesis } from 'vexflow'
+import { StaveNote, Tuplet, Articulation, Parenthesis } from 'vexflow'
 import type { Voice as VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 

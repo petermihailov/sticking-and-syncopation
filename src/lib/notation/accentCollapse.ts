@@ -1,4 +1,4 @@
-import type { NoteEvent, NoteGroup } from '../types/notation'
+import type { NoteEvent, NoteGroup } from '../../types/notation'
 
 /**
  * Collapses a sequence of 8th-note events into visually cleaner groups:

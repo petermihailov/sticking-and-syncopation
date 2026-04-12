@@ -4,19 +4,19 @@ import type { Voice } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
 function snare(index: number, accent = false) {
-  return { type: 'snare' as const, accent, index }
+  return { type: 'snare' as const, accent, ghost: false, index }
 }
 
 function kick(index: number) {
-  return { type: 'kick' as const, accent: false, index }
+  return { type: 'kick' as const, accent: false, ghost: false, index }
 }
 
 function footHH(index: number) {
-  return { type: 'footHH' as const, accent: false, index }
+  return { type: 'footHH' as const, accent: false, ghost: false, index }
 }
 
 function rest(index: number) {
-  return { type: 'rest' as const, accent: false, index }
+  return { type: 'rest' as const, accent: false, ghost: false, index }
 }
 
 describe('buildVoiceNotes', () => {

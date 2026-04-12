@@ -19,7 +19,7 @@ import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/
 type ConverterModule = {
   converterName: string
   pattern: string
-  convert: (...args: never[]) => unknown
+  convert: (accentMap8: import('../types').Accent[]) => import('./shared/config-types').ConvertResultBars
 }
 
 type NotationKind = 'sixteenth' | 'triplet' | 'sixteenthTriplet'
@@ -108,7 +108,7 @@ export type RudimentType = (typeof RUDIMENTS)[number]['id']
 
 export const converters = Object.fromEntries(
   RUDIMENTS.map(r => [r.id, r.module])
-) as Record<RudimentType, ConverterModule>
+) as unknown as Record<RudimentType, ConverterModule>
 
 const notationKindById = Object.fromEntries(
   RUDIMENTS.map(r => [r.id, r.notationKind])
