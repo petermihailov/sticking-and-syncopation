@@ -64,6 +64,19 @@
   width: 3.2rem;
   color: #007acc;
   white-space: nowrap;
+  display: inline-flex;
+}
+
+.patternChar {
+  position: relative;
+}
+
+.flamGrace {
+  position: absolute;
+  font-size: 0.6em;
+  inset-inline-end: 100%;
+  inset-block-end: 0.3rem;
+  line-height: 1;
 }
 
 .label {

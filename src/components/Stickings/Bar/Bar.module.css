@@ -13,6 +13,11 @@
   font-size: min(1rem, 3vw);
 }
 
+/* Режим выравнивания по нотам VexFlow — margin-left и width задаются inline */
+.labels.aligned {
+  margin-right: 0;
+}
+
 .label {
   position: relative;
   flex: 1;
@@ -74,13 +79,13 @@
 
 .flamPrefix {
   position: absolute;
-  display: grid;
+  text-align: end;
+  padding-inline-end: 0.1rem;
   place-content: center;
-  inline-size: 0.7rem;
+  inline-size: 0.8rem;
   font-size: 0.7em;
-  font-weight: normal;
-  inset-inline-start: calc(50% - 1rem);
-  inset-block-end: 0.3rem;
+  inset-inline-start: calc(50% - 1.2rem);
+  inset-block-end: 0rem;
   line-height: 1;
 }
 

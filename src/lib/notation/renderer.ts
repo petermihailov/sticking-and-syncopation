@@ -14,6 +14,14 @@ import { createStave, createProbeStave } from './stave'
 // Запас справа после последней ноты до правой барлайны
 const RIGHT_PADDING = 10
 
+/** X-позиции нот в SVG-координатах + общая ширина SVG */
+export interface NotePositions {
+  /** X-координата центра каждой ноты (индекс = noteIndex) */
+  xs: number[]
+  /** Полная ширина SVG (для перевода в проценты) */
+  svgWidth: number
+}
+
 interface BuiltVoices {
   vfVoices: Voice[]
   tuplets: Tuplet[]
@@ -66,6 +74,19 @@ function measureStaveOverhead(notation: NotationData): {
   return { leftOverhead, rightOverhead }
 }
 
+/** Собирает X-позиции нот после форматирования */
+function collectNotePositions(
+  indexedNotes: Array<{ note: StaveNote; index: number }>,
+  svgWidth: number
+): NotePositions {
+  const xs: number[] = []
+  for (const { note, index } of indexedNotes) {
+    // getAbsoluteX() — левый край нотной головки, добавляем половину ширины глифа
+    xs[index] = note.getAbsoluteX() + note.getGlyphWidth() / 2
+  }
+  return { xs, svgWidth }
+}
+
 // Считает минимальную ширину стана для нотации (без контекста рендера)
 export function measureNotationWidth(notation: NotationData): number {
   const { vfVoices } = buildVoices(notation)
@@ -82,7 +103,7 @@ export function renderNotation(
   x: number,
   y: number,
   width: number
-): void {
+): NotePositions {
   const stave = createStave(context, {
     x,
     y,
@@ -118,6 +139,8 @@ export function renderNotation(
     const el = note.getSVGElement?.() as SVGElement | undefined
     el?.setAttribute('data-note-index', String(index))
   }
+
+  return collectNotePositions(indexedNotes, width + x * 2)
 }
 
 /** Измеряет ширину и рендерит нотацию за один проход (один buildVoices). */
@@ -127,7 +150,7 @@ export function measureAndRender(
   x: number,
   y: number,
   widthScale: number
-): number {
+): { width: number; notePositions: NotePositions } {
   const { vfVoices, tuplets, beams, indexedNotes } = buildVoices(notation)
   const { leftOverhead, rightOverhead } = measureStaveOverhead(notation)
 
@@ -170,7 +193,8 @@ export function measureAndRender(
     el?.setAttribute('data-note-index', String(index))
   }
 
-  return width
+  const svgWidth = width + x * 2
+  return { width, notePositions: collectNotePositions(indexedNotes, svgWidth) }
 }
 
 export const STAVE_HEIGHT = 120

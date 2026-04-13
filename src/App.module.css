@@ -1,5 +1,21 @@
 /* App.module.css */
 
+.layerToggles {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: -1rem;
+  flex-wrap: wrap;
+}
+
+.layerToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  user-select: none;
+}
+
 .notesContainer {
   position: relative;
 }

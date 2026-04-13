@@ -9,7 +9,6 @@ export const CLICK_SOUNDS = [
   'classic',
   'cowbell',
   'digital',
-  'gentle',
   'percussive',
   'saw',
   'woodblock',

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Lessons } from './components/Lessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
@@ -19,11 +20,36 @@ import {
 } from './types/sticking'
 import classes from './App.module.css'
 
+interface LayerVisibility {
+  accents: boolean
+  seeNotation: boolean
+  playNotation: boolean
+  stickings: boolean
+}
+
+const LAYER_LABELS: Record<keyof LayerVisibility, string> = {
+  accents: 'Акценты',
+  seeNotation: 'Нотация',
+  playNotation: 'Нотация воспроизведения',
+  stickings: 'Стикинги',
+}
+
 function AppContent() {
   const { state, actions } = useAppState()
   const { currentBeat, instrumentCounters, isPlaying } = usePlayerControl()
 
-  const { convertResult, seeNotation, playNotation } = useNotation()
+  const [layers, setLayers] = useState<LayerVisibility>({
+    accents: true,
+    seeNotation: true,
+    playNotation: true,
+    stickings: true,
+  })
+
+  const toggleLayer = (key: keyof LayerVisibility) => {
+    setLayers(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const { convertResult, seeNotation, playNotation, meter } = useNotation()
 
   useGlobalShortcuts({ onReset: actions.resetToDefaults })
 
@@ -48,19 +74,37 @@ function AppContent() {
         onRudimentChange={actions.setRudiment}
       />
       <AudioPlayer />
+      <div className={classes.layerToggles}>
+        {(Object.keys(LAYER_LABELS) as (keyof LayerVisibility)[]).map(key => (
+          <label key={key} className={classes.layerToggle}>
+            <input
+              type="checkbox"
+              checked={layers[key]}
+              onChange={() => toggleLayer(key)}
+            />
+            {LAYER_LABELS[key]}
+          </label>
+        ))}
+      </div>
       <div className={classes.notesContainer}>
-        <AccentPattern
-          className={classes.checkboxes}
-          checkedItems={state.accents}
-          onToggle={actions.toggleAccent}
-        />
+        {layers.accents && (
+          <AccentPattern
+            className={classes.checkboxes}
+            checkedItems={state.accents}
+            onToggle={actions.toggleAccent}
+          />
+        )}
         <VexFlowNotation
           seeNotation={seeNotation}
           playNotation={playNotation}
           currentRhythmIndex={currentBeat.rhythmIndex}
           isPlaying={isPlaying}
+          notesPerBeat={meter.notesPerBeat}
+          showSeeNotation={layers.seeNotation}
+          showPlayNotation={layers.playNotation}
+          matchWidth
         >
-          {hasStickings && (
+          {hasStickings && layers.stickings && (
             <Stickings bars={convertResult.bars} flams={convertResult.flams} currentBeat={isPlaying ? currentBeat : undefined} />
           )}
         </VexFlowNotation>

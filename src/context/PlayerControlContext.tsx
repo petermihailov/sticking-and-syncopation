@@ -100,7 +100,7 @@ export function PlayerControlProvider({
     return stickingsToBars(validBars, instrumentMapping, meter, convertResult.flams)
   }, [bars, instrumentMapping, meter, convertResult.flams])
 
-  // Сборка состояния плеера — дешёвая, можно при любом изменении.
+  // Сборка состояния плеера — без громкости, она обновляется отдельно через setVolumes.
   const playerState = useMemo<PlayerState>(() => ({
     bars: computedBars,
     tempo,
@@ -114,8 +114,6 @@ export function PlayerControlProvider({
     computedBars,
     tempo,
     metronome,
-    metronomeVolume,
-    playbackVolume,
     instrumentMapping,
     drumKit,
   ])
@@ -123,6 +121,11 @@ export function PlayerControlProvider({
   useEffect(() => {
     playerRef.current?.applyState(playerState)
   }, [playerState])
+
+  // Громкость обновляем напрямую, минуя пересборку playerState.
+  useEffect(() => {
+    playerRef.current?.setVolumes(playbackVolume, metronomeVolume)
+  }, [playbackVolume, metronomeVolume])
 
   const play = useCallback(() => {
     if (playerRef.current && !isPlaying) {

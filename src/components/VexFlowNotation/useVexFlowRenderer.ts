@@ -1,10 +1,14 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Renderer } from 'vexflow'
 import type { NotationData } from '../../types/notation'
 import {
   measureAndRender,
+  renderNotation,
+  measureNotationWidth,
   STAVE_HEIGHT,
+  type NotePositions,
 } from '../../lib/notation'
+import { rhythmToAccentIndex } from '../../lib/notation/rhythmMapping'
 import classes from './VexFlowNotation.module.css'
 
 interface UseVexFlowRendererOptions {
@@ -14,6 +18,10 @@ interface UseVexFlowRendererOptions {
   // исходных стикингах и, следовательно, data-note-index в SVG.
   currentRhythmIndex?: number
   isPlaying?: boolean
+  /** Кол-во нот на долю в play-нотации (для маппинга на see-нотацию) */
+  notesPerBeat?: number
+  /** Выровнять ширину see и play станов по максимальной */
+  matchWidth?: boolean
 }
 
 const STAVE_X = 10
@@ -21,24 +29,33 @@ const STAVE_Y_PADDING = 30
 // Множитель к минимальной ширине стана, чтобы ноты не лепились друг к другу
 const WIDTH_SCALE = 1.5
 
-function renderToContainer(container: HTMLDivElement, notation: NotationData) {
+function renderToContainer(
+  container: HTMLDivElement,
+  notation: NotationData,
+  fixedWidth?: number
+): NotePositions {
   container.innerHTML = ''
 
-  // SVG создаётся с запасом, после рендера уточняем размер
-  const maxWidth = 2000
   const svgHeight = STAVE_HEIGHT + STAVE_Y_PADDING
   const renderer = new Renderer(container, Renderer.Backends.SVG)
-  renderer.resize(maxWidth, svgHeight)
-  const context = renderer.getContext()
 
-  const staveWidth = measureAndRender(
-    context,
-    notation,
-    STAVE_X,
-    STAVE_Y_PADDING,
-    WIDTH_SCALE
-  )
-  renderer.resize(staveWidth + STAVE_X * 2, svgHeight)
+  if (fixedWidth !== undefined) {
+    renderer.resize(fixedWidth + STAVE_X * 2, svgHeight)
+    const context = renderer.getContext()
+    return renderNotation(context, notation, STAVE_X, STAVE_Y_PADDING, fixedWidth)
+  } else {
+    renderer.resize(2000, svgHeight)
+    const context = renderer.getContext()
+    const { width, notePositions } = measureAndRender(
+      context,
+      notation,
+      STAVE_X,
+      STAVE_Y_PADDING,
+      WIDTH_SCALE
+    )
+    renderer.resize(width + STAVE_X * 2, svgHeight)
+    return notePositions
+  }
 }
 
 export function useVexFlowRenderer({
@@ -46,18 +63,31 @@ export function useVexFlowRenderer({
   playNotation,
   currentRhythmIndex,
   isPlaying,
+  notesPerBeat,
+  matchWidth = false,
 }: UseVexFlowRendererOptions) {
   const seeRef = useRef<HTMLDivElement>(null)
   const playRef = useRef<HTMLDivElement>(null)
+  const [playNotePositions, setPlayNotePositions] = useState<NotePositions | null>(null)
 
   useEffect(() => {
+    // При matchWidth измеряем обе ширины и берём максимум
+    const fixedWidth =
+      matchWidth && playNotation
+        ? Math.max(
+            Math.ceil(measureNotationWidth(seeNotation) * WIDTH_SCALE),
+            Math.ceil(measureNotationWidth(playNotation) * WIDTH_SCALE)
+          )
+        : undefined
+
     if (seeRef.current) {
-      renderToContainer(seeRef.current, seeNotation)
+      renderToContainer(seeRef.current, seeNotation, fixedWidth)
     }
     if (playRef.current && playNotation) {
-      renderToContainer(playRef.current, playNotation)
+      const positions = renderToContainer(playRef.current, playNotation, fixedWidth)
+      setPlayNotePositions(positions)
     }
-  }, [seeNotation, playNotation])
+  }, [seeNotation, playNotation, matchWidth])
 
   // Подсветка текущей ноты только в play-стане. Снимает класс со старой
   // ноты и вешает на новую без повторного рендера всей нотации.
@@ -76,5 +106,34 @@ export function useVexFlowRenderer({
     target?.classList.add(classes.currentNote)
   }, [currentRhythmIndex, isPlaying, playNotation])
 
-  return { seeRef, playRef }
+  // Подсветка текущей позиции в see-стане.
+  // rhythmIndex из play маппится на accentIndex через rhythmToAccentIndex.
+  // Из-за collapseAccentPairs в see-нотации может не быть элемента
+  // с точным accentIndex — ищем ближайший data-note-index ≤ target.
+  useEffect(() => {
+    const container = seeRef.current
+    if (!container) return
+
+    const prev = container.querySelectorAll(`.${classes.currentNote}`)
+    prev.forEach(el => el.classList.remove(classes.currentNote))
+
+    if (!isPlaying || currentRhythmIndex === undefined || !notesPerBeat) return
+
+    const accentIndex = rhythmToAccentIndex(currentRhythmIndex, notesPerBeat)
+    const allNotes = container.querySelectorAll('[data-note-index]')
+
+    let best: Element | null = null
+    let bestIndex = -1
+    for (const el of allNotes) {
+      const idx = Number(el.getAttribute('data-note-index'))
+      if (idx <= accentIndex && idx > bestIndex) {
+        bestIndex = idx
+        best = el
+      }
+    }
+
+    best?.classList.add(classes.currentNote)
+  }, [currentRhythmIndex, isPlaying, notesPerBeat, seeNotation])
+
+  return { seeRef, playRef, playNotePositions }
 }

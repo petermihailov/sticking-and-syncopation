@@ -59,6 +59,14 @@ export class Player {
 
   // === Public API ===
 
+  /**
+   * Обновить громкость без пересборки playerState.
+   * Мутируем this.state напрямую — следующий tick подхватит новые значения.
+   */
+  setVolumes(playbackVolume: number, metronomeVolume: number): void {
+    this.state = { ...this.state, playbackVolume, metronomeVolume }
+  }
+
   applyState(next: PlayerState): void {
     const prev = this.state
 

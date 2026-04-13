@@ -28,6 +28,6 @@
 /* Подсветка текущей ноты в play-стане во время воспроизведения */
 .currentNote,
 .currentNote * {
-  fill: #e53935 !important;
-  stroke: #e53935 !important;
+  fill: #ff003bff !important;
+  stroke: #ff003bff !important;
 }

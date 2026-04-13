@@ -4,7 +4,38 @@ import {
   getRudimentOptions,
   type RudimentType,
 } from '../../converters/registry'
+import { parseFlams } from '../../converters/shared/converter-utils'
 import classes from './RudimentSelector.module.css'
+
+/** Рисует паттерн с визуальными флэмами (грейснот — маленькая буква противоположной руки) */
+function PatternDisplay({ pattern }: { pattern: string }) {
+  const { stickings, flams } = parseFlams(pattern)
+
+  return (
+    <span className={classes.pattern}>
+      {stickings.map((s, i) => {
+        const lower = s.toLowerCase()
+        const flamLabel =
+          flams[i] && lower !== ' '
+            ? lower === 'r'
+              ? 'L'
+              : lower === 'l'
+                ? 'R'
+                : null
+            : null
+
+        return (
+          <span key={i} className={classes.patternChar}>
+            {flamLabel && (
+              <span className={classes.flamGrace}>{flamLabel}</span>
+            )}
+            {s}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
 
 interface RudimentSelectorProps {
   selectedRudiment: RudimentType
@@ -123,7 +154,7 @@ export function RudimentSelector({
             <optgroup key={group.groupName} label={group.groupName}>
               {group.options.map(option => (
                 <option key={option.value} value={option.value}>
-                  {option.pattern} · {option.label}
+                  {option.pattern.replace(/'/g, '')} · {option.label}
                 </option>
               ))}
             </optgroup>
@@ -143,7 +174,7 @@ export function RudimentSelector({
           aria-label="Select rudiment"
         >
           <div className={classes.selectedOption}>
-            <span className={classes.pattern}>{selectedOption?.pattern}</span>
+            {selectedOption && <PatternDisplay pattern={selectedOption.pattern} />}
             <span className={classes.label}>{selectedOption?.label}</span>
           </div>
           <span className={classes.arrow}>▼</span>
@@ -180,7 +211,7 @@ export function RudimentSelector({
                       aria-selected={option.value === selectedRudiment}
                       tabIndex={focusedIndex === flatIndex ? 0 : -1}
                     >
-                      <span className={classes.pattern}>{option.pattern}</span>
+                      <PatternDisplay pattern={option.pattern} />
                       <span className={classes.label}>{option.label}</span>
                     </button>
                   )
