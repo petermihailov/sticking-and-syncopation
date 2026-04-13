@@ -1,5 +1,11 @@
 /* App.module.css */
 
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .layerToggles {
   display: flex;
   gap: 1rem;

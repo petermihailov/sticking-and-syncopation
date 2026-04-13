@@ -1,5 +1,6 @@
 /* Mobile select (hidden on desktop) */
 .mobileSelect {
+  flex: 1;
   display: block;
 }
 
@@ -22,6 +23,7 @@
 
 /* Custom dropdown (hidden on mobile) */
 .customDropdown {
+  flex: 1;
   display: none;
   position: relative;
   min-width: 250px;

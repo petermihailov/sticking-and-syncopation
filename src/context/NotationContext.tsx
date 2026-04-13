@@ -9,7 +9,7 @@ interface NotationProviderProps {
 
 export function NotationProvider({ children }: NotationProviderProps) {
   const { state } = useAppState()
-  const value = useRudimentNotation(state.rudiment, state.accents)
+  const value = useRudimentNotation(state.rudiment, state.accents, state.leadingHand)
 
   return (
     <NotationContext.Provider value={value}>

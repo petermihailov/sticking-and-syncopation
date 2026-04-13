@@ -3,6 +3,9 @@ import { TEMPO } from '../config/constants'
 import type { StickingMapping } from './sticking'
 import { DEFAULT_STICKING_MAPPING } from './sticking'
 
+/** Ведущая рука */
+export type LeadingHand = 'R' | 'L'
+
 /** Доступные наборы звуков метронома (соответствуют файлам в public/sounds/clicks/) */
 export const CLICK_SOUNDS = [
   'blip',
@@ -36,6 +39,8 @@ export interface AppState {
   metronomeSound: ClickSound
   /** Instrument mapping for stickings */
   instrumentMapping: StickingMapping
+  /** Ведущая рука (R — правая, L — левая) */
+  leadingHand: LeadingHand
 }
 
 /**
@@ -50,4 +55,5 @@ export const DEFAULT_APP_STATE: AppState = {
   playbackVolume: 1.0,
   metronomeSound: 'blip',
   instrumentMapping: DEFAULT_STICKING_MAPPING,
+  leadingHand: 'R',
 }

@@ -39,6 +39,10 @@ export function useStatePersistence(state: AppState): void {
     LocalStorageManager.setItem('instrumentMapping', state.instrumentMapping)
   }, [state.instrumentMapping])
 
+  useEffect(() => {
+    LocalStorageManager.setItem('leadingHand', state.leadingHand)
+  }, [state.leadingHand])
+
   // Синхронизация URL без перезагрузки страницы
   useEffect(() => {
     const queryString = encodeStateToUrl(state)

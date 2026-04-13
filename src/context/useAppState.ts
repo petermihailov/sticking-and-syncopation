@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 import type { RudimentType } from '../converters/registry'
-import type { ClickSound } from '../types/appState'
+import type { ClickSound, LeadingHand } from '../types/appState'
 import type { StickingMapping } from '../types/sticking'
 
 export interface AppStateContextValue {
@@ -15,6 +15,7 @@ export interface AppStateContextValue {
     setPlaybackVolume: (volume: number) => void
     setMetronomeSound: (sound: ClickSound) => void
     setInstrumentMapping: (mapping: StickingMapping) => void
+    setLeadingHand: (hand: LeadingHand) => void
     resetAccents: () => void
     resetToDefaults: () => void
   }

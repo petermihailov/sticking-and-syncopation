@@ -4,7 +4,9 @@ import {
   getRudimentOptions,
   type RudimentType,
 } from '../../converters/registry'
+import type { LeadingHand } from '../../types/appState'
 import { parseFlams } from '../../converters/shared/converter-utils'
+import { mirrorSticking } from '../../utils/mirrorSticking'
 import classes from './RudimentSelector.module.css'
 
 /** Рисует паттерн с визуальными флэмами (грейснот — маленькая буква противоположной руки) */
@@ -40,6 +42,7 @@ function PatternDisplay({ pattern }: { pattern: string }) {
 interface RudimentSelectorProps {
   selectedRudiment: RudimentType
   onRudimentChange: (rudiment: RudimentType) => void
+  leadingHand: LeadingHand
 }
 
 const rudimentGroups = getRudimentGroups()
@@ -48,7 +51,9 @@ const rudimentOptions = getRudimentOptions()
 export function RudimentSelector({
   selectedRudiment,
   onRudimentChange,
+  leadingHand,
 }: RudimentSelectorProps) {
+  const mirror = leadingHand === 'L'
   const [isOpen, setIsOpen] = useState(false)
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -154,7 +159,7 @@ export function RudimentSelector({
             <optgroup key={group.groupName} label={group.groupName}>
               {group.options.map(option => (
                 <option key={option.value} value={option.value}>
-                  {option.pattern.replace(/'/g, '')} · {option.label}
+                  {(mirror ? mirrorSticking(option.pattern) : option.pattern).replace(/'/g, '')} · {option.label}
                 </option>
               ))}
             </optgroup>
@@ -174,7 +179,7 @@ export function RudimentSelector({
           aria-label="Select rudiment"
         >
           <div className={classes.selectedOption}>
-            {selectedOption && <PatternDisplay pattern={selectedOption.pattern} />}
+            {selectedOption && <PatternDisplay pattern={mirror ? mirrorSticking(selectedOption.pattern) : selectedOption.pattern} />}
             <span className={classes.label}>{selectedOption?.label}</span>
           </div>
           <span className={classes.arrow}>▼</span>
@@ -211,7 +216,7 @@ export function RudimentSelector({
                       aria-selected={option.value === selectedRudiment}
                       tabIndex={focusedIndex === flatIndex ? 0 : -1}
                     >
-                      <PatternDisplay pattern={option.pattern} />
+                      <PatternDisplay pattern={mirror ? mirrorSticking(option.pattern) : option.pattern} />
                       <span className={classes.label}>{option.label}</span>
                     </button>
                   )

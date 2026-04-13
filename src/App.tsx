@@ -6,6 +6,7 @@ import { VexFlowNotation } from './components/VexFlowNotation'
 import { Stickings } from './components/Stickings'
 import { AudioPlayer } from './components/AudioPlayer'
 import { OrchestrationSection } from './components/OrchestrationSection'
+import { LeadingHandToggle } from './components/LeadingHandToggle'
 import { AppLayout } from './components/Layout/AppLayout'
 import { AppStateProvider } from './context/AppStateContext'
 import { PlayerControlProvider } from './context/PlayerControlContext'
@@ -69,10 +70,17 @@ function AppContent() {
 
   return (
     <AppLayout sidebar={<Lessons />}>
-      <RudimentSelector
-        selectedRudiment={state.rudiment}
-        onRudimentChange={actions.setRudiment}
-      />
+      <div className={classes.topRow}>
+        <RudimentSelector
+          selectedRudiment={state.rudiment}
+          onRudimentChange={actions.setRudiment}
+          leadingHand={state.leadingHand}
+        />
+        <LeadingHandToggle
+          value={state.leadingHand}
+          onChange={actions.setLeadingHand}
+        />
+      </div>
       <AudioPlayer />
       <div className={classes.layerToggles}>
         {(Object.keys(LAYER_LABELS) as (keyof LayerVisibility)[]).map(key => (

@@ -1,7 +1,7 @@
 import { useState, useMemo, type FC, type ReactNode } from 'react'
 import type { RudimentType } from '../converters/registry'
 import type { StickingMapping } from '../types/sticking'
-import type { AppState, ClickSound } from '../types/appState'
+import type { AppState, ClickSound, LeadingHand } from '../types/appState'
 import { DEFAULT_APP_STATE, CLICK_SOUNDS } from '../types/appState'
 import { LocalStorageManager } from '../utils/localStorage'
 import { encodeStateToUrl, decodeStateFromUrl } from '../utils/urlState'
@@ -28,6 +28,8 @@ function loadInitialState(): AppState {
     savedMetronomeSound && (CLICK_SOUNDS as readonly string[]).includes(savedMetronomeSound)
       ? (savedMetronomeSound as ClickSound)
       : DEFAULT_APP_STATE.metronomeSound
+  const savedLeadingHand =
+    LocalStorageManager.getItem<LeadingHand>('leadingHand')
   const savedMapping = LocalStorageManager.getItem<unknown>('instrumentMapping')
 
   const migratedMapping = savedMapping
@@ -47,6 +49,7 @@ function loadInitialState(): AppState {
     playbackVolume: savedPlaybackVolume ?? DEFAULT_APP_STATE.playbackVolume,
     metronomeSound: validMetronomeSound,
     instrumentMapping: finalMapping,
+    leadingHand: savedLeadingHand ?? DEFAULT_APP_STATE.leadingHand,
   }
 }
 
@@ -99,6 +102,10 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, instrumentMapping }))
   }
 
+  const setLeadingHand = (leadingHand: LeadingHand) => {
+    setState(prev => ({ ...prev, leadingHand }))
+  }
+
   const resetAccents = () => {
     setState(prev => ({ ...prev, accents: DEFAULT_APP_STATE.accents }))
   }
@@ -125,6 +132,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({ children }) => {
       setPlaybackVolume,
       setMetronomeSound,
       setInstrumentMapping,
+      setLeadingHand,
       resetAccents,
       resetToDefaults,
     },
