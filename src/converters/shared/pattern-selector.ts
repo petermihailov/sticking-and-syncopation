@@ -9,9 +9,9 @@ type FindBestPatternArgs = {
 export function findBestPattern({
   result,
   patterns,
-}: FindBestPatternArgs): StickingPattern {
+}: FindBestPatternArgs): StickingPattern | FlamPattern {
   let bestScore = 0
-  let bestPattern = patterns[0]
+  let bestPattern: StickingPattern | FlamPattern = patterns[0]
 
   for (let i = 0; i < patterns.length; i++) {
     const score = evaluatePatternQuality(result, patterns[i])

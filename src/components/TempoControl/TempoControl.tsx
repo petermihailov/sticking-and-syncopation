@@ -10,7 +10,7 @@ export function TempoControl({ tempo, onChange }: TempoControlProps) {
   return (
     <div className={classes.container}>
       <label htmlFor="tempo-slider" className={classes.label}>
-        Tempo: {tempo} BPM
+        <span className={classes.bpm}>{tempo}</span> bpm
       </label>
       <input
         id="tempo-slider"
@@ -19,7 +19,7 @@ export function TempoControl({ tempo, onChange }: TempoControlProps) {
         max={TEMPO.MAX}
         value={tempo}
         onChange={e => onChange(Number(e.target.value))}
-        className={classes.slider}
+        className={`${classes.slider} customSlider`}
       />
     </div>
   )

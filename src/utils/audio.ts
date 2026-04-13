@@ -1,5 +1,6 @@
 import type { Instrument } from '../types/instrument'
 import type { DrumKit } from '../types/kit'
+import type { ClickSound } from '../types/appState'
 
 // Singleton AudioContext instance
 let audioContext: AudioContext | null = null
@@ -103,6 +104,25 @@ export async function createDrumKit(
   console.log(`DrumKit loaded: ${loadedCount}/${instruments.length} sounds`)
 
   return kit
+}
+
+/**
+ * Загрузить клик-пак метронома и подставить буферы в DrumKit
+ * как fxMetronomeAccent (accents) и fxMetronomeRegular (quarter).
+ */
+export async function loadClickPack(
+  kit: DrumKit,
+  sound: ClickSound,
+  basePath: string = '/sticking-and-syncopation/sounds/',
+  extension: string = 'mp3'
+): Promise<void> {
+  const clickPath = `${basePath}clicks/`
+  const [accent, quarter] = await Promise.all([
+    loadSound(`${clickPath}${sound}-accents.${extension}`),
+    loadSound(`${clickPath}${sound}-quarter.${extension}`),
+  ])
+  kit['fxMetronomeAccent'] = accent
+  kit['fxMetronomeRegular'] = quarter
 }
 
 /**

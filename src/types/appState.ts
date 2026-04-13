@@ -3,6 +3,20 @@ import { TEMPO } from '../config/constants'
 import type { StickingMapping } from './sticking'
 import { DEFAULT_STICKING_MAPPING } from './sticking'
 
+/** Доступные наборы звуков метронома (соответствуют файлам в public/sounds/clicks/) */
+export const CLICK_SOUNDS = [
+  'blip',
+  'classic',
+  'cowbell',
+  'digital',
+  'gentle',
+  'percussive',
+  'saw',
+  'woodblock',
+] as const
+
+export type ClickSound = (typeof CLICK_SOUNDS)[number]
+
 /**
  * Application state that can be shared via URL and persisted in localStorage
  */
@@ -17,6 +31,10 @@ export interface AppState {
   metronome: boolean
   /** Metronome volume (0.0 - 1.0), stored in localStorage only */
   metronomeVolume: number
+  /** Громкость воспроизведения инструментов (0.0 - 1.0) */
+  playbackVolume: number
+  /** Набор звуков метронома */
+  metronomeSound: ClickSound
   /** Instrument mapping for stickings */
   instrumentMapping: StickingMapping
 }
@@ -30,5 +48,7 @@ export const DEFAULT_APP_STATE: AppState = {
   tempo: TEMPO.DEFAULT,
   metronome: false,
   metronomeVolume: 1.0,
+  playbackVolume: 1.0,
+  metronomeSound: 'blip',
   instrumentMapping: DEFAULT_STICKING_MAPPING,
 }

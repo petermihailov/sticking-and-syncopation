@@ -17,13 +17,17 @@ export function AudioPlayer() {
       isPlaying={isPlaying}
       isDisabled={!drumKit || !hasPattern}
       tempo={state.tempo}
+      playbackVolume={state.playbackVolume}
       metronome={state.metronome}
       metronomeVolume={state.metronomeVolume}
+      metronomeSound={state.metronomeSound}
       hasPattern={hasPattern}
       onToggle={toggle}
       onTempoChange={actions.setTempo}
+      onPlaybackVolumeChange={actions.setPlaybackVolume}
       onMetronomeToggle={() => actions.setMetronome(!state.metronome)}
       onMetronomeVolumeChange={actions.setMetronomeVolume}
+      onMetronomeSoundChange={actions.setMetronomeSound}
     />
   )
 }

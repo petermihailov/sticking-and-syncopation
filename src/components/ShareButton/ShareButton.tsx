@@ -1,16 +1,14 @@
-import { useState, type FC, type CSSProperties } from 'react'
+import { useState, type FC, type CSSProperties, type ReactNode } from 'react'
 import { useAppState } from '../../context/useAppState'
 import { Toast } from '../Toast'
 
 interface ShareButtonProps {
   className?: string
   style?: CSSProperties
+  children?: ReactNode
 }
 
-/**
- * Button to copy shareable URL to clipboard
- */
-export const ShareButton: FC<ShareButtonProps> = ({ className, style }) => {
+export const ShareButton: FC<ShareButtonProps> = ({ className, style, children }) => {
   const { shareUrl } = useAppState()
   const [showToast, setShowToast] = useState(false)
   const [error, setError] = useState(false)
@@ -30,7 +28,7 @@ export const ShareButton: FC<ShareButtonProps> = ({ className, style }) => {
   return (
     <>
       <button onClick={handleShare} className={className} style={style}>
-        🔗 Share
+        {children ?? '🔗 Share'}
       </button>
       {showToast && (
         <Toast

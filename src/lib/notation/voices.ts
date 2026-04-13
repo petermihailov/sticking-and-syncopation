@@ -1,6 +1,7 @@
 import {
   StaveNote,
   StaveTie,
+  Stem,
   Tuplet,
   Articulation,
   Parenthesis,
@@ -11,7 +12,7 @@ import {
 
 // Уменьшаем размер grace notes (флэмов)
 MetricsDefaults.GraceNote = { ...MetricsDefaults.GraceNote, fontScale: 0.6 }
-import type { NoteEvent, VoiceData } from '../../types/notation'
+import type { NoteEvent, PlayableType, VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
 export interface IndexedNote {
@@ -19,11 +20,11 @@ export interface IndexedNote {
   readonly index: number
 }
 
-const NOTE_KEY_MAP = {
+const NOTE_KEY_MAP: Record<PlayableType, string> = {
   kick: KICK_KEY,
   footHH: FOOT_HH_KEY,
   snare: SNARE_KEY,
-} as const
+}
 
 function createRestNote(duration: string): StaveNote {
   const restKey = duration === '1' ? 'd/5' : 'b/4'
@@ -31,12 +32,12 @@ function createRestNote(duration: string): StaveNote {
 }
 
 function createPlayNote(
-  event: NoteEvent,
+  event: NoteEvent & { readonly type: PlayableType },
   duration: string,
   stemDir: number
 ): StaveNote {
   const note = new StaveNote({
-    keys: [NOTE_KEY_MAP[event.type as keyof typeof NOTE_KEY_MAP]],
+    keys: [NOTE_KEY_MAP[event.type]],
     duration,
     stemDirection: stemDir,
   })
@@ -94,7 +95,7 @@ function applyFlamModifier(note: StaveNote): void {
 }
 
 export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
-  const stemDir = voiceData.stem === 'up' ? 1 : -1
+  const stemDir = voiceData.stem === 'up' ? Stem.UP : Stem.DOWN
   const notes: StaveNote[] = []
   const beamGroups: StaveNote[][] = []
   const tuplets: Tuplet[] = []
@@ -114,7 +115,7 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
         continue
       }
 
-      const note = createPlayNote(event, effectiveDuration, stemDir)
+      const note = createPlayNote(event as NoteEvent & { readonly type: PlayableType }, effectiveDuration, stemDir)
       groupNotes.push(note)
       notes.push(note)
       groupBeamable.push(note)

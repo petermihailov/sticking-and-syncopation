@@ -1,5 +1,135 @@
 .container {
   display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+/* Левая колонка: кнопки и настройки */
+.controls {
+  display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.playbackRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Правая колонка: вертикальные фейдеры */
+.faders {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.fader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.faderLabel {
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Вертикальный слайдер в стиле DAW-фейдера */
+.verticalSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 4px;
+  height: 100%;
+  min-height: 60px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.verticalSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  background: #4a90d9;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.verticalSlider::-webkit-slider-thumb:hover {
+  background: #3a7bc8;
+}
+
+.verticalSlider::-moz-range-thumb {
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  background: #4a90d9;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.verticalSlider::-moz-range-track {
+  width: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+}
+
+/* Общие стили для горизонтальных кастомных слайдеров */
+:global(.customSlider) {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+:global(.customSlider)::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a90d9;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s;
+}
+
+:global(.customSlider)::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+:global(.customSlider)::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a90d9;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+:global(.customSlider)::-moz-range-track {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
 }

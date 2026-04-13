@@ -17,19 +17,19 @@ const expectations = [
   'rlRlrlrlrlrl', // Паттерн [0,1,0,0,0,0,0,0]
 ]
 
-// Ожидаемые флэмы (true = перед нотой играется флэм)
-const flamExpectations = [
-  'ffffffffffff', // Все нули — нет флэмов
-  'FFFFFFFFFF FF', // Все единицы: 'Rl'R 'Lr'L ...
-  'FffFffFffFff', // Чередование с 1: 'Rlr lrl → F..f..
-  'ffFfffffFfff', // Чередование с 0
-  'FfFfffFfFfff', // Парные единицы
-  'fffFfFfffFfF', // Парные нули
-  'Ffffffffffff', // Паттерн [1,0,0,0,0,0,0,0]
-  'FfffffFffFff', // Паттерн [1,0,0,0,1,0,1,0]
-  'FffffFFffffF', // Паттерн [1,0,0,1,1,0,0,1]
-  'ffFfffffffff', // Паттерн [0,1,0,0,0,0,0,0]
-]
+// TODO: ожидаемые флэмы — будут использованы в тестах флэм-проверки
+// const flamExpectations = [
+//   'ffffffffffff', // Все нули — нет флэмов
+//   'FFFFFFFFFF FF', // Все единицы: 'Rl'R 'Lr'L ...
+//   'FffFffFffFff', // Чередование с 1: 'Rlr lrl → F..f..
+//   'ffFfffffFfff', // Чередование с 0
+//   'FfFfffFfFfff', // Парные единицы
+//   'fffFfFfffFfF', // Парные нули
+//   'Ffffffffffff', // Паттерн [1,0,0,0,0,0,0,0]
+//   'FfffffFffFff', // Паттерн [1,0,0,0,1,0,1,0]
+//   'FffffFFffffF', // Паттерн [1,0,0,1,1,0,0,1]
+//   'ffFfffffffff', // Паттерн [0,1,0,0,0,0,0,0]
+// ]
 
 function flamsToString(flams: boolean[]): string {
   return flams.map(f => (f ? 'F' : 'f')).join('')

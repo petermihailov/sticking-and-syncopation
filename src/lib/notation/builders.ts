@@ -11,12 +11,15 @@ interface RhythmConfig {
   baseDuration: '4' | '8' | '16'
   groupSize: number
   tuplet?: { actual: number; normal: number }
+  /** Не-акцентные snare автоматически становятся ghost (по умолчанию true) */
+  autoGhost?: boolean
 }
 
 function stickingToNoteEvent(
   sticking: Sticking,
   index: number,
-  flam = false
+  flam = false,
+  autoGhost = true
 ): NoteEvent {
   if (sticking === 'k') {
     return { type: 'kick', accent: false, ghost: false, flam: false, index }
@@ -25,8 +28,8 @@ function stickingToNoteEvent(
     return { type: 'rest', accent: false, ghost: false, flam: false, index }
   }
   const accent = sticking === 'R' || sticking === 'L'
-  // Все не-акцентные ноты на малом в play-нотации — ghost.
-  return { type: 'snare', accent, ghost: !accent, flam, index }
+  const ghost = autoGhost && !accent
+  return { type: 'snare', accent, ghost, flam, index }
 }
 
 function groupNotes(
@@ -47,7 +50,10 @@ function buildNotation(
   config: RhythmConfig,
   flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
+  const autoGhost = config.autoGhost ?? true
+  const events = stickings.map((s, i) =>
+    stickingToNoteEvent(s, i, flams?.[i], autoGhost)
+  )
   const snareVoice: VoiceData = {
     groups: groupNotes(events, config.groupSize, config.tuplet),
     stem: 'up',

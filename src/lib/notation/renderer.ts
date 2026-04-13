@@ -28,8 +28,7 @@ function buildVoices(notation: NotationData): BuiltVoices {
   const allIndexedNotes: Array<{ note: StaveNote; index: number }> = []
 
   for (const voiceData of notation.voices) {
-    const duration = voiceData.duration ?? notation.baseDuration
-    const result = buildVoiceNotes(voiceData, duration)
+    const result = buildVoiceNotes(voiceData, notation.baseDuration)
 
     const { top, bottom } = notation.timeSignature
     const voice = new Voice({ numBeats: top, beatValue: bottom })
@@ -119,6 +118,59 @@ export function renderNotation(
     const el = note.getSVGElement?.() as SVGElement | undefined
     el?.setAttribute('data-note-index', String(index))
   }
+}
+
+/** Измеряет ширину и рендерит нотацию за один проход (один buildVoices). */
+export function measureAndRender(
+  context: RenderContext,
+  notation: NotationData,
+  x: number,
+  y: number,
+  widthScale: number
+): number {
+  const { vfVoices, tuplets, beams, indexedNotes } = buildVoices(notation)
+  const { leftOverhead, rightOverhead } = measureStaveOverhead(notation)
+
+  const formatter = new Formatter().joinVoices(vfVoices)
+  const minNotesWidth = formatter.preCalculateMinTotalWidth(vfVoices)
+  const measuredWidth = Math.ceil(
+    leftOverhead + minNotesWidth + RIGHT_PADDING + rightOverhead
+  )
+  const width = Math.ceil(measuredWidth * widthScale)
+
+  const stave = createStave(context, {
+    x,
+    y,
+    width,
+    timeSignature: notation.timeSignature,
+    repeat: notation.repeat,
+  })
+
+  formatter.formatToStave(vfVoices, stave)
+
+  for (const voice of vfVoices) {
+    const tickables = voice.getTickables()
+    if (tickables.length === 1) {
+      const note = tickables[0]
+      note.setXShift((stave.getNoteEndX() - stave.getNoteStartX()) / 2)
+    }
+    voice.draw(context, stave)
+  }
+
+  for (const tuplet of tuplets) {
+    tuplet.setContext(context).draw()
+  }
+
+  for (const beam of beams) {
+    beam.setContext(context).draw()
+  }
+
+  for (const { note, index } of indexedNotes) {
+    const el = note.getSVGElement?.() as SVGElement | undefined
+    el?.setAttribute('data-note-index', String(index))
+  }
+
+  return width
 }
 
 export const STAVE_HEIGHT = 120

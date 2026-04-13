@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react'
 import { Renderer } from 'vexflow'
 import type { NotationData } from '../../types/notation'
 import {
-  renderNotation,
+  measureAndRender,
   STAVE_HEIGHT,
-  measureNotationWidth,
 } from '../../lib/notation'
 import classes from './VexFlowNotation.module.css'
 
@@ -22,22 +21,24 @@ const STAVE_Y_PADDING = 30
 // Множитель к минимальной ширине стана, чтобы ноты не лепились друг к другу
 const WIDTH_SCALE = 1.5
 
-function renderToContainer(
-  container: HTMLDivElement,
-  notation: NotationData,
-  staveWidth: number
-) {
+function renderToContainer(container: HTMLDivElement, notation: NotationData) {
   container.innerHTML = ''
 
-  const totalWidth = staveWidth + STAVE_X * 2
-  const staveHeight = STAVE_HEIGHT
-  const svgHeight = staveHeight + STAVE_Y_PADDING
-
+  // SVG создаётся с запасом, после рендера уточняем размер
+  const maxWidth = 2000
+  const svgHeight = STAVE_HEIGHT + STAVE_Y_PADDING
   const renderer = new Renderer(container, Renderer.Backends.SVG)
-  renderer.resize(totalWidth, svgHeight)
+  renderer.resize(maxWidth, svgHeight)
   const context = renderer.getContext()
 
-  renderNotation(context, notation, STAVE_X, STAVE_Y_PADDING, staveWidth)
+  const staveWidth = measureAndRender(
+    context,
+    notation,
+    STAVE_X,
+    STAVE_Y_PADDING,
+    WIDTH_SCALE
+  )
+  renderer.resize(staveWidth + STAVE_X * 2, svgHeight)
 }
 
 export function useVexFlowRenderer({
@@ -50,14 +51,11 @@ export function useVexFlowRenderer({
   const playRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Каждый стан рендерится по своей ширине (минимальная × WIDTH_SCALE)
     if (seeRef.current) {
-      const w = Math.ceil(measureNotationWidth(seeNotation) * WIDTH_SCALE)
-      renderToContainer(seeRef.current, seeNotation, w)
+      renderToContainer(seeRef.current, seeNotation)
     }
     if (playRef.current && playNotation) {
-      const w = Math.ceil(measureNotationWidth(playNotation) * WIDTH_SCALE)
-      renderToContainer(playRef.current, playNotation, w)
+      renderToContainer(playRef.current, playNotation)
     }
   }, [seeNotation, playNotation])
 

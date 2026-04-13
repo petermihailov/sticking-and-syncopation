@@ -1,5 +1,7 @@
+export type PlayableType = 'snare' | 'kick' | 'footHH'
+
 export interface NoteEvent {
-  readonly type: 'snare' | 'kick' | 'footHH' | 'rest'
+  readonly type: PlayableType | 'rest'
   readonly accent: boolean
   readonly ghost: boolean
   readonly flam: boolean
@@ -15,7 +17,6 @@ export interface NoteGroup {
 export interface VoiceData {
   readonly groups: readonly NoteGroup[]
   readonly stem: 'up' | 'down'
-  readonly duration?: '4' | '8' | '16'
 }
 
 export interface NotationData {

@@ -15,18 +15,19 @@ export function PlayerControls({
   hasPattern,
 }: PlayerControlsProps) {
   return (
-    <div className={classes.container}>
+    <>
       <button
         onClick={onToggle}
         disabled={isDisabled}
-        className={classes.button}
+        className={classes.playButton}
+        aria-label={isPlaying ? 'Stop' : 'Play'}
       >
-        {isPlaying ? '⏹ Stop' : '▶ Play'}
+        {isPlaying ? <span className={classes.stopIcon} /> : '▶'}
       </button>
-      <ShareButton />
+      <ShareButton className={classes.shareButton}>🔗</ShareButton>
       {!hasPattern && (
-        <div className={classes.noPattern}>(No pattern to play)</div>
+        <span className={classes.noPattern}>Нет паттерна</span>
       )}
-    </div>
+    </>
   )
 }

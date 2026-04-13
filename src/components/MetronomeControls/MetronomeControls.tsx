@@ -1,50 +1,44 @@
+import { CLICK_SOUNDS, type ClickSound } from '../../types/appState'
 import classes from './MetronomeControls.module.css'
 
 interface MetronomeControlsProps {
   enabled: boolean
-  volume: number
+  sound: ClickSound
   onToggle: () => void
-  onVolumeChange: (volume: number) => void
+  onSoundChange: (sound: ClickSound) => void
 }
 
 export function MetronomeControls({
   enabled,
-  volume,
+  sound,
   onToggle,
-  onVolumeChange,
+  onSoundChange,
 }: MetronomeControlsProps) {
   return (
     <div className={classes.container}>
-      {/* Metronome toggle */}
-      <div className={classes.toggleContainer}>
+      <div className={classes.headerRow}>
         <label className={classes.toggleLabel}>
           <input
             type="checkbox"
             checked={enabled}
             onChange={onToggle}
-            className={classes.checkbox}
+            className={classes.toggleInput}
           />
+          <span className={classes.toggleSwitch} />
           Metronome
         </label>
-      </div>
 
-      {/* Metronome volume */}
-      <div className={classes.volumeContainer}>
-        <label
-          htmlFor="metronome-volume-slider"
-          className={classes.volumeLabel}
+        <select
+          value={sound}
+          onChange={e => onSoundChange(e.target.value as ClickSound)}
+          className={classes.soundSelect}
         >
-          Metronome: {Math.round(volume * 100)}%
-        </label>
-        <input
-          id="metronome-volume-slider"
-          type="range"
-          min="0"
-          max="100"
-          value={volume * 100}
-          onChange={e => onVolumeChange(Number(e.target.value) / 100)}
-          className={classes.slider}
-        />
+          {CLICK_SOUNDS.map(s => (
+            <option key={s} value={s}>
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   )

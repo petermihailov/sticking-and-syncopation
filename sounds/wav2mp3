@@ -8,12 +8,26 @@ rm -rf $sounds && mkdir $sounds
 if command -v ffmpeg &> /dev/null; then
   FFMPEG=ffmpeg
   echo "Using system ffmpeg for conversion..."
+elif [ -x "$dir/ffmpeg" ]; then
+  FFMPEG="$dir/ffmpeg"
+  echo "Using local ffmpeg for conversion..."
 
   for filename in $dir/wav/*.wav; do
     $FFMPEG -i $filename -vn -ar 44100 -ac 2 -b:a 128k $sounds/$(basename $filename .wav).mp3 2>/dev/null
+  done
+
+  # Конвертация кликов метронома
+  mkdir -p $sounds/clicks
+  for filename in $dir/clicks/*.wav; do
+    # Приводим имя к lowercase: Classic-accents.wav → classic-accents.mp3
+    base=$(basename $filename .wav)
+    lower=$(echo $base | tr '[:upper:]' '[:lower:]')
+    $FFMPEG -i $filename -vn -ar 44100 -ac 2 -b:a 128k $sounds/clicks/$lower.mp3 2>/dev/null
   done
 else
   echo "Warning: ffmpeg not found, copying WAV files instead of converting to MP3"
   echo "For production builds, install ffmpeg: brew install ffmpeg (macOS) or apt-get install ffmpeg (Ubuntu)"
   cp $dir/wav/*.wav $sounds/
+  mkdir -p $sounds/clicks
+  cp $dir/clicks/*.wav $sounds/clicks/
 fi

@@ -28,6 +28,14 @@ export function useStatePersistence(state: AppState): void {
   }, [state.metronomeVolume])
 
   useEffect(() => {
+    LocalStorageManager.setItem('playbackVolume', state.playbackVolume)
+  }, [state.playbackVolume])
+
+  useEffect(() => {
+    LocalStorageManager.setItem('metronomeSound', state.metronomeSound)
+  }, [state.metronomeSound])
+
+  useEffect(() => {
     LocalStorageManager.setItem('instrumentMapping', state.instrumentMapping)
   }, [state.instrumentMapping])
 

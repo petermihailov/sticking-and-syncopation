@@ -2,15 +2,23 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .label {
-  font-size: 0.9rem;
-  min-width: 120px;
+  font-size: 0.8rem;
+  color: #555;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.bpm {
+  font-weight: 600;
+  color: #333;
 }
 
 .slider {
   flex: 1;
-  max-width: 200px;
-  cursor: pointer;
+  min-width: 60px;
 }

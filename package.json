@@ -13,7 +13,7 @@
     "test": "vitest",
     "typecheck": "tsc --project tsconfig.app.json --noEmit",
     "convert:sounds": "sounds/wav2mp3",
-    "copy:wav": "mkdir -p public/sounds && cp sounds/wav/*.wav public/sounds/"
+    "copy:wav": "mkdir -p public/sounds/clicks && cp sounds/wav/*.wav public/sounds/ && cp sounds/clicks/*.wav public/sounds/clicks/"
   },
   "dependencies": {
     "clsx": "^2.1.1",

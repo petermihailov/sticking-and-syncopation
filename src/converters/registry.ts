@@ -123,6 +123,7 @@ const notationKindById = Object.fromEntries(
   RUDIMENTS.map(r => [r.id, r.notationKind])
 ) as Record<RudimentType, NotationKind>
 
+// Пока рендерим только первый такт — многотактовые рудименты не поддержаны
 export function generateNotation(
   type: RudimentType,
   convertResult: ConvertResult

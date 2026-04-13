@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Player, type PlayerState } from '../lib/player'
-import { createDrumKit, resumeAudioContext } from '../utils/audio'
+import { createDrumKit, loadClickPack, resumeAudioContext } from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
 import { isTextInputElement, isRangeInput } from '../utils/domFocus'
 import type { DrumKit } from '../types/kit'
@@ -28,7 +28,7 @@ export function PlayerControlProvider({
   children,
 }: PlayerControlProviderProps) {
   const { state } = useAppState()
-  const { tempo, metronome, metronomeVolume, instrumentMapping } = state
+  const { tempo, metronome, metronomeVolume, playbackVolume, metronomeSound, instrumentMapping } = state
   const { convertResult, meter } = useNotation()
   const bars = convertResult.bars
 
@@ -59,9 +59,12 @@ export function PlayerControlProvider({
 
     let cancelled = false
     setIsLoading(true)
-    createDrumKit(`${import.meta.env.BASE_URL}sounds/`, 'wav')
-      .then(kit => {
+    const basePath = `${import.meta.env.BASE_URL}sounds/`
+    createDrumKit(basePath, 'mp3')
+      .then(async kit => {
         if (cancelled) return
+        // Загружаем выбранный клик-пак поверх дефолтных звуков метронома
+        await loadClickPack(kit, state.metronomeSound, basePath, 'mp3')
         setDrumKit(kit)
         setIsLoading(false)
       })
@@ -77,25 +80,43 @@ export function PlayerControlProvider({
     }
   }, [])
 
-  // Единая синхронизация состояния плеера. Player сам диффает поля.
-  const playerState = useMemo<PlayerState>(() => {
+  // Подмена звуков метронома при смене клик-пака
+  useEffect(() => {
+    if (!drumKit) return
+    const basePath = `${import.meta.env.BASE_URL}sounds/`
+    loadClickPack(drumKit, metronomeSound, basePath, 'mp3')
+      .then(() => {
+        // Триггерим обновление drumKit, чтобы playerState пересчитался
+        setDrumKit({ ...drumKit })
+      })
+      .catch(error => {
+        console.error('Failed to load click pack:', error)
+      })
+  }, [metronomeSound]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Тяжёлый пересчёт тактов — только при смене нот/маппинга/метра.
+  const computedBars = useMemo(() => {
     const validBars = bars.filter(bar => bar && bar.length > 0)
-    return {
-      bars: stickingsToBars(validBars, instrumentMapping, meter, convertResult.flams),
-      tempo,
-      metronomeEnabled: metronome,
-      metronomeVolume,
-      mapping: instrumentMapping,
-      mutedGroups: [],
-      kit: drumKit ?? undefined,
-    }
-  }, [
-    bars,
+    return stickingsToBars(validBars, instrumentMapping, meter, convertResult.flams)
+  }, [bars, instrumentMapping, meter, convertResult.flams])
+
+  // Сборка состояния плеера — дешёвая, можно при любом изменении.
+  const playerState = useMemo<PlayerState>(() => ({
+    bars: computedBars,
+    tempo,
+    metronomeEnabled: metronome,
+    metronomeVolume,
+    playbackVolume,
+    mapping: instrumentMapping,
+    mutedGroups: [],
+    kit: drumKit ?? undefined,
+  }), [
+    computedBars,
     tempo,
     metronome,
     metronomeVolume,
+    playbackVolume,
     instrumentMapping,
-    meter,
     drumKit,
   ])
 

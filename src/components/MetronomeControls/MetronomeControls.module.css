@@ -1,40 +1,69 @@
 .container {
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+}
+
+.headerRow {
   display: flex;
-  flex-direction: column;
   gap: 0.75rem;
-}
-
-.toggleContainer {
-  display: flex;
-  gap: 0.5rem;
   align-items: center;
 }
 
+/* CSS toggle switch */
 .toggleLabel {
-  font-size: 0.9rem;
   display: flex;
   align-items: center;
-  cursor: pointer;
-}
-
-.checkbox {
-  margin-right: 0.5rem;
-  cursor: pointer;
-}
-
-.volumeContainer {
-  display: flex;
   gap: 0.5rem;
-  align-items: center;
-}
-
-.volumeLabel {
-  font-size: 0.9rem;
-  min-width: 120px;
-}
-
-.slider {
-  flex: 1;
-  max-width: 200px;
   cursor: pointer;
+  font-size: 0.8rem;
+  color: #555;
+  white-space: nowrap;
+}
+
+.toggleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 9px;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.toggleSwitch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.toggleInput:checked + .toggleSwitch {
+  background: #4a90d9;
+}
+
+.toggleInput:checked + .toggleSwitch::after {
+  transform: translateX(16px);
+}
+
+.soundSelect {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  color: #555;
 }

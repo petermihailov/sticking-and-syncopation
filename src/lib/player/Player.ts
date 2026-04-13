@@ -26,6 +26,7 @@ export interface PlayerState {
   tempo: number
   metronomeEnabled: boolean
   metronomeVolume: number
+  playbackVolume: number
   mapping: StickingMapping
   mutedGroups: Group[]
   kit?: DrumKit
@@ -36,6 +37,7 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   tempo: TEMPO.DEFAULT,
   metronomeEnabled: false,
   metronomeVolume: 1.0,
+  playbackVolume: 1.0,
   mapping: DEFAULT_STICKING_MAPPING,
   mutedGroups: [],
 }
@@ -235,8 +237,10 @@ export class Player {
   }
 
   private playVoicesAt(voices: InstrumentVoice[], time: number): void {
+    const vol = this.state.playbackVolume
     voices.forEach(voice => {
-      const source = this.audioEngine.playVoice(voice, time)
+      const adjusted = vol < 1 ? { ...voice, gain: (voice.gain ?? 1) * vol } : voice
+      const source = this.audioEngine.playVoice(adjusted, time)
       if (!source) return
 
       // Hi-hat: открытый трек копим, чтобы оборвать при закрытом ударе.

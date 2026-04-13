@@ -323,6 +323,8 @@ describe('encodeStateToUrl', () => {
         uppercaseLKick: false,
       },
       metronomeVolume: 1.0,
+      playbackVolume: 1.0,
+      metronomeSound: 'blip',
     }
     const result = encodeStateToUrl(state)
     expect(result).toBe(
@@ -478,6 +480,8 @@ describe('full round-trip integration', () => {
         uppercaseLKick: true,
       },
       metronomeVolume: 1.0,
+      playbackVolume: 1.0,
+      metronomeSound: 'blip',
     }
 
     const encoded = encodeStateToUrl(original)
