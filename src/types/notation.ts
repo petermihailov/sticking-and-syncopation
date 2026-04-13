@@ -2,6 +2,7 @@ export interface NoteEvent {
   readonly type: 'snare' | 'kick' | 'footHH' | 'rest'
   readonly accent: boolean
   readonly ghost: boolean
+  readonly flam: boolean
   readonly index: number
 }
 

@@ -1,6 +1,7 @@
-import type { Accent, Sticking, StickingPattern } from '../../types'
+import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
 import type {
   ConverterConfig,
+  ConvertResultBars,
   ConverterExports,
   FilterContext,
   PatternFilter,
@@ -94,7 +95,10 @@ function createFilterFromConfig(
 function createSelectFromConfig(
   config: ConverterConfig['selectConfig']
 ):
-  | ((patterns: StickingPattern[], result: Sticking[]) => StickingPattern)
+  | ((
+      patterns: (StickingPattern | FlamPattern)[],
+      result: Sticking[]
+    ) => StickingPattern | FlamPattern)
   | undefined {
   if (!config || config.type === 'best') {
     return undefined // Use default findBestPattern
@@ -105,7 +109,10 @@ function createSelectFromConfig(
   }
 
   if (config.type === 'byLastPattern') {
-    return (patterns: StickingPattern[], result: Sticking[]) => {
+    return (
+      patterns: (StickingPattern | FlamPattern)[],
+      result: Sticking[]
+    ) => {
       if (!patterns || patterns.length === 0) {
         throw new Error('No patterns available for selection')
       }
@@ -131,23 +138,18 @@ export function createConverter(config: ConverterConfig): ConverterExports {
   const filterFn = createFilterFromConfig(config.filterConfig)
   const selectFn = createSelectFromConfig(config.selectConfig)
 
-  // Helper to generate a single bar
-  const generateBar = (accentMap: Accent[]): Sticking[] => {
+  // Генерация стикингов (и опционально флэмов) для одного прохода.
+  const generateBar = (
+    accentMap: Accent[]
+  ): { stickings: Sticking[]; flams?: boolean[] } => {
     if (config.mode === 'accents') {
-      if (!filterFn) {
-        return processAccentsSimple(accentMap, config.replaces)
-      }
-
-      return processAccents(accentMap, config.replaces, {
-        filterPatterns: filterFn,
-      })
+      const stickings = filterFn
+        ? processAccents(accentMap, config.replaces, { filterPatterns: filterFn })
+        : processAccentsSimple(accentMap, config.replaces)
+      return { stickings }
     }
 
     if (config.mode === 'pairs') {
-      if (!selectFn) {
-        return processPairs(accentMap, config.replaces)
-      }
-
       return processPairs(accentMap, config.replaces, {
         selectPattern: selectFn,
       })
@@ -156,22 +158,30 @@ export function createConverter(config: ConverterConfig): ConverterExports {
     throw new Error(`Unknown mode: ${config.mode}`)
   }
 
-  const convert = (accentMap8: Accent[]) => {
+  const convert = (accentMap8: Accent[]): ConvertResultBars => {
     // Генерируем сразу два такта, чтобы корректно учесть переходы рук между ними.
-    // Длина выхода пропорциональна длине входа, поэтому barLength = половина результата.
     const doubledAccents: Accent[] = [...accentMap8, ...accentMap8]
-    const doubleBars = generateBar(doubledAccents)
+    const doubled = generateBar(doubledAccents)
 
-    const barLength = doubleBars.length / 2
-    const bar1 = doubleBars.slice(0, barLength)
-    const bar2 = doubleBars.slice(barLength)
+    const barLength = doubled.stickings.length / 2
+    const bar1 = doubled.stickings.slice(0, barLength)
+    const bar2 = doubled.stickings.slice(barLength)
 
     const barsAreIdentical = bar1.every((s, i) => s === bar2[i])
 
-    return {
+    const result: ConvertResultBars = {
       bar1,
       bar2: barsAreIdentical ? undefined : bar2,
     }
+
+    if (doubled.flams) {
+      result.flams1 = doubled.flams.slice(0, barLength)
+      if (!barsAreIdentical) {
+        result.flams2 = doubled.flams.slice(barLength)
+      }
+    }
+
+    return result
   }
 
   return {

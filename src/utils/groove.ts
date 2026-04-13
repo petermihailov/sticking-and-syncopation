@@ -41,7 +41,8 @@ export function getVoicesByIndex(
 export function stickingToBar(
   stickings: Sticking[],
   mapping: StickingMapping = DEFAULT_STICKING_MAPPING,
-  meter: Meter = DEFAULT_METER
+  meter: Meter = DEFAULT_METER,
+  flams?: boolean[]
 ): Bar {
   const rhythm: InstrumentVoice[][] = []
   const stickingSymbols: Sticking[] = []
@@ -72,6 +73,7 @@ export function stickingToBar(
     rhythm,
     stickings: stickingSymbols,
     hands,
+    flams,
     beatsPerBar: meter.beatsPerBar,
     noteValue: meter.noteValue,
     timeDivision: meter.notesPerBeat,
@@ -81,9 +83,12 @@ export function stickingToBar(
 export function stickingsToBars(
   stickingPatterns: Sticking[][],
   mapping?: StickingMapping,
-  meter?: Meter
+  meter?: Meter,
+  flams?: boolean[][]
 ): Bar[] {
-  return stickingPatterns.map(pattern => stickingToBar(pattern, mapping, meter))
+  return stickingPatterns.map((pattern, i) =>
+    stickingToBar(pattern, mapping, meter, flams?.[i])
+  )
 }
 
 /**

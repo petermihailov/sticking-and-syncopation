@@ -7,16 +7,20 @@ import type {
 } from '../../types/notation'
 import { collapseAccentPairs } from './accentCollapse'
 
-function stickingToNoteEvent(sticking: Sticking, index: number): NoteEvent {
+function stickingToNoteEvent(
+  sticking: Sticking,
+  index: number,
+  flam = false
+): NoteEvent {
   if (sticking === 'k') {
-    return { type: 'kick', accent: false, ghost: false, index }
+    return { type: 'kick', accent: false, ghost: false, flam: false, index }
   }
   if (sticking === ' ') {
-    return { type: 'rest', accent: false, ghost: false, index }
+    return { type: 'rest', accent: false, ghost: false, flam: false, index }
   }
   const accent = sticking === 'R' || sticking === 'L'
   // Все не-акцентные ноты на малом в play-нотации — ghost.
-  return { type: 'snare', accent, ghost: !accent, index }
+  return { type: 'snare', accent, ghost: !accent, flam, index }
 }
 
 function groupNotes(
@@ -34,9 +38,10 @@ function groupNotes(
 
 /** 16th-note patterns: 4/4, groups of 4 */
 export function buildSixteenthNotation(
-  stickings: readonly Sticking[]
+  stickings: readonly Sticking[],
+  flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i))
+  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
   const snareVoice: Voice = { groups: groupNotes(events, 4), stem: 'up' }
 
   return {
@@ -49,9 +54,10 @@ export function buildSixteenthNotation(
 
 /** Восьмые триоли: 4/4, 4 группы по 3 (триоль 3:2) */
 export function buildTripletNotation(
-  stickings: readonly Sticking[]
+  stickings: readonly Sticking[],
+  flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i))
+  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
   const snareVoice: Voice = {
     groups: groupNotes(events, 3, { actual: 3, normal: 2 }),
     stem: 'up',
@@ -67,9 +73,10 @@ export function buildTripletNotation(
 
 /** Шестнадцатые триоли: 4/4, 4 группы по 6 (секстоль 6:4) */
 export function buildSixteenthTripletNotation(
-  stickings: readonly Sticking[]
+  stickings: readonly Sticking[],
+  flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i))
+  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
   const snareVoice: Voice = {
     groups: groupNotes(events, 6, { actual: 6, normal: 4 }),
     stem: 'up',
@@ -89,6 +96,7 @@ export function buildAccentNotation(checkedItems: boolean[]): NotationData {
     type: checked ? 'snare' : 'rest',
     accent: false,
     ghost: false,
+    flam: false,
     index: i,
   }))
 

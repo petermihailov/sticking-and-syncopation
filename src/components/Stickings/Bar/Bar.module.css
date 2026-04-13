@@ -1,8 +1,8 @@
 .labels {
   display: flex;
-  width: 83%;
+  width: 88%;
   margin-left: auto;
-  margin-right: 8%;
+  margin-right: 3%;
   aspect-ratio: 20 / 1;
   font-size: min(1rem, 3vw);
 }
@@ -68,6 +68,12 @@
   font-weight: 600;
   top: -5%;
   color: #000;
+}
+
+.label.flam {
+  text-decoration: overline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 2px;
 }
 
 .label.pause {

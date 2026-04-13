@@ -22,10 +22,14 @@ export function useRudimentNotation(
 ): RudimentNotation {
   const convertResult = useMemo<ConvertResult>(() => {
     const accentArray = accents.map((checked): Accent => (checked ? 1 : 0))
-    const { bar1, bar2 } = converters[rudiment].convert(accentArray)
-    return {
+    const { bar1, bar2, flams1, flams2 } = converters[rudiment].convert(accentArray)
+    const result: ConvertResult = {
       bars: bar2 ? [bar1, bar2] : [bar1],
     }
+    if (flams1) {
+      result.flams = flams2 ? [flams1, flams2] : [flams1]
+    }
+    return result
   }, [accents, rudiment])
 
   const seeNotation = useMemo(() => buildAccentNotation(accents), [accents])

@@ -61,7 +61,7 @@ function AppContent() {
           isPlaying={isPlaying}
         >
           {hasStickings && (
-            <Stickings bars={convertResult.bars} currentBeat={currentBeat} />
+            <Stickings bars={convertResult.bars} flams={convertResult.flams} currentBeat={currentBeat} />
           )}
         </VexFlowNotation>
       </div>

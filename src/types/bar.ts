@@ -11,6 +11,8 @@ export interface Bar {
   stickings?: string[]
   // Рука на каждой субдивизии (для подсветки нот), опционально.
   hands?: Hand[]
+  // Флэм перед нотой на каждой субдивизии, опционально.
+  flams?: boolean[]
   beatsPerBar: number
   noteValue: number
   timeDivision: number

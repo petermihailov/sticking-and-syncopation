@@ -1,6 +1,6 @@
-import type { Accent, Sticking, StickingPattern } from '../../types'
+import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
 
-export type ConverterReplaces = Record<string, StickingPattern[]>
+export type ConverterReplaces = Record<string, (StickingPattern | FlamPattern)[]>
 
 export type FilterContext = {
   result: Sticking[]
@@ -43,9 +43,9 @@ export type SelectPatternConfig =
   | {
       type: 'custom'
       selectFn: (
-        patterns: StickingPattern[],
+        patterns: (StickingPattern | FlamPattern)[],
         result: Sticking[]
-      ) => StickingPattern
+      ) => StickingPattern | FlamPattern
     }
 
 export type ConverterConfig = {
@@ -60,6 +60,8 @@ export type ConverterConfig = {
 export type ConvertResultBars = {
   bar1: Sticking[]
   bar2?: Sticking[]
+  flams1?: boolean[]
+  flams2?: boolean[]
 }
 
 export type ConverterExports = {

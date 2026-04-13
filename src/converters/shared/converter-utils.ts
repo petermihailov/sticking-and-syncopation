@@ -1,6 +1,38 @@
-import type { Accent, Sticking, StickingPattern } from '../../types'
+import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
 import type { ConverterReplaces, PatternFilter } from './types'
 import { findBestPattern } from './pattern-selector'
+
+/**
+ * Разбирает паттерн с флэм-маркерами (').
+ * `'Rlr` → stickings: ['R','l','r'], flams: [true, false, false]
+ */
+export function parseFlams(pattern: string): {
+  stickings: Sticking[]
+  flams: boolean[]
+} {
+  const stickings: Sticking[] = []
+  const flams: boolean[] = []
+  let flamNext = false
+
+  for (const ch of pattern) {
+    if (ch === "'") {
+      flamNext = true
+      continue
+    }
+    stickings.push(ch as Sticking)
+    flams.push(flamNext)
+    flamNext = false
+  }
+
+  return { stickings, flams }
+}
+
+/** Проверяет, содержит ли какой-либо паттерн в replaces символ флэма */
+export function replacesHaveFlams(replaces: ConverterReplaces): boolean {
+  return Object.values(replaces).some(patterns =>
+    patterns.some(p => p.includes("'"))
+  )
+}
 
 type ProcessAccentsOptions = {
   /** Function to filter available patterns based on context */
@@ -75,20 +107,28 @@ export function processAccentsSimple(
 type ProcessPairsOptions = {
   /** Custom pattern selection logic based on result and available patterns */
   selectPattern?: (
-    availablePatterns: StickingPattern[],
+    availablePatterns: (StickingPattern | FlamPattern)[],
     result: Sticking[]
-  ) => StickingPattern
+  ) => StickingPattern | FlamPattern
+}
+
+export type ProcessPairsResult = {
+  stickings: Sticking[]
+  flams?: boolean[]
 }
 
 /**
- * Process accent map by pairs (triplet-based converters)
+ * Process accent map by pairs (triplet-based converters).
+ * Автоматически определяет наличие флэмов в replaces и парсит их.
  */
 export function processPairs(
   accentMap8: Accent[],
   replaces: ConverterReplaces,
   options?: ProcessPairsOptions
-): Sticking[] {
+): ProcessPairsResult {
   const result: Sticking[] = []
+  const hasFlams = replacesHaveFlams(replaces)
+  const flamResult: boolean[] = []
   const pairCount = Math.floor(accentMap8.length / 2)
 
   for (let i = 0; i < pairCount; i++) {
@@ -101,8 +141,17 @@ export function processPairs(
       ? options.selectPattern(availablePatterns, result)
       : findBestPattern({ patterns: availablePatterns, result })
 
-    result.push(...(chosenPattern.split('') as Sticking[]))
+    if (hasFlams) {
+      const parsed = parseFlams(chosenPattern)
+      result.push(...parsed.stickings)
+      flamResult.push(...parsed.flams)
+    } else {
+      result.push(...(chosenPattern.split('') as Sticking[]))
+    }
   }
 
-  return result
+  return {
+    stickings: result,
+    flams: hasFlams ? flamResult : undefined,
+  }
 }

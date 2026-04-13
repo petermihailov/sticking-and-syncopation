@@ -15,6 +15,7 @@ import * as invertParadiddleKickRightAccent from './16th-inverted-paradiddle-kic
 import * as handToHandTriplet8 from './8th-hand-to-hand-triplets/index'
 import * as handToHandTriplet16 from './16th-hand-to-hand-triplets/index'
 import * as invertedDoublesInTriplets8 from './8th-inverted-doubles-in-triplets/index'
+import * as flamTriplets8 from './8th-flam-triplets/index'
 
 type ConverterModule = {
   converterName: string
@@ -35,7 +36,7 @@ type RudimentDef = {
 
 const NOTATION_BUILDERS: Record<
   NotationKind,
-  (stickings: Sticking[]) => NotationData
+  (stickings: Sticking[], flams?: boolean[]) => NotationData
 > = {
   sixteenth: buildSixteenthNotation,
   triplet: buildTripletNotation,
@@ -99,6 +100,12 @@ const RUDIMENTS = [
     module: invertedDoublesInTriplets8,
   },
   {
+    id: '8th-flam-triplets',
+    group: 'Triplets',
+    notationKind: 'triplet',
+    module: flamTriplets8,
+  },
+  {
     id: '16th-hand-to-hand-triplets',
     group: 'Triplets',
     notationKind: 'sixteenthTriplet',
@@ -120,7 +127,10 @@ export function generateNotation(
   type: RudimentType,
   convertResult: ConvertResult
 ): NotationData {
-  return NOTATION_BUILDERS[notationKindById[type]](convertResult.bars[0])
+  return NOTATION_BUILDERS[notationKindById[type]](
+    convertResult.bars[0],
+    convertResult.flams?.[0]
+  )
 }
 
 export function getRudimentMeter(type: RudimentType): Meter {

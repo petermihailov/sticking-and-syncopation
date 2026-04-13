@@ -4,6 +4,7 @@ import type { Sticking } from '../../../types'
 
 interface StickingBarProps {
   labels: Sticking[]
+  flams?: boolean[]
   isSecondBar?: boolean
   className?: string
   currentIndex?: number
@@ -11,6 +12,7 @@ interface StickingBarProps {
 
 export function Bar({
   labels,
+  flams,
   isSecondBar = false,
   className,
   currentIndex,
@@ -28,6 +30,7 @@ export function Bar({
             [classes.l]: label.toLowerCase() === 'l',
             [classes.k]: label.toLowerCase() === 'k',
             [classes.a]: label === 'R' || label === 'L',
+            [classes.flam]: flams?.[index],
             [classes.pause]: label === ' ',
             [classes.current]: index === currentIndex,
           })}

@@ -81,7 +81,7 @@ export function PlayerControlProvider({
   const playerState = useMemo<PlayerState>(() => {
     const validBars = bars.filter(bar => bar && bar.length > 0)
     return {
-      bars: stickingsToBars(validBars, instrumentMapping, meter),
+      bars: stickingsToBars(validBars, instrumentMapping, meter, convertResult.flams),
       tempo,
       metronomeEnabled: metronome,
       metronomeVolume,

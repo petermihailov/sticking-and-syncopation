@@ -7,6 +7,11 @@ export type Sticking6 =
 
 export type StickingPattern = Sticking2 | Sticking3 | Sticking4 | Sticking6
 
+// Паттерн с возможными флэм-маркерами ('). Длина строки может превышать
+// количество ритмических позиций за счёт символов '.
+// Используется в replaces конвертеров с флэм��ми.
+export type FlamPattern = string & { readonly __brand?: 'FlamPattern' }
+
 export type Accent = 0 | 1
 
 /**
@@ -26,4 +31,6 @@ export interface Meter {
  */
 export interface ConvertResult {
   bars: Sticking[][]
+  // Параллельный массив — true если перед нотой играется флэм
+  flams?: boolean[][]
 }

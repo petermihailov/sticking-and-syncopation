@@ -147,13 +147,28 @@ export class Player {
     })
 
     // Сдвигаем горизонт на следующий шаг.
-    this.nextBeatAt += getTimeOffset(this.state.tempo, currentBar)
+    const stepDuration = getTimeOffset(this.state.tempo, currentBar)
+    this.nextBeatAt += stepDuration
 
     const nextRhythmIndex = (safeRhythmIndex + 1) % currentBar.rhythm.length
     const nextBarIndex =
       safeRhythmIndex === currentBar.rhythm.length - 1
         ? (safeBarIndex + 1) % bars.length
         : safeBarIndex
+
+    // Флэм: смотрим, есть ли флэм на СЛЕДУЮЩЕМ ударе.
+    // Планируем grace note заранее — пока nextBeatAt ещё в будущем.
+    const nextBar = bars[nextBarIndex]
+    if (nextBar?.flams?.[nextRhythmIndex]) {
+      const flamVoices = this.resolveFlamGrace(nextBar, nextRhythmIndex).map(
+        v => ({ ...v, gain: (v.gain ?? 1.0) * 1.3 })
+      )
+      const flamOffset = Math.max(
+        0.02,
+        Math.min(0.05, (60 / this.state.tempo) * 0.07)
+      )
+      this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
+    }
 
     const delay = (this.nextBeatAt - this.audioEngine.getCurrentTime()) * 1000
     this.timeoutId = window.setTimeout(
@@ -178,6 +193,28 @@ export class Player {
       return result.voices
     }
     return getVoicesByIndex(bar, rhythmIndex, this.state.mutedGroups)
+  }
+
+  /**
+   * Резолвим grace note для флэма: противоположная рука, ghost-громкость.
+   * Не меняем resolverState — флэм не участвует в ротации.
+   */
+  private resolveFlamGrace(bar: Bar, rhythmIndex: number): InstrumentVoice[] {
+    const stroke = bar.stickings?.[rhythmIndex]
+    if (!stroke) return []
+
+    // Противоположная рука в lowercase (ghost)
+    const lower = stroke.toLowerCase()
+    const ghostStroke = lower === 'r' ? 'l' : lower === 'l' ? 'r' : null
+    if (!ghostStroke) return []
+
+    const result = resolveStroke(
+      ghostStroke,
+      this.state.mapping,
+      this.resolverState
+    )
+    // Не обновляем resolverState — флэм не сдвигает ротацию.
+    return result.voices
   }
 
   private playVoicesAt(voices: InstrumentVoice[], time: number): void {

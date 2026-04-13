@@ -1,9 +1,9 @@
-import type { Sticking, StickingPattern } from '../../types'
+import type { FlamPattern, Sticking, StickingPattern } from '../../types'
 import { evaluatePatternQuality } from './quality-evaluator'
 
 type FindBestPatternArgs = {
   result: Sticking[]
-  patterns: StickingPattern[]
+  patterns: (StickingPattern | FlamPattern)[]
 }
 
 export function findBestPattern({
