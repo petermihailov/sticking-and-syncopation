@@ -325,6 +325,7 @@ describe('encodeStateToUrl', () => {
       metronomeVolume: 1.0,
       playbackVolume: 1.0,
       metronomeSound: 'blip',
+      leadingHand: 'R',
     }
     const result = encodeStateToUrl(state)
     expect(result).toBe(
@@ -482,6 +483,7 @@ describe('full round-trip integration', () => {
       metronomeVolume: 1.0,
       playbackVolume: 1.0,
       metronomeSound: 'blip',
+      leadingHand: 'R',
     }
 
     const encoded = encodeStateToUrl(original)

@@ -70,6 +70,7 @@ export function PlayerSection({
             value={playbackVolume * 100}
             onChange={e => onPlaybackVolumeChange(Number(e.target.value) / 100)}
             className={`${classes.verticalSlider} customSlider`}
+            // @ts-expect-error — orient нужен для Firefox vertical range
             orient="vertical"
           />
           <span className={classes.faderLabel}>Main</span>
@@ -85,7 +86,8 @@ export function PlayerSection({
               value={metronomeVolume * 100}
               onChange={e => onMetronomeVolumeChange(Number(e.target.value) / 100)}
               className={`${classes.verticalSlider} customSlider`}
-              orient="vertical"
+              // @ts-expect-error — orient нужен для Firefox vertical range
+            orient="vertical"
             />
             <span className={classes.faderLabel}>Click</span>
           </div>
