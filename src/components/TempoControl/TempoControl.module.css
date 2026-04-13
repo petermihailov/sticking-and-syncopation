@@ -11,6 +11,8 @@
   color: #555;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  width: 3.5rem;
+  flex-shrink: 0;
 }
 
 .bpm {

@@ -1,4 +1,10 @@
 .labels {
+  --color-r: hsl(0 100% 92% / 1);
+  --color-r-active: hsl(0 100% 88% / 1);
+
+  --color-l: hsl(240 100% 92% / 1);
+  --color-l-active: hsl(240 100% 88% / 1);
+
   display: flex;
   width: 88%;
   margin-left: auto;
@@ -18,28 +24,24 @@
   transition: transform 150ms ease-out;
 }
 
-/*.labels:not(:last-child) .label {*/
-/*    border-bottom: 1px dashed #00f1;*/
-/*}*/
-
 .label:first-child {
   margin-left: 0;
 }
 
 .label.r {
-  background-color: #f002;
+  background-color: var(--color-r);
 }
 
 .label.r.a {
-  background-color: #f003;
+  background-color: var(--color-r-active);
 }
 
 .label.l {
-  background-color: #00f2;
+  background-color: var(--color-l);
 }
 
 .label.l.a {
-  background-color: #00f3;
+  background-color: var(--color-l-active);
 }
 
 .label.k {
@@ -70,10 +72,24 @@
   color: #000;
 }
 
-.label.flam {
-  text-decoration: overline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 2px;
+.flamPrefix {
+  position: absolute;
+  display: grid;
+  place-content: center;
+  inline-size: 0.7rem;
+  font-size: 0.7em;
+  font-weight: normal;
+  inset-inline-start: calc(50% - 1rem);
+  inset-block-end: 0.3rem;
+  line-height: 1;
+}
+
+.flamPrefix.r {
+  background-color: var(--color-r);
+}
+
+.flamPrefix.l {
+  background-color: var(--color-l);
 }
 
 .label.pause {
@@ -83,6 +99,7 @@
 }
 
 .label.current {
+  z-index: 1;
   transform: scale(1.5);
   transition: none;
 }
@@ -92,14 +109,15 @@
 }
 
 .label.current.a::before {
+  z-index: -1;
   transform: scale(1);
   transition: none;
 }
 
 .label.current.a.r::before {
-  background-color: #f003;
+  background-color: var(--color-r);
 }
 
 .label.current.a.l::before {
-  background-color: #00f4;
+  background-color: var(--color-l);
 }
