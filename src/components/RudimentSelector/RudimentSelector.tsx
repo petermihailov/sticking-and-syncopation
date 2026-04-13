@@ -159,7 +159,11 @@ export function RudimentSelector({
             <optgroup key={group.groupName} label={group.groupName}>
               {group.options.map(option => (
                 <option key={option.value} value={option.value}>
-                  {(mirror ? mirrorSticking(option.pattern) : option.pattern).replace(/'/g, '')} · {option.label}
+                  {(mirror
+                    ? mirrorSticking(option.pattern)
+                    : option.pattern
+                  ).replace(/'/g, '')}{' '}
+                  · {option.label}
                 </option>
               ))}
             </optgroup>
@@ -179,7 +183,15 @@ export function RudimentSelector({
           aria-label="Select rudiment"
         >
           <div className={classes.selectedOption}>
-            {selectedOption && <PatternDisplay pattern={mirror ? mirrorSticking(selectedOption.pattern) : selectedOption.pattern} />}
+            {selectedOption && (
+              <PatternDisplay
+                pattern={
+                  mirror
+                    ? mirrorSticking(selectedOption.pattern)
+                    : selectedOption.pattern
+                }
+              />
+            )}
             <span className={classes.label}>{selectedOption?.label}</span>
           </div>
           <span className={classes.arrow}>▼</span>
@@ -216,7 +228,13 @@ export function RudimentSelector({
                       aria-selected={option.value === selectedRudiment}
                       tabIndex={focusedIndex === flatIndex ? 0 : -1}
                     >
-                      <PatternDisplay pattern={mirror ? mirrorSticking(option.pattern) : option.pattern} />
+                      <PatternDisplay
+                        pattern={
+                          mirror
+                            ? mirrorSticking(option.pattern)
+                            : option.pattern
+                        }
+                      />
                       <span className={classes.label}>{option.label}</span>
                     </button>
                   )

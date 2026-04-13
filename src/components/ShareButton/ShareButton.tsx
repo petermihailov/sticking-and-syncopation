@@ -8,7 +8,11 @@ interface ShareButtonProps {
   children?: ReactNode
 }
 
-export const ShareButton: FC<ShareButtonProps> = ({ className, style, children }) => {
+export const ShareButton: FC<ShareButtonProps> = ({
+  className,
+  style,
+  children,
+}) => {
   const { shareUrl } = useAppState()
   const [showToast, setShowToast] = useState(false)
   const [error, setError] = useState(false)

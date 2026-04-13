@@ -1,7 +1,15 @@
-import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
+import type {
+  Accent,
+  FlamPattern,
+  Sticking,
+  StickingPattern,
+} from '../../types'
 
 /** Mapping of accent patterns to sticking patterns */
-export type ConverterReplaces = Record<string, (StickingPattern | FlamPattern)[]>
+export type ConverterReplaces = Record<
+  string,
+  (StickingPattern | FlamPattern)[]
+>
 
 /** Metadata for a converter */
 export type ConverterMetadata = {

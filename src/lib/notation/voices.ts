@@ -115,7 +115,11 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
         continue
       }
 
-      const note = createPlayNote(event as NoteEvent & { readonly type: PlayableType }, effectiveDuration, stemDir)
+      const note = createPlayNote(
+        event as NoteEvent & { readonly type: PlayableType },
+        effectiveDuration,
+        stemDir
+      )
       groupNotes.push(note)
       notes.push(note)
       groupBeamable.push(note)

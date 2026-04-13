@@ -25,11 +25,15 @@ export function useRudimentNotation(
 ): RudimentNotation {
   const convertResult = useMemo<ConvertResult>(() => {
     const accentArray = accents.map((checked): Accent => (checked ? 1 : 0))
-    const { bar1, bar2, flams1, flams2 } = converters[rudiment].convert(accentArray)
+    const { bar1, bar2, flams1, flams2 } =
+      converters[rudiment].convert(accentArray)
     const mirror = leadingHand === 'L'
     const result: ConvertResult = {
       bars: bar2
-        ? [mirror ? mirrorStickings(bar1) : bar1, mirror ? mirrorStickings(bar2) : bar2]
+        ? [
+            mirror ? mirrorStickings(bar1) : bar1,
+            mirror ? mirrorStickings(bar2) : bar2,
+          ]
         : [mirror ? mirrorStickings(bar1) : bar1],
     }
     if (flams1) {

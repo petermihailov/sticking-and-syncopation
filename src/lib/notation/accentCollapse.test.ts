@@ -77,12 +77,7 @@ describe('collapseAccentPairs', () => {
 
   it('четвертная пауза + не-пауза → не сворачиваются в половинную', () => {
     // rest rest | snare rest → четвертная пауза + четвертная нота
-    const result = collapseAccentPairs([
-      rest(0),
-      rest(1),
-      snare(2),
-      rest(3),
-    ])
+    const result = collapseAccentPairs([rest(0), rest(1), snare(2), rest(3)])
     expect(result).toHaveLength(2)
     expect(result[0].duration).toBe('4')
     expect(result[0].notes[0].type).toBe('rest')

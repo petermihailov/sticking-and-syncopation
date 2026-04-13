@@ -15,7 +15,9 @@
 .toggle span {
   padding: 0.45rem 0.5rem;
   color: #999;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 
 .toggle span.active {

@@ -7,7 +7,11 @@ import {
   type ReactNode,
 } from 'react'
 import { Player, type PlayerState } from '../lib/player'
-import { createDrumKit, loadClickPack, resumeAudioContext } from '../utils/audio'
+import {
+  createDrumKit,
+  loadClickPack,
+  resumeAudioContext,
+} from '../utils/audio'
 import { stickingsToBars } from '../utils/groove'
 import { isTextInputElement, isRangeInput } from '../utils/domFocus'
 import type { DrumKit } from '../types/kit'
@@ -28,7 +32,14 @@ export function PlayerControlProvider({
   children,
 }: PlayerControlProviderProps) {
   const { state } = useAppState()
-  const { tempo, metronome, metronomeVolume, playbackVolume, metronomeSound, instrumentMapping } = state
+  const {
+    tempo,
+    metronome,
+    metronomeVolume,
+    playbackVolume,
+    metronomeSound,
+    instrumentMapping,
+  } = state
   const { convertResult, meter } = useNotation()
   const bars = convertResult.bars
 
@@ -97,26 +108,28 @@ export function PlayerControlProvider({
   // Тяжёлый пересчёт тактов — только при смене нот/маппинга/метра.
   const computedBars = useMemo(() => {
     const validBars = bars.filter(bar => bar && bar.length > 0)
-    return stickingsToBars(validBars, instrumentMapping, meter, convertResult.flams)
+    return stickingsToBars(
+      validBars,
+      instrumentMapping,
+      meter,
+      convertResult.flams
+    )
   }, [bars, instrumentMapping, meter, convertResult.flams])
 
   // Сборка состояния плеера — без громкости, она обновляется отдельно через setVolumes.
-  const playerState = useMemo<PlayerState>(() => ({
-    bars: computedBars,
-    tempo,
-    metronomeEnabled: metronome,
-    metronomeVolume,
-    playbackVolume,
-    mapping: instrumentMapping,
-    mutedGroups: [],
-    kit: drumKit ?? undefined,
-  }), [
-    computedBars,
-    tempo,
-    metronome,
-    instrumentMapping,
-    drumKit,
-  ])
+  const playerState = useMemo<PlayerState>(
+    () => ({
+      bars: computedBars,
+      tempo,
+      metronomeEnabled: metronome,
+      metronomeVolume,
+      playbackVolume,
+      mapping: instrumentMapping,
+      mutedGroups: [],
+      kit: drumKit ?? undefined,
+    }),
+    [computedBars, tempo, metronome, instrumentMapping, drumKit]
+  )
 
   useEffect(() => {
     playerRef.current?.applyState(playerState)

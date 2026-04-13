@@ -16,7 +16,9 @@
   justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(74, 144, 217, 0.35);
-  transition: background-color 0.15s, box-shadow 0.15s;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
 }
 
 .playButton:hover:not(:disabled) {

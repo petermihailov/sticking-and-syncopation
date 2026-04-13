@@ -33,7 +33,7 @@ export function Bar({
     const span = last - first
     // Ширина контейнера такая, чтобы центры крайних flex-элементов
     // совпали с центрами крайних нот
-    const w = n > 1 ? span * n / (n - 1) : span
+    const w = n > 1 ? (span * n) / (n - 1) : span
     const ml = first - (w - span) / 2
     containerStyle = {
       marginLeft: `${(ml / svgW) * 100}%`,

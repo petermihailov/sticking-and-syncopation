@@ -1,6 +1,14 @@
-import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
+import type {
+  Accent,
+  FlamPattern,
+  Sticking,
+  StickingPattern,
+} from '../../types'
 
-export type ConverterReplaces = Record<string, (StickingPattern | FlamPattern)[]>
+export type ConverterReplaces = Record<
+  string,
+  (StickingPattern | FlamPattern)[]
+>
 
 export type FilterContext = {
   result: Sticking[]

@@ -1,4 +1,9 @@
-import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
+import type {
+  Accent,
+  FlamPattern,
+  Sticking,
+  StickingPattern,
+} from '../../types'
 import type {
   ConverterConfig,
   ConvertResultBars,
@@ -144,7 +149,9 @@ export function createConverter(config: ConverterConfig): ConverterExports {
   ): { stickings: Sticking[]; flams?: boolean[] } => {
     if (config.mode === 'accents') {
       const stickings = filterFn
-        ? processAccents(accentMap, config.replaces, { filterPatterns: filterFn })
+        ? processAccents(accentMap, config.replaces, {
+            filterPatterns: filterFn,
+          })
         : processAccentsSimple(accentMap, config.replaces)
       return { stickings }
     }

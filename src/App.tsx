@@ -113,7 +113,11 @@ function AppContent() {
           matchWidth
         >
           {hasStickings && layers.stickings && (
-            <Stickings bars={convertResult.bars} flams={convertResult.flams} currentBeat={isPlaying ? currentBeat : undefined} />
+            <Stickings
+              bars={convertResult.bars}
+              flams={convertResult.flams}
+              currentBeat={isPlaying ? currentBeat : undefined}
+            />
           )}
         </VexFlowNotation>
       </div>

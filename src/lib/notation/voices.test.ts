@@ -8,15 +8,33 @@ function snare(index: number, accent = false) {
 }
 
 function kick(index: number) {
-  return { type: 'kick' as const, accent: false, ghost: false, flam: false, index }
+  return {
+    type: 'kick' as const,
+    accent: false,
+    ghost: false,
+    flam: false,
+    index,
+  }
 }
 
 function footHH(index: number) {
-  return { type: 'footHH' as const, accent: false, ghost: false, flam: false, index }
+  return {
+    type: 'footHH' as const,
+    accent: false,
+    ghost: false,
+    flam: false,
+    index,
+  }
 }
 
 function rest(index: number) {
-  return { type: 'rest' as const, accent: false, ghost: false, flam: false, index }
+  return {
+    type: 'rest' as const,
+    accent: false,
+    ghost: false,
+    flam: false,
+    index,
+  }
 }
 
 describe('buildVoiceNotes', () => {

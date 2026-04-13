@@ -1,4 +1,9 @@
-import type { Accent, FlamPattern, Sticking, StickingPattern } from '../../types'
+import type {
+  Accent,
+  FlamPattern,
+  Sticking,
+  StickingPattern,
+} from '../../types'
 import type { ConverterReplaces, PatternFilter } from './types'
 import { findBestPattern } from './pattern-selector'
 

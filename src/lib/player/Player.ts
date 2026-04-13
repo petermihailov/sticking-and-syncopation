@@ -106,7 +106,10 @@ export class Player {
     if (firstBar?.flams?.[0]) {
       const flamOffset = Math.max(
         FLAM.OFFSET_MIN,
-        Math.min(FLAM.OFFSET_MAX, (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER)
+        Math.min(
+          FLAM.OFFSET_MAX,
+          (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER
+        )
       )
       this.nextBeatAt += flamOffset
       const flamVoices = this.resolveFlamGrace(firstBar, 0).map(v => ({
@@ -192,7 +195,10 @@ export class Player {
       )
       const flamOffset = Math.max(
         FLAM.OFFSET_MIN,
-        Math.min(FLAM.OFFSET_MAX, (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER)
+        Math.min(
+          FLAM.OFFSET_MAX,
+          (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER
+        )
       )
       this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
     }
@@ -247,7 +253,8 @@ export class Player {
   private playVoicesAt(voices: InstrumentVoice[], time: number): void {
     const vol = this.state.playbackVolume
     voices.forEach(voice => {
-      const adjusted = vol < 1 ? { ...voice, gain: (voice.gain ?? 1) * vol } : voice
+      const adjusted =
+        vol < 1 ? { ...voice, gain: (voice.gain ?? 1) * vol } : voice
       const source = this.audioEngine.playVoice(adjusted, time)
       if (!source) return
 

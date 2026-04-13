@@ -42,8 +42,18 @@ export function VexFlowNotation({
   return (
     <div className={classes.container}>
       <SVGFilters />
-      <div ref={seeRef} className={classes.notation} style={{ display: showSeeNotation ? undefined : 'none' }} />
-      {playNotation && <div ref={playRef} className={classes.notation} style={{ display: showPlayNotation ? undefined : 'none' }} />}
+      <div
+        ref={seeRef}
+        className={classes.notation}
+        style={{ display: showSeeNotation ? undefined : 'none' }}
+      />
+      {playNotation && (
+        <div
+          ref={playRef}
+          className={classes.notation}
+          style={{ display: showPlayNotation ? undefined : 'none' }}
+        />
+      )}
       <NotePositionsContext.Provider value={playNotePositions}>
         {children}
       </NotePositionsContext.Provider>

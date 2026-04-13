@@ -25,7 +25,8 @@ function loadInitialState(): AppState {
   const savedMetronomeSound =
     LocalStorageManager.getItem<string>('metronomeSound')
   const validMetronomeSound =
-    savedMetronomeSound && (CLICK_SOUNDS as readonly string[]).includes(savedMetronomeSound)
+    savedMetronomeSound &&
+    (CLICK_SOUNDS as readonly string[]).includes(savedMetronomeSound)
       ? (savedMetronomeSound as ClickSound)
       : DEFAULT_APP_STATE.metronomeSound
   const savedLeadingHand =

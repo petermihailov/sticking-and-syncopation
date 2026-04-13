@@ -42,7 +42,13 @@ function renderToContainer(
   if (fixedWidth !== undefined) {
     renderer.resize(fixedWidth + STAVE_X * 2, svgHeight)
     const context = renderer.getContext()
-    return renderNotation(context, notation, STAVE_X, STAVE_Y_PADDING, fixedWidth)
+    return renderNotation(
+      context,
+      notation,
+      STAVE_X,
+      STAVE_Y_PADDING,
+      fixedWidth
+    )
   } else {
     renderer.resize(2000, svgHeight)
     const context = renderer.getContext()
@@ -68,7 +74,8 @@ export function useVexFlowRenderer({
 }: UseVexFlowRendererOptions) {
   const seeRef = useRef<HTMLDivElement>(null)
   const playRef = useRef<HTMLDivElement>(null)
-  const [playNotePositions, setPlayNotePositions] = useState<NotePositions | null>(null)
+  const [playNotePositions, setPlayNotePositions] =
+    useState<NotePositions | null>(null)
 
   useEffect(() => {
     // При matchWidth измеряем обе ширины и берём максимум
@@ -84,7 +91,11 @@ export function useVexFlowRenderer({
       renderToContainer(seeRef.current, seeNotation, fixedWidth)
     }
     if (playRef.current && playNotation) {
-      const positions = renderToContainer(playRef.current, playNotation, fixedWidth)
+      const positions = renderToContainer(
+        playRef.current,
+        playNotation,
+        fixedWidth
+      )
       setPlayNotePositions(positions)
     }
   }, [seeNotation, playNotation, matchWidth])

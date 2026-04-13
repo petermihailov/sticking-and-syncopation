@@ -25,9 +25,7 @@ export function PlayerControls({
         {isPlaying ? <span className={classes.stopIcon} /> : '▶'}
       </button>
       <ShareButton className={classes.shareButton}>🔗</ShareButton>
-      {!hasPattern && (
-        <span className={classes.noPattern}>Нет паттерна</span>
-      )}
+      {!hasPattern && <span className={classes.noPattern}>Нет паттерна</span>}
     </>
   )
 }

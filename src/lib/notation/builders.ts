@@ -108,7 +108,10 @@ export function buildAccentNotation(checkedItems: boolean[]): NotationData {
     index: i,
   }))
 
-  const snareVoice: VoiceData = { groups: collapseAccentPairs(events), stem: 'up' }
+  const snareVoice: VoiceData = {
+    groups: collapseAccentPairs(events),
+    stem: 'up',
+  }
 
   return {
     timeSignature: { top: 4, bottom: 4 },
