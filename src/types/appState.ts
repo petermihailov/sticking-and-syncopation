@@ -1,4 +1,5 @@
 import type { RudimentType } from '../converters/registry'
+import { TEMPO } from '../config/constants'
 import type { StickingMapping } from './sticking'
 import { DEFAULT_STICKING_MAPPING } from './sticking'
 
@@ -10,7 +11,7 @@ export interface AppState {
   accents: boolean[]
   /** Selected rudiment type */
   rudiment: RudimentType
-  /** Playback tempo in BPM (40-200) */
+  /** Playback tempo in BPM */
   tempo: number
   /** Whether metronome is enabled */
   metronome: boolean
@@ -26,7 +27,7 @@ export interface AppState {
 export const DEFAULT_APP_STATE: AppState = {
   accents: [false, false, false, false, false, false, false, false],
   rudiment: '16th-paradiddle-single-accent',
-  tempo: 80,
+  tempo: TEMPO.DEFAULT,
   metronome: false,
   metronomeVolume: 1.0,
   instrumentMapping: DEFAULT_STICKING_MAPPING,

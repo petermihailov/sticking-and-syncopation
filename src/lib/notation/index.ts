@@ -1,5 +1,5 @@
 export {
   renderNotation,
-  getStaveHeight,
+  STAVE_HEIGHT,
   measureNotationWidth,
 } from './renderer'

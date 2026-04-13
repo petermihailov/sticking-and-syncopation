@@ -11,7 +11,7 @@ import {
 
 // Уменьшаем размер grace notes (флэмов)
 MetricsDefaults.GraceNote = { ...MetricsDefaults.GraceNote, fontScale: 0.6 }
-import type { Voice as VoiceData } from '../../types/notation'
+import type { NoteEvent, VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
 export interface IndexedNote {
@@ -19,13 +19,85 @@ export interface IndexedNote {
   readonly index: number
 }
 
+const NOTE_KEY_MAP = {
+  kick: KICK_KEY,
+  footHH: FOOT_HH_KEY,
+  snare: SNARE_KEY,
+} as const
+
+function createRestNote(duration: string): StaveNote {
+  const restKey = duration === '1' ? 'd/5' : 'b/4'
+  return new StaveNote({ keys: [restKey], duration: `${duration}r` })
+}
+
+function createPlayNote(
+  event: NoteEvent,
+  duration: string,
+  stemDir: number
+): StaveNote {
+  const note = new StaveNote({
+    keys: [NOTE_KEY_MAP[event.type as keyof typeof NOTE_KEY_MAP]],
+    duration,
+    stemDirection: stemDir,
+  })
+
+  if (event.accent) {
+    note.addModifier(new Articulation('a>'))
+  }
+  if (event.ghost) {
+    note.setFontSize(24)
+    note.noteHeads.forEach(nh => nh.setFontSize(20))
+    Parenthesis.buildAndAttach([note])
+  }
+  if (event.flam) {
+    applyFlamModifier(note)
+  }
+
+  return note
+}
+
+// Добавляет флэм (grace note + кастомный slur) к ноте.
+// Monkey-patching getWidth/draw — хак для VexFlow 5, где нет нативного
+// способа управлять размером slur у GraceNoteGroup.
+function applyFlamModifier(note: StaveNote): void {
+  const grace = new GraceNote({
+    keys: [SNARE_KEY],
+    duration: '8',
+    slash: true,
+  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const graceGroup = new GraceNoteGroup([grace], true) as any
+  // Сужаем ширину grace group, чтобы флэм был ближе к основной ноте
+  const origGetWidth = graceGroup.getWidth.bind(graceGroup)
+  graceGroup.getWidth = () => Math.max(0, origGetWidth() - 12)
+  // Уменьшаем размер slur (улыбочки) — перехватываем draw
+  const origDraw = graceGroup.draw.bind(graceGroup)
+  graceGroup.draw = () => {
+    graceGroup.showSlur = false
+    origDraw()
+    const ctx = graceGroup.checkContext()
+    const attachedNote = graceGroup.checkAttachedNote()
+    const tie = new StaveTie({
+      lastNote: grace,
+      firstNote: attachedNote,
+      firstIndexes: [0],
+      lastIndexes: [0],
+    })
+    tie.renderOptions.cp1 = 2
+    tie.renderOptions.cp2 = 6
+    tie.renderOptions.yShift = 7
+    tie.renderOptions.firstXShift = -6
+    tie.renderOptions.lastXShift = 3
+    tie.setContext(ctx).draw()
+  }
+  note.addModifier(graceGroup)
+}
+
 export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
   const stemDir = voiceData.stem === 'up' ? 1 : -1
   const notes: StaveNote[] = []
   const beamGroups: StaveNote[][] = []
   const tuplets: Tuplet[] = []
-  // Маппинг noteIndex (из NoteEvent) → StaveNote — для подсветки во время
-  // воспроизведения. Включает и паузы: подсветка их может пропускать.
   const indexedNotes: IndexedNote[] = []
 
   for (const group of voiceData.groups) {
@@ -35,70 +107,14 @@ export function buildVoiceNotes(voiceData: VoiceData, baseDuration: string) {
 
     for (const event of group.notes) {
       if (event.type === 'rest') {
-        const restKey = effectiveDuration === '1' ? 'd/5' : 'b/4'
-        const rest = new StaveNote({
-          keys: [restKey],
-          duration: `${effectiveDuration}r`,
-        })
+        const rest = createRestNote(effectiveDuration)
         groupNotes.push(rest)
         notes.push(rest)
         indexedNotes.push({ note: rest, index: event.index })
         continue
       }
 
-      const keyMap = { kick: KICK_KEY, footHH: FOOT_HH_KEY, snare: SNARE_KEY }
-      const key = keyMap[event.type]
-      const note = new StaveNote({
-        keys: [key],
-        duration: effectiveDuration,
-        stemDirection: stemDir,
-      })
-
-      if (event.accent) {
-        note.addModifier(new Articulation('a>'))
-      }
-      if (event.ghost) {
-        // Уменьшаем размер ghost нот
-        note.setFontSize(24)
-        note.noteHeads.forEach(nh => nh.setFontSize(20))
-        Parenthesis.buildAndAttach([note])
-      }
-      if (event.flam) {
-        const grace = new GraceNote({
-          keys: [SNARE_KEY],
-          duration: '8',
-          slash: true,
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const graceGroup = new GraceNoteGroup([grace], true) as any
-        // Сужаем ширину grace group, чтобы флэм был ближе к основной ноте
-        const origGetWidth = graceGroup.getWidth.bind(graceGroup)
-        graceGroup.getWidth = () => Math.max(0, origGetWidth() - 12)
-        // Уменьшаем размер slur (улыбочки) — перехватываем draw
-        const origDraw = graceGroup.draw.bind(graceGroup)
-        graceGroup.draw = () => {
-          // Отключаем showSlur чтобы origDraw не рисовал дефолтный slur
-          graceGroup.showSlur = false
-          origDraw()
-          // Рисуем slur вручную с уменьшенными параметрами
-          const ctx = graceGroup.checkContext()
-          const attachedNote = graceGroup.checkAttachedNote()
-          const tie = new StaveTie({
-            lastNote: grace,
-            firstNote: attachedNote,
-            firstIndexes: [0],
-            lastIndexes: [0],
-          })
-          tie.renderOptions.cp1 = 2
-          tie.renderOptions.cp2 = 6
-          tie.renderOptions.yShift = 7
-          tie.renderOptions.firstXShift = -6
-          tie.renderOptions.lastXShift = 3
-          tie.setContext(ctx).draw()
-        }
-        note.addModifier(graceGroup)
-      }
-
+      const note = createPlayNote(event, effectiveDuration, stemDir)
       groupNotes.push(note)
       notes.push(note)
       groupBeamable.push(note)

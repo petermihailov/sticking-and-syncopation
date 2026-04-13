@@ -1,3 +1,4 @@
+import { TEMPO } from '../config/constants'
 import type { RudimentType } from '../converters/registry'
 import type { Instrument } from '../types/instrument'
 import type { StickingMapping } from '../types/sticking'
@@ -229,7 +230,7 @@ export function decodeStateFromUrl(
   const tempoParam = searchParams.get('t')
   if (tempoParam) {
     const tempo = parseInt(tempoParam, 10)
-    if (!isNaN(tempo) && tempo >= 40 && tempo <= 200) {
+    if (!isNaN(tempo) && tempo >= TEMPO.MIN && tempo <= TEMPO.MAX) {
       state.tempo = tempo
     }
   }

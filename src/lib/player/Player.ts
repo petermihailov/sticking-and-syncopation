@@ -1,3 +1,4 @@
+import { TEMPO, FLAM } from '../../config/constants'
 import type { Beat, Group } from '../../types/instrument'
 import type { Bar } from '../../types/bar'
 import type { DrumKit } from '../../types/kit'
@@ -32,7 +33,7 @@ export interface PlayerState {
 
 const DEFAULT_PLAYER_STATE: PlayerState = {
   bars: [],
-  tempo: 80,
+  tempo: TEMPO.DEFAULT,
   metronomeEnabled: false,
   metronomeVolume: 1.0,
   mapping: DEFAULT_STICKING_MAPPING,
@@ -89,6 +90,22 @@ export class Player {
 
     this.resolverState = EMPTY_RESOLVER_STATE
     this.nextBeatAt = this.audioEngine.getCurrentTime()
+
+    // Если первый удар с флэмом — сдвигаем старт, чтобы grace note успел прозвучать
+    const firstBar = bars[0]
+    if (firstBar?.flams?.[0]) {
+      const flamOffset = Math.max(
+        FLAM.OFFSET_MIN,
+        Math.min(FLAM.OFFSET_MAX, (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER)
+      )
+      this.nextBeatAt += flamOffset
+      const flamVoices = this.resolveFlamGrace(firstBar, 0).map(v => ({
+        ...v,
+        gain: (v.gain ?? 1.0) * FLAM.GAIN_MULTIPLIER,
+      }))
+      this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
+    }
+
     this.tickAt(0, 0)
   }
 
@@ -161,11 +178,11 @@ export class Player {
     const nextBar = bars[nextBarIndex]
     if (nextBar?.flams?.[nextRhythmIndex]) {
       const flamVoices = this.resolveFlamGrace(nextBar, nextRhythmIndex).map(
-        v => ({ ...v, gain: (v.gain ?? 1.0) * 1.3 })
+        v => ({ ...v, gain: (v.gain ?? 1.0) * FLAM.GAIN_MULTIPLIER })
       )
       const flamOffset = Math.max(
-        0.02,
-        Math.min(0.05, (60 / this.state.tempo) * 0.07)
+        FLAM.OFFSET_MIN,
+        Math.min(FLAM.OFFSET_MAX, (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER)
       )
       this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
     }

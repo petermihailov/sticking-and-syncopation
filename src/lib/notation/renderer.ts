@@ -3,15 +3,13 @@ import {
   VoiceMode,
   Formatter,
   Beam,
-  Stave,
-  Barline,
   type RenderContext,
   type Tuplet,
   type StaveNote,
 } from 'vexflow'
 import type { NotationData } from '../../types/notation'
 import { buildVoiceNotes } from './voices'
-import { createStave } from './stave'
+import { createStave, createProbeStave } from './stave'
 
 // Запас справа после последней ноты до правой барлайны
 const RIGHT_PADDING = 10
@@ -56,21 +54,14 @@ function buildVoices(notation: NotationData): BuiltVoices {
   return { vfVoices, tuplets: allTuplets, beams, indexedNotes: allIndexedNotes }
 }
 
-// Создаёт стан только ради измерения noteStartX/noteEndX оверхеда
-// (клеф + timesig + repeat-барлайны). Контекст не нужен для этих метрик.
 function measureStaveOverhead(notation: NotationData): {
   leftOverhead: number
   rightOverhead: number
 } {
-  const probe = new Stave(0, 0, 500)
-  probe.addClef('percussion')
-  probe.addTimeSignature(
-    `${notation.timeSignature.top}/${notation.timeSignature.bottom}`
-  )
-  if (notation.repeat) {
-    probe.setBegBarType(Barline.type.REPEAT_BEGIN)
-    probe.setEndBarType(Barline.type.REPEAT_END)
-  }
+  const probe = createProbeStave({
+    timeSignature: notation.timeSignature,
+    repeat: notation.repeat,
+  })
   const leftOverhead = probe.getNoteStartX() - probe.getX()
   const rightOverhead = probe.getX() + probe.getWidth() - probe.getNoteEndX()
   return { leftOverhead, rightOverhead }
@@ -130,6 +121,4 @@ export function renderNotation(
   }
 }
 
-export function getStaveHeight(): number {
-  return 120
-}
+export const STAVE_HEIGHT = 120

@@ -3,7 +3,7 @@ import { Renderer } from 'vexflow'
 import type { NotationData } from '../../types/notation'
 import {
   renderNotation,
-  getStaveHeight,
+  STAVE_HEIGHT,
   measureNotationWidth,
 } from '../../lib/notation'
 import classes from './VexFlowNotation.module.css'
@@ -30,7 +30,7 @@ function renderToContainer(
   container.innerHTML = ''
 
   const totalWidth = staveWidth + STAVE_X * 2
-  const staveHeight = getStaveHeight()
+  const staveHeight = STAVE_HEIGHT
   const svgHeight = staveHeight + STAVE_Y_PADDING
 
   const renderer = new Renderer(container, Renderer.Backends.SVG)

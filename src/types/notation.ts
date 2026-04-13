@@ -12,7 +12,7 @@ export interface NoteGroup {
   readonly duration?: '1' | '2' | '4' | '8' | '16'
 }
 
-export interface Voice {
+export interface VoiceData {
   readonly groups: readonly NoteGroup[]
   readonly stem: 'up' | 'down'
   readonly duration?: '4' | '8' | '16'
@@ -21,6 +21,6 @@ export interface Voice {
 export interface NotationData {
   readonly timeSignature: { readonly top: number; readonly bottom: number }
   readonly baseDuration: '4' | '8' | '16'
-  readonly voices: readonly Voice[]
+  readonly voices: readonly VoiceData[]
   readonly repeat: boolean
 }

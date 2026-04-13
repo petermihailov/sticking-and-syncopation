@@ -1,3 +1,4 @@
+import { TEMPO } from '../../config/constants'
 import classes from './TempoControl.module.css'
 
 interface TempoControlProps {
@@ -14,8 +15,8 @@ export function TempoControl({ tempo, onChange }: TempoControlProps) {
       <input
         id="tempo-slider"
         type="range"
-        min="40"
-        max="200"
+        min={TEMPO.MIN}
+        max={TEMPO.MAX}
         value={tempo}
         onChange={e => onChange(Number(e.target.value))}
         className={classes.slider}

@@ -3,9 +3,15 @@ import type {
   NotationData,
   NoteEvent,
   NoteGroup,
-  Voice,
+  VoiceData,
 } from '../../types/notation'
 import { collapseAccentPairs } from './accentCollapse'
+
+interface RhythmConfig {
+  baseDuration: '4' | '8' | '16'
+  groupSize: number
+  tuplet?: { actual: number; normal: number }
+}
 
 function stickingToNoteEvent(
   sticking: Sticking,
@@ -36,20 +42,30 @@ function groupNotes(
   return groups
 }
 
-/** 16th-note patterns: 4/4, groups of 4 */
+function buildNotation(
+  stickings: readonly Sticking[],
+  config: RhythmConfig,
+  flams?: readonly boolean[]
+): NotationData {
+  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
+  const snareVoice: VoiceData = {
+    groups: groupNotes(events, config.groupSize, config.tuplet),
+    stem: 'up',
+  }
+  return {
+    timeSignature: { top: 4, bottom: 4 },
+    baseDuration: config.baseDuration,
+    voices: [snareVoice],
+    repeat: true,
+  }
+}
+
+/** 16th-note patterns: 4/4, группы по 4 */
 export function buildSixteenthNotation(
   stickings: readonly Sticking[],
   flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
-  const snareVoice: Voice = { groups: groupNotes(events, 4), stem: 'up' }
-
-  return {
-    timeSignature: { top: 4, bottom: 4 },
-    baseDuration: '16',
-    voices: [snareVoice],
-    repeat: true,
-  }
+  return buildNotation(stickings, { baseDuration: '16', groupSize: 4 }, flams)
 }
 
 /** Восьмые триоли: 4/4, 4 группы по 3 (триоль 3:2) */
@@ -57,18 +73,11 @@ export function buildTripletNotation(
   stickings: readonly Sticking[],
   flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
-  const snareVoice: Voice = {
-    groups: groupNotes(events, 3, { actual: 3, normal: 2 }),
-    stem: 'up',
-  }
-
-  return {
-    timeSignature: { top: 4, bottom: 4 },
-    baseDuration: '8',
-    voices: [snareVoice],
-    repeat: true,
-  }
+  return buildNotation(
+    stickings,
+    { baseDuration: '8', groupSize: 3, tuplet: { actual: 3, normal: 2 } },
+    flams
+  )
 }
 
 /** Шестнадцатые триоли: 4/4, 4 группы по 6 (секстоль 6:4) */
@@ -76,21 +85,14 @@ export function buildSixteenthTripletNotation(
   stickings: readonly Sticking[],
   flams?: readonly boolean[]
 ): NotationData {
-  const events = stickings.map((s, i) => stickingToNoteEvent(s, i, flams?.[i]))
-  const snareVoice: Voice = {
-    groups: groupNotes(events, 6, { actual: 6, normal: 4 }),
-    stem: 'up',
-  }
-
-  return {
-    timeSignature: { top: 4, bottom: 4 },
-    baseDuration: '16',
-    voices: [snareVoice],
-    repeat: true,
-  }
+  return buildNotation(
+    stickings,
+    { baseDuration: '16', groupSize: 6, tuplet: { actual: 6, normal: 4 } },
+    flams
+  )
 }
 
-/** Accent pattern notation: 8th notes in 4/4, collapsed to quarters where possible */
+/** Accent pattern: восьмые в 4/4, свёрнутые в четверти где возможно */
 export function buildAccentNotation(checkedItems: boolean[]): NotationData {
   const events: NoteEvent[] = checkedItems.map((checked, i) => ({
     type: checked ? 'snare' : 'rest',
@@ -100,7 +102,7 @@ export function buildAccentNotation(checkedItems: boolean[]): NotationData {
     index: i,
   }))
 
-  const snareVoice: Voice = { groups: collapseAccentPairs(events), stem: 'up' }
+  const snareVoice: VoiceData = { groups: collapseAccentPairs(events), stem: 'up' }
 
   return {
     timeSignature: { top: 4, bottom: 4 },

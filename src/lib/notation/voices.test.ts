@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildVoiceNotes } from './voices'
-import type { Voice } from '../../types/notation'
+import type { VoiceData } from '../../types/notation'
 import { SNARE_KEY, KICK_KEY, FOOT_HH_KEY } from './constants'
 
 function snare(index: number, accent = false) {
@@ -21,7 +21,7 @@ function rest(index: number) {
 
 describe('buildVoiceNotes', () => {
   it('maps snare to correct key', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0)] }],
     }
@@ -31,7 +31,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('maps kick to correct key', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'down',
       groups: [{ notes: [kick(0)] }],
     }
@@ -40,7 +40,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('maps footHH to correct key', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'down',
       groups: [{ notes: [footHH(0)] }],
     }
@@ -49,7 +49,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('creates rest notes with r suffix', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [rest(0)] }],
     }
@@ -59,7 +59,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('whole rest uses d/5 key', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [rest(0)], duration: '1' }],
     }
@@ -68,7 +68,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('adds accent articulation', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0, true)] }],
     }
@@ -77,7 +77,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('no accent → no modifiers', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0, false)] }],
     }
@@ -86,7 +86,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('creates beam groups for multiple beamable notes', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0), snare(1), snare(2), snare(3)] }],
     }
@@ -96,7 +96,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('single note group does not create beam', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0)] }],
     }
@@ -105,7 +105,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('creates tuplets when specified', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [
         {
@@ -119,7 +119,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('uses group duration over base duration', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0)], duration: '4' }],
     }
@@ -128,7 +128,7 @@ describe('buildVoiceNotes', () => {
   })
 
   it('rests are not added to beam groups', () => {
-    const voice: Voice = {
+    const voice: VoiceData = {
       stem: 'up',
       groups: [{ notes: [snare(0), rest(1), snare(2)] }],
     }
