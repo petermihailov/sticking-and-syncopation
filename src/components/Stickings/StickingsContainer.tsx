@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { Sticking } from '../../types'
+import type { Beat } from '../../context/usePlayerControl'
 import { resolveAllStrokes } from '../../lib/player/StrokeResolver'
 import { useNotePositions } from '../VexFlowNotation'
 import { StickingBar } from './StickingBar'
@@ -9,7 +10,7 @@ import classes from './StickingsContainer.module.css'
 interface StickingsContainerProps {
   bars: Sticking[][]
   flams?: boolean[][]
-  currentBeat?: { barIndex: number; rhythmIndex: number }
+  currentBeat?: Beat
   showStickings?: boolean
   showStrokes?: boolean
 }

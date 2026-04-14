@@ -17,12 +17,7 @@ import { isTextInputElement, isRangeInput } from '../utils/domFocus'
 import type { DrumKit } from '../types/kit'
 import { useAppState } from './useAppState'
 import { useNotation } from './useNotation'
-import { PlayerControlContext } from './usePlayerControl'
-
-interface Beat {
-  barIndex: number
-  rhythmIndex: number
-}
+import { PlayerControlContext, type Beat } from './usePlayerControl'
 
 interface PlayerControlProviderProps {
   children: ReactNode

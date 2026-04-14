@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import type { DrumKit } from '../types/kit'
 
-interface Beat {
+export interface Beat {
   barIndex: number
   rhythmIndex: number
   flamOffsetMs?: number
