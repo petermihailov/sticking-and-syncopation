@@ -19,7 +19,11 @@
   font-size: 1rem;
   font-weight: 400;
   line-height: 1;
-  transition: transform 150ms ease-out;
+  transition: transform var(--transition-ms) ease-out;
+}
+
+.cell.accent {
+  font-weight: 700;
 }
 
 .cell.current {

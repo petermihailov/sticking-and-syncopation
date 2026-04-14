@@ -62,6 +62,7 @@ export function StickingsContainer({
             <StrokeBar
               strokes={resolvedByBar[index].strokes}
               flamStrokes={resolvedByBar[index].flamStrokes}
+              accents={barStickings.map(s => s === 'R' || s === 'L')}
               isSecondBar={index === 1}
               currentIndex={
                 currentBeat?.barIndex === index

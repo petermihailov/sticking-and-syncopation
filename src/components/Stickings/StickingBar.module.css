@@ -26,11 +26,6 @@
   place-items: center;
   line-height: 0;
   text-transform: uppercase;
-  transition: transform 150ms ease-out;
-}
-
-.cell:first-child {
-  margin-left: 0;
 }
 
 .cell.r {
@@ -56,17 +51,6 @@
 
 .cell.a {
   font-weight: 700;
-}
-
-.cell.a::before {
-  content: '';
-  position: absolute;
-  bottom: -35%;
-  width: 2.5rem;
-  height: 2.5rem;
-  transform: scale(0);
-  border-radius: 50%;
-  transition: transform 0.3s ease-out;
 }
 
 .cell.a::after {
@@ -103,39 +87,13 @@
   color: #666;
 }
 
-.mainLabel {
-  /* Обёртка основной буквы — нужна для независимой анимации при флэме */
-}
-
-.cell.current {
-  z-index: 1;
-  transform: scale(1.5);
-  transition: none;
-}
-
-/* Флэм-ячейка при воспроизведении: z-index без scale (scale управляет Web Animations API) */
+/* Подсветка текущего бита при проигрывании — скейлим только букву, не фон */
+.cell.current,
 .cell.flamActive {
   z-index: 1;
 }
 
-.cell.current.a,
-.cell.flamActive.a {
-  background-color: #0000;
-}
-
-.cell.current.a::before,
-.cell.flamActive.a::before {
-  z-index: -1;
-  transform: scale(1);
-  transition: none;
-}
-
-.cell.current.a.r::before,
-.cell.flamActive.a.r::before {
-  background-color: var(--color-r);
-}
-
-.cell.current.a.l::before,
-.cell.flamActive.a.l::before {
-  background-color: var(--color-l);
+.cell.current > .mainLabel {
+  display: inline-block;
+  transform: scale(1.5);
 }

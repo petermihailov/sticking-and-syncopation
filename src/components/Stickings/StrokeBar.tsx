@@ -7,6 +7,7 @@ import classes from './StrokeBar.module.css'
 interface StrokeBarProps {
   strokes: (StrokeType | null)[]
   flamStrokes?: (StrokeType | null)[]
+  accents?: boolean[]
   isSecondBar?: boolean
   currentIndex?: number
   flamOffsetMs?: number
@@ -16,6 +17,7 @@ interface StrokeBarProps {
 export function StrokeBar({
   strokes,
   flamStrokes,
+  accents,
   isSecondBar = false,
   currentIndex,
   flamOffsetMs,
@@ -50,6 +52,7 @@ export function StrokeBar({
               cellsRef.current[index] = el
             }}
             className={clsx(classes.cell, {
+              [classes.accent]: accents?.[index],
               [classes.current]: isCurrent && !isFlamCurrent,
               [classes.flamActive]: isFlamCurrent,
             })}

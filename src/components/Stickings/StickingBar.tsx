@@ -64,7 +64,6 @@ export function StickingBar({
               [classes.l]: label.toLowerCase() === 'l',
               [classes.k]: label.toLowerCase() === 'k',
               [classes.a]: label === 'R' || label === 'L',
-              [classes.flam]: flams?.[index],
               [classes.pause]: label === ' ',
               [classes.current]: isCurrent && !isFlamCurrent,
               [classes.flamActive]: isFlamCurrent,

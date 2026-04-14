@@ -31,3 +31,23 @@
   right: 1rem;
   z-index: 1;
 }
+
+.lessonHeader {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.lessonHeaderTitle {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lessonHeaderNumber {
+  font-weight: 600;
+  opacity: 0.7;
+}

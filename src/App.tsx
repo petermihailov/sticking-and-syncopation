@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Lessons } from './components/Lessons'
+import { findActiveLesson } from './components/Lessons/lessonData'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { VexFlowNotation } from './components/VexFlowNotation'
@@ -113,6 +114,19 @@ function AppContent() {
         ))}
       </div>
       <div className={classes.notesContainer}>
+        {(() => {
+          const activeLesson = findActiveLesson(state.accents)
+          return activeLesson ? (
+            <div className={classes.lessonHeader}>
+              <span className={classes.lessonHeaderTitle}>
+                {activeLesson.lessonTitle}
+              </span>
+              <span className={classes.lessonHeaderNumber}>
+                {activeLesson.exerciseNumber.toString().padStart(2, '0')}
+              </span>
+            </div>
+          ) : null
+        })()}
         {layers.accents && (
           <AccentPattern
             className={classes.checkboxes}
