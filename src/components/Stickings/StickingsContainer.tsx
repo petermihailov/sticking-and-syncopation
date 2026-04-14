@@ -50,6 +50,11 @@ export function StickingsContainer({
                   ? currentBeat.rhythmIndex
                   : undefined
               }
+              flamOffsetMs={
+                currentBeat?.barIndex === index
+                  ? currentBeat.flamOffsetMs
+                  : undefined
+              }
             />
           )}
           {showStrokes && (
@@ -60,6 +65,11 @@ export function StickingsContainer({
               currentIndex={
                 currentBeat?.barIndex === index
                   ? currentBeat.rhythmIndex
+                  : undefined
+              }
+              flamOffsetMs={
+                currentBeat?.barIndex === index
+                  ? currentBeat.flamOffsetMs
                   : undefined
               }
               notePositions={notePositions}

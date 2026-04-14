@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import type { Sticking } from '../../types'
 import type { NotePositions } from '../../lib/notation'
-import { useBarAlignment } from './useBarAlignment'
+import { useBarHighlight } from './useBarHighlight'
 import classes from './StickingBar.module.css'
 
 interface StickingBarProps {
@@ -9,6 +9,7 @@ interface StickingBarProps {
   flams?: boolean[]
   isSecondBar?: boolean
   currentIndex?: number
+  flamOffsetMs?: number
   notePositions?: NotePositions | null
 }
 
@@ -17,12 +18,18 @@ export function StickingBar({
   flams,
   isSecondBar = false,
   currentIndex,
+  flamOffsetMs,
   notePositions,
 }: StickingBarProps) {
-  const { containerStyle, aligned } = useBarAlignment(
-    labels.length,
-    notePositions
-  )
+  const { containerStyle, aligned, cellsRef } = useBarHighlight({
+    itemCount: labels.length,
+    notePositions,
+    currentIndex,
+    flamOffsetMs,
+    hasFlamAtCurrent: currentIndex !== undefined && !!flams?.[currentIndex],
+    graceClass: classes.flamPrefix,
+    mainClass: classes.mainLabel,
+  })
 
   return (
     <div
@@ -43,8 +50,15 @@ export function StickingBar({
                 : null
             : null
 
+        // Для флэм-ячеек не ставим .current — анимацию делает Web Animations API
+        const isCurrent = index === currentIndex
+        const isFlamCurrent = isCurrent && flams?.[index]
+
         return (
           <div
+            ref={el => {
+              cellsRef.current[index] = el
+            }}
             className={clsx(classes.cell, {
               [classes.r]: label.toLowerCase() === 'r',
               [classes.l]: label.toLowerCase() === 'l',
@@ -52,7 +66,8 @@ export function StickingBar({
               [classes.a]: label === 'R' || label === 'L',
               [classes.flam]: flams?.[index],
               [classes.pause]: label === ' ',
-              [classes.current]: index === currentIndex,
+              [classes.current]: isCurrent && !isFlamCurrent,
+              [classes.flamActive]: isFlamCurrent,
             })}
             key={index}
           >
@@ -66,7 +81,9 @@ export function StickingBar({
                 {flamLabel}
               </span>
             )}
-            {label === ' ' ? '—' : label}
+            <span className={classes.mainLabel}>
+              {label === ' ' ? '—' : label}
+            </span>
           </div>
         )
       })}

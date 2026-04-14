@@ -29,6 +29,48 @@ const STAVE_Y_PADDING = 30
 // Множитель к минимальной ширине стана, чтобы ноты не лепились друг к другу
 const WIDTH_SCALE = 1.5
 
+/** Снимает старую подсветку и ставит .currentNote на элемент с нужным data-note-index */
+function highlightNoteInContainer(
+  container: HTMLElement | null,
+  noteIndex: number | undefined,
+  cssClass: string
+) {
+  if (!container) return
+  const prev = container.querySelectorAll(`.${cssClass}`)
+  prev.forEach(el => el.classList.remove(cssClass))
+  if (noteIndex === undefined) return
+
+  const target = container.querySelector(`[data-note-index="${noteIndex}"]`)
+  target?.classList.add(cssClass)
+}
+
+/**
+ * Для see-нотации: ищет ближайший data-note-index ≤ target
+ * (из-за collapseAccentPairs точного элемента может не быть)
+ */
+function highlightClosestNoteInContainer(
+  container: HTMLElement | null,
+  noteIndex: number | undefined,
+  cssClass: string
+) {
+  if (!container) return
+  const prev = container.querySelectorAll(`.${cssClass}`)
+  prev.forEach(el => el.classList.remove(cssClass))
+  if (noteIndex === undefined) return
+
+  const allNotes = container.querySelectorAll('[data-note-index]')
+  let best: Element | null = null
+  let bestIndex = -1
+  for (const el of allNotes) {
+    const idx = Number(el.getAttribute('data-note-index'))
+    if (idx <= noteIndex && idx > bestIndex) {
+      bestIndex = idx
+      best = el
+    }
+  }
+  best?.classList.add(cssClass)
+}
+
 function renderToContainer(
   container: HTMLDivElement,
   notation: NotationData,
@@ -100,50 +142,20 @@ export function useVexFlowRenderer({
     }
   }, [seeNotation, playNotation, matchWidth])
 
-  // Подсветка текущей ноты только в play-стане. Снимает класс со старой
-  // ноты и вешает на новую без повторного рендера всей нотации.
+  // Подсветка текущей ноты в play-стане
   useEffect(() => {
-    const container = playRef.current
-    if (!container) return
-
-    const prev = container.querySelectorAll(`.${classes.currentNote}`)
-    prev.forEach(el => el.classList.remove(classes.currentNote))
-
-    if (!isPlaying || currentRhythmIndex === undefined) return
-
-    const target = container.querySelector(
-      `[data-note-index="${currentRhythmIndex}"]`
-    )
-    target?.classList.add(classes.currentNote)
+    const idx = isPlaying ? currentRhythmIndex : undefined
+    highlightNoteInContainer(playRef.current, idx, classes.currentNote)
   }, [currentRhythmIndex, isPlaying, playNotation])
 
-  // Подсветка текущей позиции в see-стане.
-  // rhythmIndex из play маппится на accentIndex через rhythmToAccentIndex.
-  // Из-за collapseAccentPairs в see-нотации может не быть элемента
-  // с точным accentIndex — ищем ближайший data-note-index ≤ target.
+  // Подсветка текущей позиции в see-стане (маппинг через rhythmToAccentIndex,
+  // ищет ближайший data-note-index ≤ target из-за collapseAccentPairs)
   useEffect(() => {
-    const container = seeRef.current
-    if (!container) return
-
-    const prev = container.querySelectorAll(`.${classes.currentNote}`)
-    prev.forEach(el => el.classList.remove(classes.currentNote))
-
-    if (!isPlaying || currentRhythmIndex === undefined || !notesPerBeat) return
-
-    const accentIndex = rhythmToAccentIndex(currentRhythmIndex, notesPerBeat)
-    const allNotes = container.querySelectorAll('[data-note-index]')
-
-    let best: Element | null = null
-    let bestIndex = -1
-    for (const el of allNotes) {
-      const idx = Number(el.getAttribute('data-note-index'))
-      if (idx <= accentIndex && idx > bestIndex) {
-        bestIndex = idx
-        best = el
-      }
-    }
-
-    best?.classList.add(classes.currentNote)
+    const idx =
+      isPlaying && currentRhythmIndex !== undefined && notesPerBeat
+        ? rhythmToAccentIndex(currentRhythmIndex, notesPerBeat)
+        : undefined
+    highlightClosestNoteInContainer(seeRef.current, idx, classes.currentNote)
   }, [currentRhythmIndex, isPlaying, notesPerBeat, seeNotation])
 
   return { seeRef, playRef, playNotePositions }

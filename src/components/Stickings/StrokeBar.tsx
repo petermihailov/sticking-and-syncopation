@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import type { StrokeType } from '../../lib/player/StrokeResolver'
 import type { NotePositions } from '../../lib/notation'
-import { useBarAlignment } from './useBarAlignment'
+import { useBarHighlight } from './useBarHighlight'
 import classes from './StrokeBar.module.css'
 
 interface StrokeBarProps {
@@ -9,6 +9,7 @@ interface StrokeBarProps {
   flamStrokes?: (StrokeType | null)[]
   isSecondBar?: boolean
   currentIndex?: number
+  flamOffsetMs?: number
   notePositions?: NotePositions | null
 }
 
@@ -17,12 +18,19 @@ export function StrokeBar({
   flamStrokes,
   isSecondBar = false,
   currentIndex,
+  flamOffsetMs,
   notePositions,
 }: StrokeBarProps) {
-  const { containerStyle, aligned } = useBarAlignment(
-    strokes.length,
-    notePositions
-  )
+  const { containerStyle, aligned, cellsRef } = useBarHighlight({
+    itemCount: strokes.length,
+    notePositions,
+    currentIndex,
+    flamOffsetMs,
+    hasFlamAtCurrent:
+      currentIndex !== undefined && !!flamStrokes?.[currentIndex],
+    graceClass: classes.flamStroke,
+    mainClass: classes.stroke,
+  })
 
   return (
     <div
@@ -32,19 +40,28 @@ export function StrokeBar({
       })}
       style={containerStyle}
     >
-      {strokes.map((stroke, index) => (
-        <div
-          className={clsx(classes.cell, {
-            [classes.current]: index === currentIndex,
-          })}
-          key={index}
-        >
-          {flamStrokes?.[index] && (
-            <span className={classes.flamStroke}>{flamStrokes[index]}</span>
-          )}
-          {stroke && <span className={classes.stroke}>{stroke}</span>}
-        </div>
-      ))}
+      {strokes.map((stroke, index) => {
+        const isCurrent = index === currentIndex
+        const isFlamCurrent = isCurrent && !!flamStrokes?.[index]
+
+        return (
+          <div
+            ref={el => {
+              cellsRef.current[index] = el
+            }}
+            className={clsx(classes.cell, {
+              [classes.current]: isCurrent && !isFlamCurrent,
+              [classes.flamActive]: isFlamCurrent,
+            })}
+            key={index}
+          >
+            {flamStrokes?.[index] && (
+              <span className={classes.flamStroke}>{flamStrokes[index]}</span>
+            )}
+            {stroke && <span className={classes.stroke}>{stroke}</span>}
+          </div>
+        )
+      })}
     </div>
   )
 }

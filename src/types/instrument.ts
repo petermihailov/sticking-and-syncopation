@@ -38,4 +38,6 @@ export interface Beat {
   barIndex: number
   rhythmIndex: number
   instruments: Instrument[]
+  /** Миллисекунды между grace note и основным ударом (только для флэмов) */
+  flamOffsetMs?: number
 }

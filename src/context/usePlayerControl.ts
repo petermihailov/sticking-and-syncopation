@@ -4,6 +4,7 @@ import type { DrumKit } from '../types/kit'
 interface Beat {
   barIndex: number
   rhythmIndex: number
+  flamOffsetMs?: number
 }
 
 export interface PlayerControlContextValue {

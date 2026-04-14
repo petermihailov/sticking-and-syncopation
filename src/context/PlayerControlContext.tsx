@@ -63,7 +63,11 @@ export function PlayerControlProvider({
   useEffect(() => {
     const player = new Player()
     player.setOnBeat(beat => {
-      setCurrentBeat({ barIndex: beat.barIndex, rhythmIndex: beat.rhythmIndex })
+      setCurrentBeat({
+        barIndex: beat.barIndex,
+        rhythmIndex: beat.rhythmIndex,
+        flamOffsetMs: beat.flamOffsetMs,
+      })
       setInstrumentCounters(player.getInstrumentCounters())
     })
     playerRef.current = player

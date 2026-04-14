@@ -28,8 +28,15 @@
   transition: none;
 }
 
+/* Флэм-ячейка: z-index без scale (scale управляет Web Animations API) */
+.cell.flamActive {
+  z-index: 2;
+  font-weight: bold;
+}
+
 .stroke {
-  /* Основной stroke по центру ячейки */
+  /* inline-block нужен чтобы transform (Web Animations API) работал */
+  display: inline-block;
 }
 
 .flamStroke {

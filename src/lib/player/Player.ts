@@ -178,6 +178,9 @@ export class Player {
       barIndex: safeBarIndex,
       rhythmIndex: safeRhythmIndex,
       instruments: voices.map(v => v.instrument),
+      flamOffsetMs: currentBar?.flams?.[safeRhythmIndex]
+        ? flamOffset * 1000
+        : undefined,
     })
 
     // Сдвигаем горизонт на следующий шаг.
