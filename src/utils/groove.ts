@@ -6,6 +6,7 @@ import {
   EMPTY_RESOLVER_STATE,
   resolveStroke,
 } from '../lib/player/StickingResolver'
+import { resolveStrokes } from '../lib/player/StrokeResolver'
 import type { Sticking, Meter } from '../types'
 
 const DEFAULT_METER: Meter = { beatsPerBar: 4, noteValue: 4, notesPerBeat: 4 }
@@ -42,7 +43,8 @@ export function stickingToBar(
   stickings: Sticking[],
   mapping: StickingMapping = DEFAULT_STICKING_MAPPING,
   meter: Meter = DEFAULT_METER,
-  flams?: boolean[]
+  flams?: boolean[],
+  loop: boolean = true
 ): Bar {
   const rhythm: InstrumentVoice[][] = []
   const stickingSymbols: Sticking[] = []
@@ -74,6 +76,7 @@ export function stickingToBar(
     stickings: stickingSymbols,
     hands,
     flams,
+    strokes: resolveStrokes(stickings, loop),
     beatsPerBar: meter.beatsPerBar,
     noteValue: meter.noteValue,
     timeDivision: meter.notesPerBeat,
@@ -84,10 +87,11 @@ export function stickingsToBars(
   stickingPatterns: Sticking[][],
   mapping?: StickingMapping,
   meter?: Meter,
-  flams?: boolean[][]
+  flams?: boolean[][],
+  loop: boolean = true
 ): Bar[] {
   return stickingPatterns.map((pattern, i) =>
-    stickingToBar(pattern, mapping, meter, flams?.[i])
+    stickingToBar(pattern, mapping, meter, flams?.[i], loop)
   )
 }
 

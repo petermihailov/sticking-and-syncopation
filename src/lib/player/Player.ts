@@ -1,4 +1,4 @@
-import { TEMPO, FLAM } from '../../config/constants'
+import { TEMPO, FLAM, getFlamOffset } from '../../config/constants'
 import type { Beat, Group } from '../../types/instrument'
 import type { Bar } from '../../types/bar'
 import type { DrumKit } from '../../types/kit'
@@ -104,19 +104,13 @@ export class Player {
     // Если первый удар с флэмом — сдвигаем старт, чтобы grace note успел прозвучать
     const firstBar = bars[0]
     if (firstBar?.flams?.[0]) {
-      const flamOffset = Math.max(
-        FLAM.OFFSET_MIN,
-        Math.min(
-          FLAM.OFFSET_MAX,
-          (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER
-        )
-      )
-      this.nextBeatAt += flamOffset
+      const offset = getFlamOffset(this.state.tempo)
+      this.nextBeatAt += offset
       const flamVoices = this.resolveFlamGrace(firstBar, 0).map(v => ({
         ...v,
         gain: (v.gain ?? 1.0) * FLAM.GAIN_MULTIPLIER,
       }))
-      this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
+      this.playVoicesAt(flamVoices, this.nextBeatAt - offset)
     }
 
     this.tickAt(0, 0)
@@ -167,6 +161,16 @@ export class Player {
       )
     }
 
+    // Флэм: если текущий удар с флэмом — планируем grace note.
+    // Tick просыпается на OFFSET раньше, поэтому обе ноты ещё в будущем.
+    const flamOffset = getFlamOffset(this.state.tempo)
+    if (currentBar?.flams?.[safeRhythmIndex]) {
+      const flamVoices = this.resolveFlamGrace(currentBar, safeRhythmIndex).map(
+        v => ({ ...v, gain: (v.gain ?? 1.0) * FLAM.GAIN_MULTIPLIER })
+      )
+      this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
+    }
+
     const voices = this.resolveVoices(currentBar, safeRhythmIndex)
     this.playVoicesAt(voices, this.nextBeatAt)
 
@@ -186,24 +190,15 @@ export class Player {
         ? (safeBarIndex + 1) % bars.length
         : safeBarIndex
 
-    // Флэм: смотрим, есть ли флэм на СЛЕДУЮЩЕМ ударе.
-    // Планируем grace note заранее — пока nextBeatAt ещё в будущем.
+    // Если следующий удар с флэмом — просыпаемся на OFFSET раньше,
+    // чтобы grace note успел запланироваться в будущем Web Audio.
     const nextBar = bars[nextBarIndex]
-    if (nextBar?.flams?.[nextRhythmIndex]) {
-      const flamVoices = this.resolveFlamGrace(nextBar, nextRhythmIndex).map(
-        v => ({ ...v, gain: (v.gain ?? 1.0) * FLAM.GAIN_MULTIPLIER })
-      )
-      const flamOffset = Math.max(
-        FLAM.OFFSET_MIN,
-        Math.min(
-          FLAM.OFFSET_MAX,
-          (60 / this.state.tempo) * FLAM.OFFSET_TEMPO_MULTIPLIER
-        )
-      )
-      this.playVoicesAt(flamVoices, this.nextBeatAt - flamOffset)
-    }
+    const hasNextFlam = nextBar?.flams?.[nextRhythmIndex]
+    const wakeUpAt = hasNextFlam
+      ? this.nextBeatAt - flamOffset
+      : this.nextBeatAt
 
-    const delay = (this.nextBeatAt - this.audioEngine.getCurrentTime()) * 1000
+    const delay = (wakeUpAt - this.audioEngine.getCurrentTime()) * 1000
     this.timeoutId = window.setTimeout(
       () => this.tickAt(nextBarIndex, nextRhythmIndex),
       Math.max(0, delay)

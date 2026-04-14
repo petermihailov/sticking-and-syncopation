@@ -450,7 +450,7 @@ describe('decodeStateFromUrl', () => {
 
   it('should ignore out of range tempo', () => {
     const params = new URLSearchParams(
-      'a=00&r=16th-paradiddle-single-accent&t=300'
+      'a=00&r=16th-paradiddle-single-accent&t=301'
     )
     const result = decodeStateFromUrl(params)
     expect(result.tempo).toBeUndefined()

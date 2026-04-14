@@ -126,3 +126,19 @@
 .label.current.a.l::before {
   background-color: var(--color-l);
 }
+
+.stroke {
+  position: absolute;
+  bottom: -1.2em;
+  font-size: 0.7em;
+  font-weight: 400;
+  color: #666;
+  text-transform: none;
+}
+
+.strokeFlam {
+  inset-inline-start: calc(50% - 1.2rem);
+  text-align: end;
+  inline-size: 0.8rem;
+  padding-inline-end: 0.1rem;
+}

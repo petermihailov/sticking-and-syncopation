@@ -1,5 +1,6 @@
 import type { Hand, Instrument } from './instrument'
 import type { InstrumentVoice } from './sticking'
+import type { StrokeType } from '../lib/player/StrokeResolver'
 
 // Такт в формате готовом для воспроизведения.
 // rhythm[i] — список voices, играющихся одновременно на субдивизии i.
@@ -13,6 +14,8 @@ export interface Bar {
   hands?: Hand[]
   // Флэм перед нотой на каждой субдивизии, опционально.
   flams?: boolean[]
+  // Тип удара по Мёллеру (F/D/u/t) на каждой субдивизии, опционально.
+  strokes?: (StrokeType | null)[]
   beatsPerBar: number
   noteValue: number
   timeDivision: number

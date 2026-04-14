@@ -2,10 +2,13 @@ import type { CSSProperties } from 'react'
 import clsx from 'clsx'
 import classes from './Bar.module.css'
 import type { Sticking } from '../../../types'
+import type { StrokeType } from '../../../lib/player/StrokeResolver'
 import type { NotePositions } from '../../../lib/notation'
 
 interface StickingBarProps {
   labels: Sticking[]
+  strokes?: (StrokeType | null)[]
+  flamStrokes?: (StrokeType | null)[]
   flams?: boolean[]
   isSecondBar?: boolean
   className?: string
@@ -15,6 +18,8 @@ interface StickingBarProps {
 
 export function Bar({
   labels,
+  strokes,
+  flamStrokes,
   flams,
   isSecondBar = false,
   className,
@@ -84,6 +89,14 @@ export function Bar({
               </span>
             )}
             {label === ' ' ? '—' : label}
+            {flamStrokes?.[index] && (
+              <span className={clsx(classes.stroke, classes.strokeFlam)}>
+                {flamStrokes[index]}
+              </span>
+            )}
+            {strokes?.[index] && (
+              <span className={classes.stroke}>{strokes[index]}</span>
+            )}
           </div>
         )
       })}
