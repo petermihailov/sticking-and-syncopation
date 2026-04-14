@@ -29,6 +29,7 @@ interface LayerVisibility {
   playNotation: boolean
   stickings: boolean
   strokes: boolean
+  highlight: boolean
 }
 
 const LAYER_LABELS: Record<keyof LayerVisibility, string> = {
@@ -37,6 +38,7 @@ const LAYER_LABELS: Record<keyof LayerVisibility, string> = {
   playNotation: 'Playback notation',
   stickings: 'Stickings',
   strokes: 'Strokes',
+  highlight: 'Highlight',
 }
 
 const LAYERS_STORAGE_KEY = 'layerVisibility'
@@ -47,6 +49,7 @@ const DEFAULT_LAYERS: LayerVisibility = {
   playNotation: true,
   stickings: false,
   strokes: false,
+  highlight: true,
 }
 
 function loadLayers(): LayerVisibility {
@@ -137,7 +140,9 @@ function AppContent() {
         <VexFlowNotation
           seeNotation={seeNotation}
           playNotation={playNotation}
-          currentRhythmIndex={currentBeat.rhythmIndex}
+          currentRhythmIndex={
+            layers.highlight ? currentBeat.rhythmIndex : undefined
+          }
           isPlaying={isPlaying}
           notesPerBeat={meter.notesPerBeat}
           showSeeNotation={layers.seeNotation}
@@ -148,7 +153,9 @@ function AppContent() {
             <StickingsContainer
               bars={convertResult.bars}
               flams={convertResult.flams}
-              currentBeat={isPlaying ? currentBeat : undefined}
+              currentBeat={
+                isPlaying && layers.highlight ? currentBeat : undefined
+              }
               showStickings={layers.stickings}
               showStrokes={layers.strokes}
             />
