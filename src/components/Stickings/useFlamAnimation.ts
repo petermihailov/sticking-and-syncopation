@@ -10,15 +10,19 @@ interface FlamAnimationTarget {
 
 import { ANIMATE_TRANSITIONS } from './animationConfig'
 
-/** Длительность анимации выхода (ms) — совпадает с CSS transition обычных ячеек */
+/** Длительность короткого «пульса» grace-ноты (ms) */
+const PULSE_DURATION = 80
+/** Длительность плавного уменьшения основной буквы при уходе (ms) */
 const EXIT_DURATION = ANIMATE_TRANSITIONS ? 150 : 0
 
 /**
  * Хук для анимации флэмов через Web Animations API.
  *
- * Поведение аналогично обычным стикингам:
- * - вход: мгновенный scale (grace сразу, main с задержкой flamOffsetMs)
- * - выход: плавный scale(1.5) → scale(1) за 150ms ease-out
+ * Поведение:
+ * - grace (флэм): короткий пульс scale(1) → scale(1.5) → scale(1).
+ *   При выключенных анимациях — мгновенный подскок и возврат.
+ * - основная буква: масштаб до 1.5 с задержкой flamOffsetMs (синхронно с аудио)
+ *   и удержание до следующего бита, где она плавно возвращается к scale(1).
  */
 export function useFlamAnimation(
   currentIndex: number | undefined,
@@ -36,15 +40,9 @@ export function useFlamAnimation(
     const prevIndex = prevIndexRef.current
     prevIndexRef.current = currentIndex
 
-    // Анимация выхода для предыдущего бита
+    // Плавный уход основной буквы предыдущего флэм-бита
     if (prevIndex !== undefined) {
       const prev = getTarget(prevIndex)
-      if (prev.grace) {
-        prev.grace.animate(
-          [{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }],
-          { duration: EXIT_DURATION, easing: 'ease-out' }
-        )
-      }
       if (prev.main) {
         prev.main.animate(
           [{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }],
@@ -58,16 +56,29 @@ export function useFlamAnimation(
     const { grace, main } = getTarget(currentIndex)
     const animations: Animation[] = []
 
-    // Grace note — мгновенный масштаб (duration: 1ms, fill: forwards)
+    // Grace-нота — короткий пульс. При выключенных анимациях — мгновенный
+    // скачок до scale(1.5) и обратно через PULSE_DURATION (без сглаживания).
     if (grace) {
-      const a = grace.animate([{ transform: 'scale(1.5)' }], {
-        duration: 1,
-        fill: 'forwards',
-      })
+      const a = ANIMATE_TRANSITIONS
+        ? grace.animate(
+            [
+              { transform: 'scale(1)' },
+              { transform: 'scale(1.5)' },
+              { transform: 'scale(1)' },
+            ],
+            { duration: PULSE_DURATION, easing: 'ease-out' }
+          )
+        : grace.animate(
+            [
+              { transform: 'scale(1.5)', offset: 0 },
+              { transform: 'scale(1)', offset: 1 },
+            ],
+            { duration: PULSE_DURATION, easing: 'step-end' }
+          )
       animations.push(a)
     }
 
-    // Основная нота — мгновенный масштаб с задержкой, совпадающей с аудио
+    // Основная буква — масштаб с задержкой, удерживается до ухода
     if (main) {
       const a = main.animate([{ transform: 'scale(1.5)' }], {
         duration: 1,
