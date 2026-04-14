@@ -1,0 +1,10 @@
+.stickings {
+  display: grid;
+  grid-template-rows: repeat(2, auto);
+}
+
+.barGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

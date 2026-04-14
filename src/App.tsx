@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Lessons } from './components/Lessons'
 import { RudimentSelector } from './components/RudimentSelector'
 import { AccentPattern } from './components/AccentPattern'
 import { VexFlowNotation } from './components/VexFlowNotation'
-import { Stickings } from './components/Stickings'
+import { StickingsContainer } from './components/Stickings'
 import { AudioPlayer } from './components/AudioPlayer'
 import { OrchestrationSection } from './components/OrchestrationSection'
 import { LeadingHandToggle } from './components/LeadingHandToggle'
@@ -19,6 +19,7 @@ import {
   DEFAULT_STICKING_MAPPING,
   type StickingMapping,
 } from './types/sticking'
+import { LocalStorageManager } from './utils/localStorage'
 import classes from './App.module.css'
 
 interface LayerVisibility {
@@ -26,29 +27,46 @@ interface LayerVisibility {
   seeNotation: boolean
   playNotation: boolean
   stickings: boolean
+  strokes: boolean
 }
 
 const LAYER_LABELS: Record<keyof LayerVisibility, string> = {
-  accents: 'Акценты',
-  seeNotation: 'Нотация',
-  playNotation: 'Нотация воспроизведения',
-  stickings: 'Стикинги',
+  accents: 'Accents',
+  seeNotation: 'Notation',
+  playNotation: 'Playback notation',
+  stickings: 'Stickings',
+  strokes: 'Strokes',
+}
+
+const LAYERS_STORAGE_KEY = 'layerVisibility'
+
+const DEFAULT_LAYERS: LayerVisibility = {
+  accents: false,
+  seeNotation: true,
+  playNotation: true,
+  stickings: false,
+  strokes: false,
+}
+
+function loadLayers(): LayerVisibility {
+  const saved =
+    LocalStorageManager.getItem<Partial<LayerVisibility>>(LAYERS_STORAGE_KEY)
+  return saved ? { ...DEFAULT_LAYERS, ...saved } : DEFAULT_LAYERS
 }
 
 function AppContent() {
   const { state, actions } = useAppState()
   const { currentBeat, instrumentCounters, isPlaying } = usePlayerControl()
 
-  const [layers, setLayers] = useState<LayerVisibility>({
-    accents: true,
-    seeNotation: true,
-    playNotation: true,
-    stickings: true,
-  })
+  const [layers, setLayers] = useState<LayerVisibility>(loadLayers)
 
-  const toggleLayer = (key: keyof LayerVisibility) => {
+  useEffect(() => {
+    LocalStorageManager.setItem(LAYERS_STORAGE_KEY, layers)
+  }, [layers])
+
+  const toggleLayer = useCallback((key: keyof LayerVisibility) => {
     setLayers(prev => ({ ...prev, [key]: !prev[key] }))
-  }
+  }, [])
 
   const { convertResult, seeNotation, playNotation, meter } = useNotation()
 
@@ -112,11 +130,13 @@ function AppContent() {
           showPlayNotation={layers.playNotation}
           matchWidth
         >
-          {hasStickings && layers.stickings && (
-            <Stickings
+          {hasStickings && (layers.stickings || layers.strokes) && (
+            <StickingsContainer
               bars={convertResult.bars}
               flams={convertResult.flams}
               currentBeat={isPlaying ? currentBeat : undefined}
+              showStickings={layers.stickings}
+              showStrokes={layers.strokes}
             />
           )}
         </VexFlowNotation>

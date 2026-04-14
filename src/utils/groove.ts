@@ -6,7 +6,7 @@ import {
   EMPTY_RESOLVER_STATE,
   resolveStroke,
 } from '../lib/player/StickingResolver'
-import { resolveStrokes } from '../lib/player/StrokeResolver'
+import { resolveAllStrokes } from '../lib/player/StrokeResolver'
 import type { Sticking, Meter } from '../types'
 
 const DEFAULT_METER: Meter = { beatsPerBar: 4, noteValue: 4, notesPerBeat: 4 }
@@ -76,7 +76,7 @@ export function stickingToBar(
     stickings: stickingSymbols,
     hands,
     flams,
-    strokes: resolveStrokes(stickings, loop),
+    strokes: resolveAllStrokes({ stickings, flams, loop }).strokes,
     beatsPerBar: meter.beatsPerBar,
     noteValue: meter.noteValue,
     timeDivision: meter.notesPerBeat,

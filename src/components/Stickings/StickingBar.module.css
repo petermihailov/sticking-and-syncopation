@@ -1,4 +1,4 @@
-.labels {
+.bar {
   --color-r: hsl(0 100% 92% / 1);
   --color-r-active: hsl(0 100% 88% / 1);
 
@@ -14,11 +14,11 @@
 }
 
 /* Режим выравнивания по нотам VexFlow — margin-left и width задаются inline */
-.labels.aligned {
+.bar.aligned {
   margin-right: 0;
 }
 
-.label {
+.cell {
   position: relative;
   flex: 1;
   height: 100%;
@@ -29,36 +29,36 @@
   transition: transform 150ms ease-out;
 }
 
-.label:first-child {
+.cell:first-child {
   margin-left: 0;
 }
 
-.label.r {
+.cell.r {
   background-color: var(--color-r);
 }
 
-.label.r.a {
+.cell.r.a {
   background-color: var(--color-r-active);
 }
 
-.label.l {
+.cell.l {
   background-color: var(--color-l);
 }
 
-.label.l.a {
+.cell.l.a {
   background-color: var(--color-l-active);
 }
 
-.label.k {
+.cell.k {
   background-color: #0df4;
   border-bottom: 1px dashed #0df4;
 }
 
-.label.a {
+.cell.a {
   font-weight: 700;
 }
 
-.label.a::before {
+.cell.a::before {
   content: '';
   position: absolute;
   bottom: -35%;
@@ -69,7 +69,7 @@
   transition: transform 0.3s ease-out;
 }
 
-.label.a::after {
+.cell.a::after {
   content: '>';
   position: absolute;
   font-weight: 600;
@@ -97,48 +97,32 @@
   background-color: var(--color-l);
 }
 
-.label.pause {
+.cell.pause {
   background-color: #8882;
   opacity: 0.5;
   color: #666;
 }
 
-.label.current {
+.cell.current {
   z-index: 1;
   transform: scale(1.5);
   transition: none;
 }
 
-.label.current.a {
+.cell.current.a {
   background-color: #0000;
 }
 
-.label.current.a::before {
+.cell.current.a::before {
   z-index: -1;
   transform: scale(1);
   transition: none;
 }
 
-.label.current.a.r::before {
+.cell.current.a.r::before {
   background-color: var(--color-r);
 }
 
-.label.current.a.l::before {
+.cell.current.a.l::before {
   background-color: var(--color-l);
-}
-
-.stroke {
-  position: absolute;
-  bottom: -1.2em;
-  font-size: 0.7em;
-  font-weight: 400;
-  color: #666;
-  text-transform: none;
-}
-
-.strokeFlam {
-  inset-inline-start: calc(50% - 1.2rem);
-  text-align: end;
-  inline-size: 0.8rem;
-  padding-inline-end: 0.1rem;
 }

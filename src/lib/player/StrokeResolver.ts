@@ -16,105 +16,103 @@ function isHand(s: string): boolean {
   return s === 'R' || s === 'r' || s === 'L' || s === 'l'
 }
 
+// Событие руки в unified-последовательности.
+interface HandEvent {
+  position: number // индекс в массиве stickings
+  accent: boolean // акцентированный удар?
+  isGrace: boolean // грейс-нота флэма?
+}
+
 /**
- * Определить stroke types для массива стикингов.
+ * Единый резолвер stroke types для основных нот и флэм-грейсов.
  *
- * Каждая рука обрабатывается независимо: тип удара зависит от
- * динамики текущей и следующей ноты той же руки.
- *
- * @param stickings — массив символов стикинга
- * @param loop — зациклен ли такт (последняя нота руки смотрит на первую)
+ * Строит полную последовательность событий каждой руки
+ * (грейс-ноты + основные ноты в хронологическом порядке)
+ * и определяет тип удара по таблице переходов Мёллера.
+ */
+export function resolveAllStrokes(opts: {
+  stickings: Sticking[]
+  flams?: boolean[]
+  loop: boolean
+}): { strokes: (StrokeType | null)[]; flamStrokes: (StrokeType | null)[] } {
+  const { stickings, flams, loop } = opts
+  const strokes: (StrokeType | null)[] = new Array(stickings.length).fill(null)
+  const flamStrokes: (StrokeType | null)[] = new Array(stickings.length).fill(
+    null
+  )
+
+  // Собираем события каждой руки в хронологическом порядке.
+  // Грейс-нота идёт ДО основной ноты на той же позиции.
+  const rightEvents: HandEvent[] = []
+  const leftEvents: HandEvent[] = []
+
+  for (let i = 0; i < stickings.length; i++) {
+    const s = stickings[i]
+
+    // Грейс флэма — гост противоположной рукой
+    if (flams?.[i] && isHand(s)) {
+      const graceIsRight = s === 'L' || s === 'l'
+      const event: HandEvent = { position: i, accent: false, isGrace: true }
+      if (graceIsRight) rightEvents.push(event)
+      else leftEvents.push(event)
+    }
+
+    // Основная нота
+    if (s === 'R' || s === 'r') {
+      rightEvents.push({ position: i, accent: isAccent(s), isGrace: false })
+    } else if (s === 'L' || s === 'l') {
+      leftEvents.push({ position: i, accent: isAccent(s), isGrace: false })
+    }
+  }
+
+  resolveHandEvents(rightEvents, loop, strokes, flamStrokes)
+  resolveHandEvents(leftEvents, loop, strokes, flamStrokes)
+
+  return { strokes, flamStrokes }
+}
+
+// Резолвим stroke types для событий одной руки.
+function resolveHandEvents(
+  events: HandEvent[],
+  loop: boolean,
+  strokes: (StrokeType | null)[],
+  flamStrokes: (StrokeType | null)[]
+): void {
+  if (events.length === 0) return
+
+  for (let i = 0; i < events.length; i++) {
+    const event = events[i]
+    const accent = event.accent
+
+    // Следующее событие той же руки
+    let nextAccent: boolean
+    if (i < events.length - 1) {
+      nextAccent = events[i + 1].accent
+    } else if (loop) {
+      nextAccent = events[0].accent
+    } else {
+      // Последнее событие без цикла — конечная позиция не важна
+      nextAccent = accent
+    }
+
+    const type = strokeType(accent, nextAccent)
+    if (event.isGrace) {
+      flamStrokes[event.position] = type
+    } else {
+      strokes[event.position] = type
+    }
+  }
+}
+
+/**
+ * Определить stroke types для массива стикингов (без учёта флэмов).
+ * Обёртка над resolveAllStrokes для обратной совместимости.
  */
 export function resolveStrokes(
   stickings: Sticking[],
   loop: boolean
 ): (StrokeType | null)[] {
-  const result: (StrokeType | null)[] = new Array(stickings.length).fill(null)
-
-  // Собираем индексы нот для каждой руки (R/r → 'R', L/l → 'L')
-  const rightIndices: number[] = []
-  const leftIndices: number[] = []
-
-  for (let i = 0; i < stickings.length; i++) {
-    const s = stickings[i]
-    if (s === 'R' || s === 'r') rightIndices.push(i)
-    else if (s === 'L' || s === 'l') leftIndices.push(i)
-  }
-
-  resolveHand(stickings, rightIndices, loop, result)
-  resolveHand(stickings, leftIndices, loop, result)
-
-  return result
-}
-
-// Определить stroke type для всех нот одной руки.
-function resolveHand(
-  stickings: Sticking[],
-  indices: number[],
-  loop: boolean,
-  result: (StrokeType | null)[]
-): void {
-  if (indices.length === 0) return
-
-  for (let i = 0; i < indices.length; i++) {
-    const current = stickings[indices[i]]
-    const accent = isAccent(current)
-
-    // Следующая нота той же руки
-    let nextAccent: boolean
-    if (i < indices.length - 1) {
-      nextAccent = isAccent(stickings[indices[i + 1]])
-    } else if (loop) {
-      // Зацикливание — смотрим на первую ноту руки
-      nextAccent = isAccent(stickings[indices[0]])
-    } else {
-      // Последняя нота без цикла — конечная позиция не важна
-      nextAccent = accent // F если акцент, t если гост
-    }
-
-    result[indices[i]] = strokeType(accent, nextAccent)
-  }
-}
-
-/**
- * Определить stroke types для флэм-грейс-нот.
- *
- * Флэм — всегда гост противоположной рукой, значит `u` или `t`.
- * Тип зависит от следующей ноты руки грейса.
- */
-export function resolveFlamStrokes(
-  stickings: Sticking[],
-  flams: boolean[],
-  loop: boolean
-): (StrokeType | null)[] {
-  const result: (StrokeType | null)[] = new Array(stickings.length).fill(null)
-
-  for (let i = 0; i < stickings.length; i++) {
-    if (!flams[i]) continue
-
-    const main = stickings[i]
-    if (!isHand(main)) continue
-
-    // Рука грейса — противоположная основному удару
-    const graceIsRight = main === 'L' || main === 'l'
-
-    // Ищем следующую ноту руки грейса
-    let nextAccent: boolean | null = null
-    for (let j = 1; j < stickings.length; j++) {
-      const idx = (i + j) % stickings.length
-      if (!loop && idx <= i) break
-      const s = stickings[idx]
-      if (graceIsRight ? s === 'R' || s === 'r' : s === 'L' || s === 'l') {
-        nextAccent = isAccent(s)
-        break
-      }
-    }
-
-    // Если нет следующей ноты — t (гост без продолжения)
-    result[i] = (nextAccent ?? false) ? 'u' : 't'
-  }
-
-  return result
+  return resolveAllStrokes({ stickings, loop }).strokes
 }
 
 // Таблица переходов Мёллера.
